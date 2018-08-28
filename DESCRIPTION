@@ -1,0 +1,14 @@
+Package: edgeFrequency
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Evan A Martin
+Maintainer: Evan A Martin <evanamartin@gmail.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+RoxygenNote: 6.0.1
+Suggests: testthat
