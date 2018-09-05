@@ -16,8 +16,8 @@
 cycleTB <- function (branches) {
 
   # A list to hold each trimmed branch. A trimmed branch contains only the nodes
-  # that appear in a cycle. The branches passed to this function contain nodes
-  # that are connected to the cycle but are not a part of the cycle.
+  # that appear in a cycle. The branches passed to this function may contain
+  # nodes that are connected to the cycle but are not part of the cycle.
   tBranches <- list()
 
   # The following loop will take each branch, starting at the leaf, and move
@@ -25,14 +25,16 @@ cycleTB <- function (branches) {
   # These nodes will form a cycle and they will be stored in tBranches.
   for (e in 1:dim(branches)[2]) {
 
-    # A vector to the nodes that form a cycle. They will be in reserse order
+    # A vector of the nodes that form a cycle. They will be in reserse order
     # from how they were listed in the branches matrix.
     branch <- c()
 
-    # Get the number of elements excluding NAs
+    # Get the number of nodes in the eth column of the branches matrix excluding
+    # any NAs.
     nNodes <- length(na.omit(branches[, e]))
 
-    # The leaf will be used to stop the repeat loop
+    # The leaf or last node in the eth column of the branches matrix will be
+    # used to stop the while loop.
     sNode <- branches[nNodes, e]
 
     # Add the leaf to the branch vector.

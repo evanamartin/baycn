@@ -1,14 +1,14 @@
 #' cycleBranches
 #'
-#' Turns the stem and leaf matrix returned by the cycleSL function into a list
+#' Turns the stem and leaf matrix returned by the cycleSaL function into a list
 #' of matrices. Each matrix contains all the cycles for each child of the root
 #' node.
 #'
-#' @param SaL A binary matrix with only the nodes and edges that could
-#' potentially form a cycle.
+#' @param SaL A binary matrix containing the nodes that could potentially form a
+#' directed cycle.
 #'
-#' @return A list of matrices that contain all the cycles for each child of the
-#' root node. The cycles are displayed across the columns of the matrices.
+#' @return A matrix that contains all the cycles for the current graph. The
+#' cycles are displayed down the columns of the matrix.
 #'
 #' @importFrom stats na.omit
 #'
@@ -16,16 +16,19 @@
 #'
 cycleBranches <- function (SaL) {
 
-  # start by getting the name of the root node
+  # Start by getting the name of the root node.
   root <- rownames(SaL)[1]
 
-  # vector of children of the root node.
+  # Create a vector of the children of the root node.
   rChildren <- names(SaL[1, SaL[1, ] == 1])
 
   # Create a list to hold the matrices of cycles. There will be one matrix for
   # each child of the root node.
   tree <- list()
 
+  # This for loop will go through each child of the root node and build a matrix
+  # that contains all of the nodes that could form a directed cycle down the
+  # columns of the matrix.
   for (e in 1:length(rChildren)) {
 
     # A matrix that holds the cycles of the eth child of the root node.
@@ -40,8 +43,8 @@ cycleBranches <- function (SaL) {
     tree[[e]][2, 1] <- rChildren[[e]]
 
     # Create a variable for the number of columns of the matrices in tree. This
-    # variable will be updated at the end of the following for loop to account
-    # for branches further down the tree.
+    # variable will be updated at the end of the following repeat loop to
+    # account for branches further down the tree.
     nCol <- ncol(tree[[e]])
 
     # An index to move across the columns of the tree[[e]] matrix
@@ -55,17 +58,22 @@ cycleBranches <- function (SaL) {
 
       if (v == 1) {
 
-        # Get the potential children of the eth child of the root node
+        # Get the potential children of the eth child of the root node. They are
+        # potential children because we will not keep all of the children of the
+        # current node. One of the child nodes will be the root node.
         pChildren <- names(SaL[tree[[e]][2, 1],
                                    SaL[tree[[e]][2, 1], ] == 1])
 
-        # Eliminate the children that are the same as the grandparent.
+        # Eliminate the root node from the children of the current node. This is
+        # done becuase it would lead to creating branches that bounced back and
+        # forth between two nodes.
         children <- pChildren[pChildren != tree[[e]][1, 1]]
 
         # If there is more than one child create additional columns to hold each
         # child and their descendants.
         if (length(children) > 1) {
 
+          # This for loop creates new rows in the tree matrix for each child.
           for (i in 1:length(children)) {
 
             # Copy the current column and add it to the end of the tree[[e]]
@@ -79,18 +87,20 @@ cycleBranches <- function (SaL) {
               # Add the children to their respective columns
               tree[[e]][3, i] <- children[[i]]
 
-              # This is run when i in the for loop that loops through the
-              # children of the current parent is not equal to one.
+              # This is run the first time through the for loop, i = 1, because
+              # the child node needs to be added to the first column of the
+              # matrix and not one of the columns added for the additional
+              # children of the current node.
             } else {
 
-              # Add the children to their respective columns
+              # Add the children to their respective columns.
               tree[[e]][3, i] <- children[[i]]
 
             }
 
           }
 
-          # This is run if the current parent only has one child.
+          # This is run if the current node only has one child.
         } else {
 
           # Add the child node to the row beneath the parent node.
@@ -104,8 +114,8 @@ cycleBranches <- function (SaL) {
         # appeared previously.
         nRow <- 3
 
-        # This runs when v is not equal to 1 (when it is not the first time
-        # through the repeat loo)
+        # This runs when v is not equal to 1, when it is not the first time
+        # through the repeat loop.
       } else {
 
         # Get the number of elements in the current column to start filling in
@@ -115,23 +125,25 @@ cycleBranches <- function (SaL) {
       }
 
       # Loops through the current column, v, of tree[[e]] and adds nodes until
-      # the loop comes to a node that it has added already.
+      # the loop comes to a node that has already been added.
       while (! tree[[e]][nRow, v] %in% tree[[e]][1:(nRow - 1), v]) {
 
         # Increase the row index by one.
         nRow <- nRow + 1
 
-        # potential children of the current parent
+        # Potential children of the current parent.
         pChildren <- names(SaL[tree[[e]][nRow - 1, v],
                                    SaL[tree[[e]][nRow - 1, v], ] == 1])
 
-        # Eliminate the children that are the same as the grandparent
+        # Eliminate the child that is the same as the grandparent.
         children <- pChildren[pChildren != tree[[e]][nRow - 2, v]]
 
         # If there is more than one child create additional columns to hold each
         # child and their descendants.
         if (length(children) > 1) {
 
+          # This for loop adds one column for each of the children after the
+          # first child.
           for (i in 1:length(children)) {
 
             # Copy the current column and add it to the end of the tree[[e]]

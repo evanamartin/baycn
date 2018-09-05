@@ -1,14 +1,14 @@
 #' cycleEN
 #'
-#' Gets the number of each edge in the DNA that could form a cycle.
+#' Extracts the edge number of each edge in the graph.
 #'
 #' @param adjMatrix The adjacency matrix of the graph.
 #'
 #' @param cCoord A list containing the coordinates in the adjacency matrix of
-#' the nodes that could form a cycle
+#' the nodes that could form a cycle.
 #'
 #' @return A list containing the edge numbers for the edges that could form a
-#' cycle for each cycle in the graph.
+#' directed cycle for each cycle in the graph.
 #'
 #' @export
 #'
@@ -24,16 +24,21 @@ cycleEN <- function (adjMatrix,
   # Stores the location of each edge for each cycle in the tBranches list
   edgeNum <- list()
 
-  # Create a for loop that loops through the position matrix for each element
-  # in the cycleCoor list. This loop will be within another loop that will
-  # create a new matrix of DNA position for each edge in each cycle.
-  # the for loop starts across the columns then moves down the rows.
+  # The first for loop loops through each of the cycles present in the graph.
   for (e in 1:length(cCoord)) {
 
+    # Create a list to store the edge number for each edge in the cycle.
     edgeNum[[e]] <- list()
 
+    # This for loop is the length of the current cycle, the number of edges in
+    # the cycle.
     for (v in 1:length(cCoord[[e]])) {
 
+      # This loops through all of the coordinates for each edge in the graph and
+      # compares the coordinates of the current edge from the cycle to the
+      # coordinates of each edge in the graph until it finds a match. When it
+      # finds a match it stores the column number in the coordinates matrix
+      # which is the edge number of the current edge in the graph.
       for (a in 1:dim(position)[2]) {
 
         if (setequal(position[, a], cCoord[[e]][[v]])) {

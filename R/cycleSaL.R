@@ -28,7 +28,7 @@ cycleSaL <- function (adjMatrix) {
   # If a graph with undirected edges is passed to the removeCycles function then
   # the row sums could be 2 or greater even if that node is not in a potential
   # cycle because the cell in the undirected matrix for those nodes will be a 2.
-  # To fix this problem we can change any 2 in the undirected matrix to a 1.
+  # To fix this problem we change any 2 in the undirected matrix to a 1.
   undirected[undirected == 2]  <- 1
 
   # Sum each row across all columns. The nodes that can potentially form a cycle
@@ -102,9 +102,9 @@ cycleSaL <- function (adjMatrix) {
                    MARGIN = 1,
                    FUN = sum)
 
-  # The following while lookp will continue to trim down the cycles matrix when
+  # The following while lookp will continue to trim down the SaL matrix when
   # there is a string of nodes that are connected to at least two nodes but none
-  # of the nodes make a cycle.
+  # of the nodes form a cycle.
   while (any(newSums <= 1)) {
 
     # Only keep the rows with a sum >= 2
