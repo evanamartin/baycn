@@ -27,11 +27,10 @@ cyclePrep <- function (adjMatrix) {
   # functions to remove them.
   branches <- cycleBranches(SaL)
   tBranches <- cycleTB(branches)
-  cCoord <- cycleCoord(tBranches)
-  edgeDir <- cycleED(tBranches)
+  ced <- cycleCED(tBranches)
   edgeNum <- cycleEN(adjMatrix,
-                     cCoord)
-  cycleDN <- decimal(edgeDir,
+                     ced$cCoord)
+  cycleDN <- decimal(ced$edgeDir,
                      edgeNum)
 
   # Keep only the unique values of the decimal numbers.

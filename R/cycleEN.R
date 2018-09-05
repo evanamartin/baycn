@@ -45,6 +45,9 @@ cycleEN <- function (adjMatrix,
 
           edgeNum[[e]][[v]] <- a
 
+          # Stop checking for the edge number once it is found.
+          break
+
         }
 
       }
