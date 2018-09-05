@@ -11,9 +11,10 @@ cycleED(tBranches)
 contain only the nodes that could form a cycle.}
 }
 \value{
-A list of DNA that creates a cycle.
+A list of edge directions that forms a directed cycle for each
+trimmed branch passed to the cycleED function.
 }
 \description{
 Takes the names of the nodes that could form a cycle and creates a vector of
-DNA that forms a cycle between the nodes.
+edge directions that form a directed cycle.
 }

@@ -7,13 +7,14 @@
 cycleCoord(tBranches)
 }
 \arguments{
-\item{tBranches}{A list of the nodes that could form a cycle.}
+\item{tBranches}{A list cycles. Each element in the list is a vector of nodes
+that could form a directed cycle.}
 }
 \value{
-A list of row column coordinates for each node that could form a
+A list of row and column coordinates for each edge in a directed
 cycle. The coordinates are to the adjacency matrix.
 }
 \description{
-Gets the coordinates in the adjacency matrix of the nodes that could form a
-cycle.
+Extracts the coordinates from the adjacency matrix of each edge that is part
+of a directed cycle.
 }

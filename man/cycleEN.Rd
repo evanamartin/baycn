@@ -10,12 +10,12 @@ cycleEN(adjMatrix, cCoord)
 \item{adjMatrix}{The adjacency matrix of the graph.}
 
 \item{cCoord}{A list containing the coordinates in the adjacency matrix of
-the nodes that could form a cycle}
+the nodes that could form a cycle.}
 }
 \value{
 A list containing the edge numbers for the edges that could form a
-cycle for each cycle in the graph.
+directed cycle for each cycle in the graph.
 }
 \description{
-Gets the number of each edge in the DNA that could form a cycle.
+Extracts the edge number of each edge in the graph.
 }

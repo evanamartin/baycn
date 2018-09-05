@@ -7,15 +7,15 @@
 cycleBranches(SaL)
 }
 \arguments{
-\item{SaL}{A binary matrix with only the nodes and edges that could
-potentially form a cycle.}
+\item{SaL}{A binary matrix containing the nodes that could potentially form a
+directed cycle.}
 }
 \value{
-A list of matrices that contain all the cycles for each child of the
-root node. The cycles are displayed across the columns of the matrices.
+A matrix that contains all the cycles for the current graph. The
+cycles are displayed down the columns of the matrix.
 }
 \description{
-Turns the stem and leaf matrix returned by the cycleSL function into a list
+Turns the stem and leaf matrix returned by the cycleSaL function into a list
 of matrices. Each matrix contains all the cycles for each child of the root
 node.
 }
