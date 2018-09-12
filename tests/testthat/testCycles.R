@@ -71,7 +71,9 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
 
   cp <- cyclePrep(adjMatrix)
 
-  expect_true(is.null(cp))
+  expect_true(is.null(cp$dnUnique))
+  expect_true(is.null(cp$edgeNum))
+  expect_true(is.null(cp$wCycle))
 
   # The adjacency matrix for topology NC8
   # T1 - T3 - T5 - T7
@@ -90,7 +92,9 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
 
   cp <- cyclePrep(adjMatrix)
 
-  expect_true(is.null(cp))
+  expect_true(is.null(cp$dnUnique))
+  expect_true(is.null(cp$edgeNum))
+  expect_true(is.null(cp$wCycle))
 
 })
 

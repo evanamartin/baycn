@@ -1,6 +1,7 @@
 #' rmCycle
 #'
-#' Changes the DNA of the individual until there are no cylces.
+#' Changes the edge direction of the current graph until there are no directed
+#' cylces.
 #'
 #' @param dnUnique A vector of unique decimal numbers for each potential cycle
 #' in the graph.

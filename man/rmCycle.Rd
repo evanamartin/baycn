@@ -27,5 +27,6 @@ in the graph. This argument is NULL if there are no cycles in the graph.}
 A vector of the DNA of the individual with the cycles removed.
 }
 \description{
-Changes the DNA of the individual until there are no cylces.
+Changes the edge direction of the current graph until there are no directed
+cylces.
 }

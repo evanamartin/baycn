@@ -19,7 +19,9 @@ cyclePrep <- function (adjMatrix) {
   # If there aren't any cycles return NULL.
   if (is.null(SaL)) {
 
-    return (NULL)
+    return (list(dnUnique = NULL,
+                 edgeNum = NULL,
+                 wCycle = NULL))
 
   }
 

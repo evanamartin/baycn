@@ -4,7 +4,7 @@
 \alias{MHEdge}
 \title{MHEdge}
 \usage{
-MHEdge(adjMatrix, data, iterations, mutationRate, prior = c(0.33, 0.33, 0.33),
+MHEdge(adjMatrix, data, iterations, mutationRate, prior = c(0.05, 0.05, 0.9),
   scoreFun)
 }
 \arguments{
@@ -13,13 +13,13 @@ adjacency matrix is a matrix of zeros and ones. The ones represent an edge
 and also indicates the direction of that edge.}
 
 \item{data}{A matrix with the nodes across the columns and the observations
-along the rows.}
+down the rows.}
 
 \item{iterations}{An integer for the number of iterations to run the MH
 algorithm.}
 
 \item{mutationRate}{A number between 0 and 1. As a rule of thumb the mutation
-rate should be 1 / length of the DNA.}
+rate should be 1 / (number of edges in the graph).}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
@@ -28,8 +28,8 @@ direction.}
 calculating the fitness.}
 }
 \value{
-A matrix where the first m columns are the DNA and the m + 1 column
-is the log likelihood. Each row represents one individual.
+A matrix where the first m columns are the edge directions and the
+m + 1 column is the log likelihood. Each row represents one graph.
 }
 \description{
 MHEdge
