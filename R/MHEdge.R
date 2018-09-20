@@ -13,6 +13,8 @@
 #' @param mutationRate A number between 0 and 1. As a rule of thumb the mutation
 #' rate should be 1 / (number of edges in the graph).
 #'
+#' @param nGV The number of genetic variants in the graph.
+#'
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
 #'
@@ -28,6 +30,7 @@ MHEdge <- function (adjMatrix,
                     data,
                     iterations,
                     mutationRate,
+                    nGV,
                     prior = c(0.05,
                               0.05,
                               0.9),
@@ -44,6 +47,10 @@ MHEdge <- function (adjMatrix,
   # Get the number of edges in the graph.
   nEdges <- dim(coord)[2]
 
+  # Get the number of nodes in the graph. This will be used in for loops
+  # throughout the function.
+  nNodes <- ncol(adjMatrix)
+
   # Create the length of the individual which is the number of edges plus the
   # fitness of the individual.
   m <- nEdges + 1
@@ -59,8 +66,8 @@ MHEdge <- function (adjMatrix,
                   replace = TRUE,
                   prob = prior)
 
-  # Check the output of the cyclePrep function if there aren't any cycles run
-  # the populate function as normal.
+  # Check the output of the cyclePrep function. If there are cycles in the graph
+  # run the rmCycle function to remove any directed cycles.
   if (!is.null(cp$dnUnique)) {
 
     # Remove any directed cycles in the graph.
@@ -73,9 +80,11 @@ MHEdge <- function (adjMatrix,
   }
 
   # Calculate the log likelihood for the strating graph given the data.
-  graph[[nEdges + 1]] <- cllEdge(individual = graph,
-                                 coordinates = coord,
+  graph[[nEdges + 1]] <- cllEdge(coordinates = coord,
                                  data = data,
+                                 individual = graph,
+                                 nGV = nGV,
+                                 nNodes = nNodes,
                                  scoreFun = scoreFun)
 
   # Run through the iterations of the Metropolis Hastings algorithm.
@@ -83,16 +92,18 @@ MHEdge <- function (adjMatrix,
 
     # Mutate the graph at each iteration. A new graph is proposed and accepted
     # or rejected within the mutate function.
-    graph <- mutate(individual = graph,
-                    m = m,
-                    mutationRate = mutationRate,
-                    coordinates = coord,
+    graph <- mutate(coordinates = coord,
                     data = data,
-                    prior = prior,
                     dnUnique = cp$dnUnique,
                     edgeNum = cp$edgeNum,
-                    wCycle = cp$wCycle,
-                    scoreFun = scoreFun)
+                    individual = graph,
+                    m = m,
+                    mutationRate = mutationRate,
+                    nGV = nGV,
+                    nNodes = nNodes,
+                    prior = prior,
+                    scoreFun = scoreFun,
+                    wCycle = cp$wCycle)
 
     # A matrix to hold the accepted graph at each iteration.
     mcGraph[e, ] <- graph

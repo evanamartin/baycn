@@ -4,8 +4,8 @@
 \alias{mutate}
 \title{mutate}
 \usage{
-mutate(coordinates, data, dnUnique, edgeNum, individual, m, mutationRate, prior,
-  scoreFun, wCycle)
+mutate(coordinates, data, dnUnique, edgeNum, individual, m, mutationRate, nGV,
+  nNodes, prior, scoreFun, wCycle)
 }
 \arguments{
 \item{coordinates}{A matrix of the row and column numbers of the nonzero
@@ -31,6 +31,10 @@ the graph and the fitness of the graph.}
 
 \item{mutationRate}{A number between 0 and 1. As a rule of thumb the mutation
 rate should be 1 / length of the DNA.}
+
+\item{nGV}{The number of genetic variants in the graph.}
+
+\item{nNodes}{The number of nodes in the graph.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}

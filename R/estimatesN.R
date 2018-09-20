@@ -1,7 +1,7 @@
-#' estimates
+#' estimatesN
 #'
 #' Calculates the estimates of the mean and standard deviation for the current
-#' node. If the current node doesn't have any parent then the mean and standard
+#' node. If the current node doesn't have any parents then the mean and standard
 #' deviation are simply calculated from the data. If the current node has at
 #' least one parent the mean is estimated by a linear model with the current
 #' node as the independent variable and parent nodes as independent variables.
@@ -27,10 +27,11 @@
 #'
 #' @export
 #'
-estimates <- function (adjMatrix,
-                       node,
-                       data) {
+estimatesN <- function (adjMatrix,
+                        data,
+                        node) {
 
+  # Get the number of parents for the current node.
   nParents <- sum(adjMatrix[, node])
 
   if (nParents == 0) {
@@ -43,7 +44,9 @@ estimates <- function (adjMatrix,
 
     estimates[[2]] <- sd(data[, node])
 
-    parentData <- data.frame(y = data[, node])
+    # parentData is part of the returned list and must be assigned a value even if
+    # it won't be used in any calculations.
+    parentData <- NULL
 
   } else {
 
@@ -59,8 +62,10 @@ estimates <- function (adjMatrix,
     lmSummary <- summary(lm(y ~ .,
                             data = parentData))
 
+    # Extract the coefficients of the linear model.
     estimates <- as.vector(lmSummary$coefficients[, 1])
 
+    # Add the standard deviation to the beta coefficients.
     estimates <- append(estimates, lmSummary$sigma)
 
   }

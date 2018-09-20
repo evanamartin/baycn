@@ -27,6 +27,10 @@
 #' @param mutationRate A number between 0 and 1. As a rule of thumb the mutation
 #' rate should be 1 / length of the DNA.
 #'
+#' @param nGV The number of genetic variants in the graph.
+#'
+#' @param nNodes The number of nodes in the graph.
+#'
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
 #'
@@ -50,6 +54,8 @@ mutate <- function (coordinates,
                     individual,
                     m,
                     mutationRate,
+                    nGV,
+                    nNodes,
                     prior,
                     scoreFun,
                     wCycle) {
@@ -128,9 +134,11 @@ mutate <- function (coordinates,
     # calculate the fitness then return the new individual if the likelihood
     # is higher. If the likelihood is lower return the new individual with
     # probability of new likelihood / old likelihood.
-    newIndividual[[m]] <- cllEdge(individual = newIndividual,
-                                  coordinates = coordinates,
+    newIndividual[[m]] <- cllEdge(coordinates = coordinates,
                                   data = data,
+                                  individual = newIndividual,
+                                  nGV = nGV,
+                                  nNodes = nNodes,
                                   scoreFun = scoreFun)
 
     # Determine whether to keep the original individual, individual, or the
@@ -150,9 +158,11 @@ mutate <- function (coordinates,
     # calculate the fitness then return the new individual if the likelihood is
     # higher. If the likelihood is lower return the new individual with
     # probability of new likelihood / old likelihood.
-    newIndividual[[m]] <- cllEdge(individual = newIndividual,
-                                  coordinates = coordinates,
+    newIndividual[[m]] <- cllEdge(coordinates = coordinates,
                                   data = data,
+                                  individual = newIndividual,
+                                  nGV = nGV,
+                                  nNodes = nNodes,
                                   scoreFun = scoreFun)
 
     # Determine whether to keep the original individual, individual, or the new

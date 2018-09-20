@@ -10,7 +10,11 @@
 #' @param data A matrix with the nodes across the columns and the observations
 #' along the rows.
 #'
-#' @param individual The DNA of the current individual.
+#' @param individual The edge directions of the current graph.
+#'
+#' @param nGV The number of genetic variants in the graph.
+#'
+#' @param nNodes The number of nodes in the graph.
 #'
 #' @param scoreFun A character string indicating what method to use for
 #' calculating the fitness.
@@ -22,66 +26,37 @@
 #'
 #' @export
 #'
-cllEdge <- function (individual,
-                     coordinates,
+cllEdge <- function (coordinates,
                      data,
+                     individual,
+                     nGV,
+                     nNodes,
                      scoreFun) {
 
   # Convert the DNA of the current individual to an adjacency matrix
-  adjMatrix <- toAdjMatrix(individual = individual,
-                           coordinates = coordinates,
+  adjMatrix <- toAdjMatrix(coordinates = coordinates,
+                           individual = individual,
                            nNodes = ncol(data))
 
-  # empty vector to hold the log likelihood for each node in the graph
-  logLikelihood <- c()
+  # Calculate the log likelihood for the genetic variant nodes.
+  cllM <- cllMultinom(adjMatrix = adjMatrix,
+                      data = data,
+                      nGV = nGV,
+                      nNodes = nNodes)
 
-  # Hold the number of parents per node. This will be used for calculating the
-  # BIC if it is chosen as the fitness measure.
-  k <- c()
-
-  # Number of nodes in the graph. This will be used in for loops throughout the
-  # function.
-  nNodes <- ncol(adjMatrix)
-
-  for (e in 1:nNodes) {
-
-    # Get the number of parents, estimates for the mean and standard
-    # deviation of the current node, and the data of the parent nodes
-    ep <- estimates(adjMatrix = adjMatrix,
-                    node = e,
-                    data = data)
-
-    k[[e]] <- ep$nParents
-
-    if (ep$nParents == 0) {
-
-      ll <- sum(dnorm(x = data[, e],
-                      mean = ep$estimates[[1]],
-                      sd = ep$estimates[[2]],
-                      log = TRUE))
-
-      logLikelihood[[e]] <- ll
-
-    } else {
-
-      ll <- sum(dnorm(x = data[, e],
-                      mean = makeFormula(estimates = ep$estimates,
-                                         nParents = ep$nParents,
-                                         parentData = ep$parentData),
-                      sd = ep$estimates[[length(ep$estimates)]],
-                      log = TRUE))
-
-      logLikelihood[[e]] <- ll
-
-    }
-
-  }
+  # Calculate the log likelihood for the gene expression nodes.
+  cll <- cllNormal(adjMatrix = adjMatrix,
+                   data = data,
+                   k = cllM$nParents,
+                   logLikelihood = cllM$logLikelihood,
+                   nGV = nGV,
+                   nNodes = nNodes)
 
   switch(scoreFun,
 
          'logLikelihood' = {
 
-           return (sum(logLikelihood))
+           return (sum(cll$logLikelihood))
 
          },
 
@@ -96,7 +71,9 @@ cllEdge <- function (individual,
            # Calculate BIC for each node in the graph.
            for (e in 1:nNodes) {
 
-             bic[[e]] <- log(n) * (k[[e]] + 2) - 2 * logLikelihood[[e]]
+             bic[[e]] <- (log(n) *
+                            (cll$nParents[[e]] + 2) -
+                            2 * cll$logLikelihood[[e]])
 
            }
 

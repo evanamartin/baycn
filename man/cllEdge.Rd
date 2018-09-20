@@ -4,17 +4,21 @@
 \alias{cllEdge}
 \title{cllEdge}
 \usage{
-cllEdge(individual, coordinates, data, scoreFun)
+cllEdge(coordinates, data, individual, nGV, nNodes, scoreFun)
 }
 \arguments{
-\item{individual}{The DNA of the current individual.}
-
 \item{coordinates}{A matrix of the row and column numbers of the nonzero
 elements in the adjacency matrix. The row numbers make up the first row of
 the coordinates matrix and the column numbers make up the second row.}
 
 \item{data}{A matrix with the nodes across the columns and the observations
 along the rows.}
+
+\item{individual}{The edge directions of the current graph.}
+
+\item{nGV}{The number of genetic variants in the graph.}
+
+\item{nNodes}{The number of nodes in the graph.}
 
 \item{scoreFun}{A character string indicating what method to use for
 calculating the fitness.}

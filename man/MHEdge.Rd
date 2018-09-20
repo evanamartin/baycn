@@ -4,8 +4,8 @@
 \alias{MHEdge}
 \title{MHEdge}
 \usage{
-MHEdge(adjMatrix, data, iterations, mutationRate, prior = c(0.05, 0.05, 0.9),
-  scoreFun)
+MHEdge(adjMatrix, data, iterations, mutationRate, nGV, prior = c(0.05, 0.05,
+  0.9), scoreFun)
 }
 \arguments{
 \item{adjMatrix}{The adjacency matrix returned by the MRPC algorithm. The
@@ -20,6 +20,8 @@ algorithm.}
 
 \item{mutationRate}{A number between 0 and 1. As a rule of thumb the mutation
 rate should be 1 / (number of edges in the graph).}
+
+\item{nGV}{The number of genetic variants in the graph.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
