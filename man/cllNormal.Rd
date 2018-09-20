@@ -13,7 +13,7 @@ current graph.}
 \item{data}{The data matrix.}
 
 \item{k}{A vector containing the number of parents for each genetic variant
-node.}
+node. This vector will be used if the scoreFun argument is set to 'BIC'.}
 
 \item{logLikelihood}{A vector containing the log likelihood for each genetic
 variant node.}

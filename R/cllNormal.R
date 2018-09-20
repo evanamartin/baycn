@@ -8,7 +8,7 @@
 #' @param data The data matrix.
 #'
 #' @param k A vector containing the number of parents for each genetic variant
-#' node.
+#' node. This vector will be used if the scoreFun argument is set to 'BIC'.
 #'
 #' @param logLikelihood A vector containing the log likelihood for each genetic
 #' variant node.
@@ -21,6 +21,8 @@
 #' the log likelihood for each node. The second element is a vector with the
 #' number of parents for each node.
 #'
+#' @importFrom stats lm logLik sd
+#'
 cllNormal <- function (adjMatrix,
                        data,
                        k,
@@ -32,35 +34,35 @@ cllNormal <- function (adjMatrix,
   # go to the value of nNodes.
   for (e in (nGV + 1):nNodes) {
 
-    # Get the number of parents, estimates for the mean and standard
-    # deviation of the current node, and the data of the parent nodes
-    ep <- estimatesN(adjMatrix = adjMatrix,
-                     data = data,
-                     node = e)
+    # Get the number of parents for the current node.
+    nParents <- sum(adjMatrix[, e])
 
     # Loop through each of the gene expression nodes and calculate the log
     # likelihood given the edge directions of the current graph.
-    if (ep$nParents == 0) {
+    if (nParents == 0) {
 
       ll <- sum(dnorm(x = data[, e],
-                      mean = ep$estimates[[1]],
-                      sd = ep$estimates[[2]],
+                      mean = mean(data[, e]),
+                      sd = sd(data[, e]),
                       log = TRUE))
 
     } else {
 
-      ll <- sum(dnorm(x = data[, e],
-                      mean = makeFormula(estimates = ep$estimates,
-                                         nParents = ep$nParents,
-                                         parentData = ep$parentData),
-                      sd = ep$estimates[[length(ep$estimates)]],
-                      log = TRUE))
+      # Take only the columns of the data that pertain to the child node and its
+      # parents.
+      parentData <- data.frame(y = data[, e],
+                               data[, which(adjMatrix[, e] != 0)])
+
+      model <- lm(y ~ .,
+                  data = parentData)
+
+      ll <- logLik(model)[1]
 
     }
 
     # Store the number of parents for each node. This will be used if the
     # scoreFun argument is set to 'BIC'.
-    k[[e]] <- ep$nParents
+    k[[e]] <- nParents
 
     # Store the log likelihood for the current node.
     logLikelihood[[e]] <- ll

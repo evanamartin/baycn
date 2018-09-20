@@ -15,7 +15,7 @@
 #' the log likelihood for each node. The second element is a vector with the
 #' number of parents for each node.
 #'
-#' @importFrom stats dmultinom
+#' @importFrom stats dmultinom lm logLik
 #'
 cllMultinom <- function (adjMatrix,
                          data,
@@ -42,29 +42,37 @@ cllMultinom <- function (adjMatrix,
   # the value of nGV.
   for (e in 1:nGV) {
 
-    # Get the number of parents, estimates for the mean and standard
-    # deviation of the current node, and the data of the parent nodes
-    ep <- estimatesM(adjMatrix = adjMatrix,
-                     data = data,
-                     node = e)
+    # Get the number of parents for the current node.
+    nParents <- sum(adjMatrix[, e])
 
     # Loop through each of the genetic variant nodes and calculate the log
     # likelihood given the edge directions of the current graph.
-    if (ep$nParents == 0) {
+    if (nParents == 0) {
 
-      ll <- dmultinom(x = ep$estimates$counts,
-                      prob = ep$estimates$probs,
+      # Calculate the counts for each level of the current genetic variant.
+      counts <- as.vector(table(data[, e]))
+
+      ll <- dmultinom(x = counts,
+                      prob = counts / sum(counts),
                       log = TRUE)
 
     } else {
 
-      ll <- 0
+      # Take only the columns of the data that pertain to the child node and its
+      # parents.
+      parentData <- data.frame(y = data[, e],
+                               data[, which(adjMatrix[, e] != 0)])
+
+      model <- lm(y ~ .,
+                  data = parentData)
+
+      ll <- logLik(model)[1]
 
     }
 
     # Store the number of parents for each node. This will be used if the
     # scoreFun argument is set to 'BIC'.
-    k[[e]] <- ep$nParents
+    k[[e]] <- nParents
 
     # Store the log likelihood for the current node.
     logLikelihood[[e]] <- ll
