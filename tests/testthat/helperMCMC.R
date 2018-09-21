@@ -1,5 +1,5 @@
 ################################################################################
-# Generate data under topology M1 with only gene expression nodes.
+# Generate data under topology M1 with only gene expression nodes:
 # T1 -> T2 -> T3
 ################################################################################
 
@@ -28,7 +28,7 @@ m1ge <- function (N, ss) {
 }
 
 ################################################################################
-# Generate data under topology H2
+# Generate data under topology H2:
 # T1 -> T2 -> T4 -> T5 <- T3 <- T1
 ################################################################################
 

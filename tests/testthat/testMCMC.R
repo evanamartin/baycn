@@ -2,6 +2,9 @@ context('Test MH algorithm')
 
 test_that('the MHEdge function returns the correct matrix',{
 
+  # Load the standards to test against.
+  system.file('testdata', 'standards.RData', package = 'edgeFrequency')
+
   set.seed(338)
 
   # Generate data for topology M1 with no genetic variants.
@@ -48,7 +51,7 @@ test_that('the MHEdge function returns the correct matrix',{
                                  0.9),
                        scoreFun = 'logLikelihood')
 
-  expect_identical(standardM1ge, mhm1ge_200_1)
   expect_identical(standardH2, mhh2_200_1)
+  expect_identical(standardM1ge, mhm1ge_200_1)
 
 })
