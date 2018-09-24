@@ -15,7 +15,9 @@
 #' the log likelihood for each node. The second element is a vector with the
 #' number of parents for each node.
 #'
-#' @importFrom stats dmultinom lm logLik
+#' @importFrom MASS polr
+#'
+#' @importFrom stats dmultinom logLik
 #'
 cllMultinom <- function (adjMatrix,
                          data,
@@ -63,8 +65,8 @@ cllMultinom <- function (adjMatrix,
       parentData <- data.frame(y = data[, e],
                                data[, which(adjMatrix[, e] != 0)])
 
-      model <- lm(y ~ .,
-                  data = parentData)
+      model <- polr(factor(y) ~ .,
+                    data = parentData)
 
       ll <- logLik(model)[1]
 
