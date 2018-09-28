@@ -3,6 +3,7 @@
 export(MHEdge)
 export(caRatio)
 export(cllEdge)
+export(cllMultinom)
 export(coordinates)
 export(cycleBranches)
 export(cycleCED)

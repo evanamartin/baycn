@@ -19,6 +19,8 @@
 #'
 #' @importFrom stats dmultinom logLik
 #'
+#' @export
+#'
 cllMultinom <- function (adjMatrix,
                          data,
                          nGV,
@@ -54,9 +56,22 @@ cllMultinom <- function (adjMatrix,
       # Calculate the counts for each level of the current genetic variant.
       counts <- as.vector(table(data[, e]))
 
-      ll <- dmultinom(x = counts,
-                      prob = counts / sum(counts),
-                      log = TRUE)
+      # Calculate the probability of each level of counts.
+      lprob <- log(counts / sum(counts))
+
+      # Create a vector to hold the log of the probability of seeing each value
+      # the observed number of times.
+      lp <- c()
+
+      # Loop through each of the levels of the genetic variant to calculate the
+      # log likelihood.
+      for (v in 1:length(counts)) {
+
+        lp[[v]] <- lprob[[v]] * counts[[v]]
+
+      }
+
+      ll <- sum(lp)
 
     } else {
 
@@ -65,7 +80,9 @@ cllMultinom <- function (adjMatrix,
       parentData <- data.frame(y = data[, e],
                                data[, which(adjMatrix[, e] != 0)])
 
-      model <- polr(factor(y) ~ .,
+      # Run ordered logistic regression on the current genetic variant given its
+      # parents.
+      model <- polr(as.factor(y) ~ .,
                     data = parentData)
 
       ll <- logLik(model)[1]
