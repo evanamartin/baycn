@@ -4,16 +4,16 @@
 \alias{toAdjMatrix}
 \title{toAdjMatrix}
 \usage{
-toAdjMatrix(individual, coordinates, nNodes)
+toAdjMatrix(coordinates, graph, nNodes)
 }
 \arguments{
-\item{individual}{A vector containing the directions of the edges in the
-graph and the log likelihood of the individual.}
-
 \item{coordinates}{A matrix with the row and column coordinates of the
 edges from the adjacency matrix from the MRPC function. The row numbers of
 each nonzero element make up the first row in the matrix and the column
 numbers of each nonzero element make up the second row of the matrix.}
+
+\item{graph}{A vector containing the directions of the edges in the
+graph and the log likelihood of the graph.}
 
 \item{nNodes}{The number of nodes in the graph.}
 }
@@ -21,7 +21,7 @@ numbers of each nonzero element make up the second row of the matrix.}
 An adjacency matrix.
 }
 \description{
-Creates an adjacency matrix from the DNA of the current individual. The DNA
+Creates an adjacency matrix from the DNA of the current graph. The DNA
 is converted to an adjacency matrix to determine the parents of each node
 in order to calculate its log likelihood.
 }

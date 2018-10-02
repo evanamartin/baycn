@@ -4,8 +4,8 @@
 \alias{MHEdge}
 \title{MHEdge}
 \usage{
-MHEdge(adjMatrix, data, iterations, mutationRate, nGV, prior = c(0.05, 0.05,
-  0.9), scoreFun)
+MHEdge(adjMatrix, data, iterations, mutationRate, nGV, pmr = FALSE,
+  prior = c(0.05, 0.05, 0.9), scoreFun)
 }
 \arguments{
 \item{adjMatrix}{The adjacency matrix returned by the MRPC algorithm. The
@@ -23,6 +23,10 @@ rate should be 1 / (number of edges in the graph).}
 
 \item{nGV}{The number of genetic variants in the graph.}
 
+\item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
+Principle of Mendelian Randomization, PMR. This prevents the direction of an
+edge pointing from a gene expression node to a genetic variant node.}
+
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
 
@@ -34,5 +38,6 @@ A matrix where the first m columns are the edge directions and the
 m + 1 column is the log likelihood. Each row represents one graph.
 }
 \description{
-MHEdge
+The main function for the Metropolis-Hastings algorithm. It returns the
+posterior distribution of the edge directions.
 }

@@ -7,11 +7,11 @@
 #' @param m The length of the individual vector. This is the number of edges in
 #' the graph and the fitness of the graph.
 #'
-#' @param newIndividual A vector of edge directions. This the the proposed
+#' @param newGraph A vector of edge directions. This the the proposed
 #' vector of edge directions.
 #'
-#' @param oldIndividual A vector of edge directions. This is the individual from
-#' the start of the current interation/generation
+#' @param oldGraph A vector of edge directions. This is the graph from
+#' the start of the current interation.
 #'
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
@@ -26,8 +26,8 @@
 #' @export
 #'
 caRatio <- function (m,
-                     newIndividual,
-                     oldIndividual,
+                     newGraph,
+                     oldGraph,
                      prior,
                      scoreFun) {
 
@@ -35,12 +35,12 @@ caRatio <- function (m,
   # of the edges in the old individual and the new individual. Because they will
   # be the same for most of the edges we only need to consider the probabilities
   # of the edges that are different.
-  difference <- newIndividual[1:(m - 1)] != oldIndividual[1:(m - 1)]
+  difference <- newGraph[1:(m - 1)] != oldGraph[1:(m - 1)]
 
   # Ater getting the locations of the differences of the edge directions between
   # the old and new individuals we need to get the directions of the edges.
-  diffNew <- newIndividual[difference]
-  diffOld <- oldIndividual[difference]
+  diffNew <- newGraph[1:(m - 1)][difference]
+  diffOld <- oldGraph[1:(m - 1)][difference]
 
   # After getting the edge directions for each edge that if different between
   # the old and new individuals we need to get the prior probability associated
@@ -87,8 +87,8 @@ caRatio <- function (m,
 
           'logLikelihood' = {
 
-            ratio <- ((sum(priorNew) + newIndividual[[m]])
-                      - (sum(priorOld) + oldIndividual[[m]]))
+            ratio <- ((sum(priorNew) + newGraph[[m]])
+                      - (sum(priorOld) + oldGraph[[m]]))
 
             # Generate log uniform(0, 1) to compare to alpha which is
             # min(ratio, 0).
@@ -101,11 +101,11 @@ caRatio <- function (m,
             # Determine if the proposed graph should be accepted.
             if (logU < alpha) {
 
-              return (newIndividual)
+              return (newGraph)
 
             } else {
 
-              return (oldIndividual)
+              return (oldGraph)
 
             }
 
@@ -116,8 +116,8 @@ caRatio <- function (m,
             # Because we want to minimize the BIC the ratio will change from
             # new/old to old/new. This will change the caRatio function from
             # always accepting a higher value to always accepting a lower value.
-            ratio <- ((sum(priorOld) + oldIndividual[[m]])
-                      - (sum(priorNew) + newIndividual[[m]]))
+            ratio <- ((sum(priorOld) + oldGraph[[m]])
+                      - (sum(priorNew) + newGraph[[m]]))
 
             # Generate log uniform(0, 1) to compare to alpha which is
             # min(ratio, 0).
@@ -130,11 +130,11 @@ caRatio <- function (m,
             # Determine if the proposed graph should be accepted.
             if (logU < alpha) {
 
-              return (newIndividual)
+              return (newGraph)
 
             } else {
 
-              return (oldIndividual)
+              return (oldGraph)
 
             }
 

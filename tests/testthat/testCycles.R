@@ -1,4 +1,4 @@
-context('Check cycles')
+context('Identify cycles')
 
 test_that('cyclePrep returns the correct number of cycles',{
 

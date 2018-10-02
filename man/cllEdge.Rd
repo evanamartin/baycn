@@ -4,7 +4,7 @@
 \alias{cllEdge}
 \title{cllEdge}
 \usage{
-cllEdge(coordinates, data, individual, nGV, nNodes, scoreFun)
+cllEdge(coordinates, data, graph, m, nGV, nNodes, pmr, scoreFun)
 }
 \arguments{
 \item{coordinates}{A matrix of the row and column numbers of the nonzero
@@ -14,18 +14,25 @@ the coordinates matrix and the column numbers make up the second row.}
 \item{data}{A matrix with the nodes across the columns and the observations
 along the rows.}
 
-\item{individual}{The edge directions of the current graph.}
+\item{graph}{The edge directions of the current graph.}
+
+\item{m}{The length of the graph vector. This is the number of edges in the
+graph plus the fitness of the graph.}
 
 \item{nGV}{The number of genetic variants in the graph.}
 
 \item{nNodes}{The number of nodes in the graph.}
+
+\item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
+Principle of Mendelian Randomization, PMR. This prevents the direction of an
+edge pointing from a gene expression node to a genetic variant node.}
 
 \item{scoreFun}{A character string indicating what method to use for
 calculating the fitness.}
 }
 \value{
 The log likelihood of the graph according to the orientation of the
-edges denoted by the DNA of the current individual.
+edges denoted by the DNA of the current graph.
 }
 \description{
 Calculates the log likelihood of the current node when running a genetic

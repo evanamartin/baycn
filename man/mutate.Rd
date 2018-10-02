@@ -4,52 +4,25 @@
 \alias{mutate}
 \title{mutate}
 \usage{
-mutate(coordinates, data, dnUnique, edgeNum, individual, m, mutationRate, nGV,
-  nNodes, prior, scoreFun, wCycle)
+mutate(graph, m, mutationRate, prior)
 }
 \arguments{
-\item{coordinates}{A matrix of the row and column numbers of the nonzero
-elements in the adjacency matrix. The row numbers make up the first row of
-the coordinates matrix and the column numbers make up the second row.}
-
-\item{data}{A matrix with the nodes across the columns and the observations
-along the rows.}
-
-\item{dnUnique}{A vector of unique decimal numbers. These numbers represent
-each cycle in the graph. This argument is NULL if there are no cycles in the
-graph.}
-
-\item{edgeNum}{A list containing the number of each edge in each of the
-cycles in the graph. This argument is NULL if there are no cycles in the
-graph.}
-
-\item{individual}{A vector containing the DNA of the individual who was
+\item{graph}{A vector containing the DNA of the graph who was
 selected by the selectBest function.}
 
-\item{m}{The length of the individual vector. This is the number of edges in
-the graph and the fitness of the graph.}
+\item{m}{The length of the graph vector. This is the number of edges in the
+graph plus the fitness of the graph.}
 
 \item{mutationRate}{A number between 0 and 1. As a rule of thumb the mutation
 rate should be 1 / length of the DNA.}
 
-\item{nGV}{The number of genetic variants in the graph.}
-
-\item{nNodes}{The number of nodes in the graph.}
-
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
-
-\item{scoreFun}{A character string indicating what method to use for
-calculating the fitness.}
-
-\item{wCycle}{A vector of the locations in the cycleDN vector where each
-unique number occurs. The unique numbers refer to each of the unique cycles
-in the graph. This argument is NULL if there are no cycles in the graph.}
 }
 \value{
-A vector of the DNA and the log likelihood.
+A vector of the edge directions and log likelihood.
 }
 \description{
-Takes the DNA of the cloned winner and mutates it according to the mutation
-rate passed to the function.
+Takes the edge directions of the current graph mutates it according to the
+mutation rate passed to the function.
 }

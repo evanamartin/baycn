@@ -1,5 +1,8 @@
 #' MHEdge
 #'
+#' The main function for the Metropolis-Hastings algorithm. It returns the
+#' posterior distribution of the edge directions.
+#'
 #' @param adjMatrix The adjacency matrix returned by the MRPC algorithm. The
 #' adjacency matrix is a matrix of zeros and ones. The ones represent an edge
 #' and also indicates the direction of that edge.
@@ -14,6 +17,10 @@
 #' rate should be 1 / (number of edges in the graph).
 #'
 #' @param nGV The number of genetic variants in the graph.
+#'
+#' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
+#' Principle of Mendelian Randomization, PMR. This prevents the direction of an
+#' edge pointing from a gene expression node to a genetic variant node.
 #'
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
@@ -31,6 +38,7 @@ MHEdge <- function (adjMatrix,
                     iterations,
                     mutationRate,
                     nGV,
+                    pmr = FALSE,
                     prior = c(0.05,
                               0.05,
                               0.9),
@@ -79,34 +87,89 @@ MHEdge <- function (adjMatrix,
 
   }
 
-  # Calculate the log likelihood for the strating graph given the data.
-  graph[[nEdges + 1]] <- cllEdge(coordinates = coord,
-                                 data = data,
-                                 individual = graph,
-                                 nGV = nGV,
-                                 nNodes = nNodes,
-                                 scoreFun = scoreFun)
+  # Calculate the log likelihood for the starting graph given the data.
+  graph <- cllEdge(coordinates = coord,
+                   data = data,
+                   graph = graph,
+                   m = m,
+                   nGV = nGV,
+                   nNodes = nNodes,
+                   pmr = pmr,
+                   scoreFun = scoreFun)
+
+  # The initial graph is the first graph in the Markov chain.
+  mcGraph[1, ] <- graph
 
   # Run through the iterations of the Metropolis Hastings algorithm.
-  for (e in 1:iterations) {
+  for (e in 2:iterations) {
 
-    # Mutate the graph at each iteration. A new graph is proposed and accepted
-    # or rejected within the mutate function.
-    graph <- mutate(coordinates = coord,
-                    data = data,
-                    dnUnique = cp$dnUnique,
-                    edgeNum = cp$edgeNum,
-                    individual = graph,
-                    m = m,
-                    mutationRate = mutationRate,
-                    nGV = nGV,
-                    nNodes = nNodes,
-                    prior = prior,
-                    scoreFun = scoreFun,
-                    wCycle = cp$wCycle)
+    # Mutate the graph at each iteration.
+    mGraph <- mutate(graph = mcGraph[e - 1, ],
+                     m = m,
+                     mutationRate = mutationRate,
+                     prior = prior)
 
-    # A matrix to hold the accepted graph at each iteration.
-    mcGraph[e, ] <- graph
+    # If there are potential directed cycles in the graph check if they are
+    # present and remove them if they are.
+    if (!is.null(cp$dnUnique)) {
+
+      # Remove any directed cycles in the graph.
+      mGraph <- rmCycle(dnUnique = cp$dnUnique,
+                        edgeNum = cp$edgeNum,
+                        wCycle = cp$wCycle,
+                        prior = prior,
+                        individual = graph)
+
+    }
+
+    # If the graph after mutation and removing directed cycles is the same as
+    # the graph at the previous iteration then return that graph without
+    # calculating the log likelihood.
+    if (identical(mGraph[1:nEdges], mcGraph[e - 1, 1:nEdges])) {
+
+      # Add the e - 1 graph to the eth row of the mcGraph matrix.
+      mcGraph[e, ] <- mcGraph[e - 1, ]
+
+      # Skip the rest of the for loop and go to the next iteration
+      next
+
+    }
+
+    # Calculate the log likelihood of the mutated graph
+    mGraph <- cllEdge(coordinates = coord,
+                      data = data,
+                      graph = mGraph,
+                      m = m,
+                      nGV = nGV,
+                      nNodes = nNodes,
+                      pmr = pmr,
+                      scoreFun = scoreFun)
+
+    # When pmr is set to true sometimes the graph that is passed to cllEdge
+    # is different from the graph that is returned by cllEdge. This happens when
+    # a gv node is the child of a ge node . It is possible that the changes made
+    # to the graph in the cllEdge function revert the graph back to the graph at
+    # iteration e - 1. We need to check if the two graphs are equal and return
+    # the graph at iteration e - 1 if they are.
+    if (identical(mGraph[1:nEdges], mcGraph[e - 1, 1:nEdges])) {
+
+      # Add the e - 1 graph to the eth row of the mcGraph matrix.
+      mcGraph[e, ] <- mcGraph[e - 1, ]
+
+      # Skip the rest of the for loop and go to the next iteration.
+      next
+
+    }
+
+    # Determine whether to accept the new graph or the original graph.
+    acceptedGraph <- caRatio(m = m,
+                             newGraph = mGraph,
+                             oldGraph = mcGraph[e - 1, ],
+                             prior = prior,
+                             scoreFun = scoreFun)
+
+    # Store the accepted graph at each iteration in the mcGraph matrix.
+    mcGraph[e, ] <- acceptedGraph
 
   }
 
