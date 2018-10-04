@@ -10,20 +10,20 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
   set.seed(22)
 
   # Generate data under topology M1 with one genetic variant.
-  m1gv_200_1_data <- m1gv(N = 200,
+  data_m1gv_200_1 <- m1gv(N = 200,
                           p = 0.45,
                           ss = 1)
 
   # Adjacency matrix for toplogy M1
-  m1gv_adjMatrix <- matrix(c(0, 1, 0,
+  adjMatrix_m1gv <- matrix(c(0, 1, 0,
                              0, 0, 1,
                              0, 0, 0),
                            byrow = TRUE,
                            nrow = 3)
 
   # Run the MH algorithm with the edges from the true graph with out pmr.
-  m1gv_200_1_mh <- MHEdge(adjMatrix = m1gv_adjMatrix,
-                          data = m1gv_200_1_data,
+  mh_m1gv_200_1 <- MHEdge(adjMatrix = adjMatrix_m1gv,
+                          data = data_m1gv_200_1,
                           iterations = 100,
                           mutationRate = 1/2,
                           nGV = 1,
@@ -34,8 +34,8 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                           scoreFun = 'logLikelihood')
 
   # Run the MH algorithm with the edges from the true graph with pmr.
-  m1gv_200_1_mh_pmr <- MHEdge(adjMatrix = m1gv_adjMatrix,
-                              data = m1gv_200_1_data,
+  mh_m1gv_200_1_pmr <- MHEdge(adjMatrix = adjMatrix_m1gv,
+                              data = data_m1gv_200_1,
                               iterations = 100,
                               mutationRate = 1/2,
                               nGV = 1,
@@ -46,20 +46,20 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                               scoreFun = 'logLikelihood')
 
   # Generate data under topology M3 with one genetic variant.
-  m3gv_200_1_data <- m3gv(N = 200,
+  data_m3gv_200_1 <- m3gv(N = 200,
                           p = 0.45,
                           ss = 1)
 
   # Adjacency matrix for topology M3
-  m3gv_adjMatrix <- matrix(c(0, 1, 1,
+  adjMatrix_m3gv <- matrix(c(0, 1, 1,
                              0, 0, 0,
                              0, 0, 0),
                            nrow = 3,
                            byrow = TRUE)
 
   # Run the MH algorithm with the edges from the true graph without pmr.
-  m3gv_200_1_mh <- MHEdge(adjMatrix = m3gv_adjMatrix,
-                          data = m3gv_200_1_data,
+  mh_m3gv_200_1 <- MHEdge(adjMatrix = adjMatrix_m3gv,
+                          data = data_m3gv_200_1,
                           iterations = 100,
                           mutationRate = 1/2,
                           nGV = 1,
@@ -70,8 +70,8 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                           scoreFun = 'logLikelihood')
 
   # Run the MH algorithm with the edges from the true graph with pmr.
-  m3gv_200_1_mh_pmr <- MHEdge(adjMatrix = m3gv_adjMatrix,
-                              data = m3gv_200_1_data,
+  mh_m3gv_200_1_pmr <- MHEdge(adjMatrix = adjMatrix_m3gv,
+                              data = data_m3gv_200_1,
                               iterations = 100,
                               mutationRate = 1/2,
                               nGV = 1,
@@ -81,9 +81,9 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                                         0.9),
                               scoreFun = 'logLikelihood')
 
-  expect_identical(m1gv_standard, m1gv_200_1_mh)
-  expect_identical(m1gv_standard_pmr, m1gv_200_1_mh_pmr)
-  expect_identical(m3gv_standard, m3gv_200_1_mh)
-  expect_identical(m3gv_standard_pmr, m3gv_200_1_mh_pmr)
+  expect_identical(m1gv_standard, mh_m1gv_200_1)
+  expect_identical(m1gv_standard_pmr, mh_m1gv_200_1_pmr)
+  expect_identical(m3gv_standard, mh_m3gv_200_1)
+  expect_identical(m3gv_standard_pmr, mh_m3gv_200_1_pmr)
 
 })
