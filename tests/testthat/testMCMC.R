@@ -22,7 +22,7 @@ test_that('the MHEdge function returns the correct matrix',{
   # Run the MH algorithm with the edges from the true graph.
   mh_m1ge_200_1 <- MHEdge(adjMatrix = adjMatrix_m1,
                           data = data_m1ge_200_1,
-                          iterations = 500,
+                          iterations = 100,
                           mutationRate = 1/2,
                           nGV = 0,
                           pmr = FALSE,
@@ -46,7 +46,7 @@ test_that('the MHEdge function returns the correct matrix',{
   # Run the MH algorithm with the edges from the true graph.
   mh_h2_200_1 <- MHEdge(adjMatrix = adjMatrix_h2,
                         data = data_h2_200_1,
-                        iterations = 500,
+                        iterations = 100,
                         mutationRate = 1/5,
                         nGV = 0,
                         pmr = FALSE,
@@ -55,7 +55,7 @@ test_that('the MHEdge function returns the correct matrix',{
                                   0.9),
                         scoreFun = 'logLikelihood')
 
-  expect_identical(m1ge_standard, mh_m1ge_200_1)
-  expect_identical(h2_standard, mh_h2_200_1)
+  expect_identical(standard_m1ge, mh_m1ge_200_1)
+  expect_identical(standard_h2, mh_h2_200_1)
 
 })
