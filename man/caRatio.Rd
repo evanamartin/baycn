@@ -4,16 +4,16 @@
 \alias{caRatio}
 \title{caRatio}
 \usage{
-caRatio(m, newGraph, oldGraph, prior, scoreFun)
+caRatio(m, proposed, current, prior, scoreFun)
 }
 \arguments{
 \item{m}{The length of the individual vector. This is the number of edges in
 the graph and the fitness of the graph.}
 
-\item{newGraph}{A vector of edge directions. This the the proposed
+\item{proposed}{A vector of edge directions. This the the proposed
 vector of edge directions.}
 
-\item{oldGraph}{A vector of edge directions. This is the graph from
+\item{current}{A vector of edge directions. This is the graph from
 the start of the current interation.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge

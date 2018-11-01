@@ -31,6 +31,39 @@
 #' @return A matrix where the first m columns are the edge directions and the
 #' m + 1 column is the log likelihood. Each row represents one graph.
 #'
+#' @examples
+#' # Generate data under topology M1.
+#' data_m1 <- m1gv(N = 200, p = 0.27, ss = 1)
+#'
+#' # Use the true edges as the inferred edges.
+#' adjmatrix_m1 <- matrix(c(0, 1, 0,
+#'                          0, 0, 1,
+#'                          0, 0, 0),
+#'                        byrow = TRUE,
+#'                        nrow = 3)
+#'
+#' # Run the Metropolis-Hastings algorithm with the Principle of Mendelian
+#' # Randomization (PMR).
+#' mh_m1_pmr <- MHEdge(adjMatrix = adjmatrix_m1,
+#'                     data = data_m1,
+#'                     iterations = 500,
+#'                     mutationRate = 1/2,
+#'                     nGV = 1,
+#'                     pmr = TRUE,
+#'                     prior = c(0.05, 0.05, 0.9),
+#'                     scoreFun = 'logLikelihood')
+#'
+#' # Run the Metropolis-Hastings algorithm on the same data as the previous
+#' # example but with pmr set to FALSE.
+#' mh_m1 <- MHEdge(adjMatrix = adjmatrix_m1,
+#'                 data = data_m1,
+#'                 iterations = 500,
+#'                 mutationRate = 1/2,
+#'                 nGV = 1,
+#'                 pmr = FALSE,
+#'                 prior = c(0.05, 0.05, 0.9),
+#'                 scoreFun = 'logLikelihood')
+#'
 #' @export
 #'
 MHEdge <- function (adjMatrix,
@@ -118,7 +151,7 @@ MHEdge <- function (adjMatrix,
                         edgeNum = cp$edgeNum,
                         wCycle = cp$wCycle,
                         prior = prior,
-                        individual = graph)
+                        individual = mGraph)
 
     }
 
@@ -163,8 +196,8 @@ MHEdge <- function (adjMatrix,
 
     # Determine whether to accept the new graph or the original graph.
     acceptedGraph <- caRatio(m = m,
-                             newGraph = mGraph,
-                             oldGraph = mcGraph[e - 1, ],
+                             proposed = mGraph,
+                             current = mcGraph[e - 1, ],
                              prior = prior,
                              scoreFun = scoreFun)
 

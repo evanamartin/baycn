@@ -7,10 +7,10 @@
 #' @param m The length of the individual vector. This is the number of edges in
 #' the graph and the fitness of the graph.
 #'
-#' @param newGraph A vector of edge directions. This the the proposed
+#' @param proposed A vector of edge directions. This the the proposed
 #' vector of edge directions.
 #'
-#' @param oldGraph A vector of edge directions. This is the graph from
+#' @param current A vector of edge directions. This is the graph from
 #' the start of the current interation.
 #'
 #' @param prior A vector containing the prior probability of seeing each edge
@@ -26,8 +26,8 @@
 #' @export
 #'
 caRatio <- function (m,
-                     newGraph,
-                     oldGraph,
+                     proposed,
+                     current,
                      prior,
                      scoreFun) {
 
@@ -35,51 +35,43 @@ caRatio <- function (m,
   # of the edges in the old individual and the new individual. Because they will
   # be the same for most of the edges we only need to consider the probabilities
   # of the edges that are different.
-  difference <- newGraph[1:(m - 1)] != oldGraph[1:(m - 1)]
+  difference <- proposed[1:(m - 1)] != current[1:(m - 1)]
 
   # Ater getting the locations of the differences of the edge directions between
-  # the old and new individuals we need to get the directions of the edges.
-  diffNew <- newGraph[1:(m - 1)][difference]
-  diffOld <- oldGraph[1:(m - 1)][difference]
+  # the current and proposed graphs we need to get the directions of the edges.
+  edgeDirP <- proposed[1:(m - 1)][difference]
+  edgeDirC <- current[1:(m - 1)][difference]
 
-  # After getting the edge directions for each edge that if different between
-  # the old and new individuals we need to get the prior probability associated
-  # with each edge direction.
-  priorNew <- c()
-  priorOld <- c()
+  # After getting the edge directions for each edge that is different between
+  # the current and proposed graphs we need to get the prior probability
+  # associated with each edge direction.
+  priorP <- c()
+  priorC <- c()
+
+  # The following vectors will contain the transition probabilities for the
+  # current and proposed graphs. transProbP will hold the probabilities for
+  # moving from the proposed graph to the current graph and transProbC will hold
+  # the probabilities of moving from the current graph to the proposed graph.
+  transProbP <- c()
+  transProbC <- c()
 
 
   # Attach the correct prior probability to each edge direction for both the old
   # and new individuals.
-  for(e in 1:length(diffNew)) {
+  for(e in 1:length(edgeDirP)) {
 
-    if (diffNew[[e]] == 0) {
+    # I can use the edge direction (0, 1, or 2) to select the correct prior by
+    # adding a 1 to it and using that number to subset the prior vector. For
+    # example, if the edge direction is 0 the corresponding prior is in the
+    # first position of the prior vector so prior[[0 + 1]] will give 0.05 which
+    # is the default prior for an edge being 0.
+    priorP[[e]] <- log(prior[[edgeDirP[[e]] + 1]])
+    transProbP[[e]] <- log(prior[[edgeDirC[[e]] + 1]] /
+                             sum(prior[-(edgeDirP[[e]] + 1)]))
 
-      priorNew[[e]] <- log(prior[[1]])
-
-    } else if (diffNew[[e]] == 1) {
-
-      priorNew[[e]] <- log(prior[[2]])
-
-    } else {
-
-      priorNew[[e]] <- log(prior[[3]])
-
-    }
-
-    if (diffOld[[e]] == 0) {
-
-      priorOld[[e]] <- log(prior[[1]])
-
-    } else if (diffOld[[e]] == 1) {
-
-      priorOld[[e]] <- log(prior[[2]])
-
-    } else {
-
-      priorOld[[e]] <- log(prior[[3]])
-
-    }
+    priorC[[e]] <- log(prior[[edgeDirC[[e]] + 1]])
+    transProbC[[e]] <- log(prior[[edgeDirP[[e]] + 1]] /
+                             sum(prior[-(edgeDirC[[e]] + 1)]))
 
   }
 
@@ -87,8 +79,8 @@ caRatio <- function (m,
 
           'logLikelihood' = {
 
-            ratio <- ((sum(priorNew) + newGraph[[m]])
-                      - (sum(priorOld) + oldGraph[[m]]))
+            ratio <- ((sum(priorP) + proposed[[m]] + sum(transProbP))
+                      - (sum(priorC) + current[[m]] + sum(transProbC)))
 
             # Generate log uniform(0, 1) to compare to alpha which is
             # min(ratio, 0).
@@ -101,11 +93,11 @@ caRatio <- function (m,
             # Determine if the proposed graph should be accepted.
             if (logU < alpha) {
 
-              return (newGraph)
+              return (proposed)
 
             } else {
 
-              return (oldGraph)
+              return (current)
 
             }
 
@@ -116,8 +108,8 @@ caRatio <- function (m,
             # Because we want to minimize the BIC the ratio will change from
             # new/old to old/new. This will change the caRatio function from
             # always accepting a higher value to always accepting a lower value.
-            ratio <- ((sum(priorOld) + oldGraph[[m]])
-                      - (sum(priorNew) + newGraph[[m]]))
+            ratio <- ((sum(priorC) + current[[m]])
+                      - (sum(priorP) + proposed[[m]]))
 
             # Generate log uniform(0, 1) to compare to alpha which is
             # min(ratio, 0).
@@ -130,11 +122,11 @@ caRatio <- function (m,
             # Determine if the proposed graph should be accepted.
             if (logU < alpha) {
 
-              return (newGraph)
+              return (proposed)
 
             } else {
 
-              return (oldGraph)
+              return (current)
 
             }
 
