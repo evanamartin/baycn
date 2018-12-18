@@ -4,17 +4,24 @@
 \alias{caRatio}
 \title{caRatio}
 \usage{
-caRatio(m, proposed, current, prior, scoreFun)
+caRatio(current, edgeType, m, pmr, proposed, prior, scoreFun)
 }
 \arguments{
+\item{current}{A vector of edge directions. This is the graph from
+the start of the current interation.}
+
+\item{edgeType}{A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
+a gv-gv or ge-ge edge (1).}
+
 \item{m}{The length of the individual vector. This is the number of edges in
 the graph and the fitness of the graph.}
 
+\item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
+Principle of Mendelian Randomization, PMR. This prevents the direction of an
+edge pointing from a gene expression node to a genetic variant node.}
+
 \item{proposed}{A vector of edge directions. This the the proposed
 vector of edge directions.}
-
-\item{current}{A vector of edge directions. This is the graph from
-the start of the current interation.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}

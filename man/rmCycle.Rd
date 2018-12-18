@@ -4,7 +4,7 @@
 \alias{rmCycle}
 \title{rmCycle}
 \usage{
-rmCycle(dnUnique, edgeNum, individual, prior, wCycle)
+rmCycle(dnUnique, edgeNum, edgeType, individual, pmr, prior, wCycle)
 }
 \arguments{
 \item{dnUnique}{A vector of unique decimal numbers for each potential cycle
@@ -13,8 +13,15 @@ in the graph.}
 \item{edgeNum}{A list containing the numbers for each of the edges in each of
 the potential cycles in the graph.}
 
+\item{edgeType}{A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
+a gv-gv or ge-ge edge (1).}
+
 \item{individual}{A vector of the edge directions, and the log likelihood
 when the function is called within the populate function, of an individual.}
+
+\item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
+Principle of Mendelian Randomization, PMR. This prevents the direction of an
+edge pointing from a gene expression node to a genetic variant node.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}

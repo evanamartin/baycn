@@ -4,14 +4,21 @@
 #' Algorithm. It takes the ratio of the original vector of edge directions, old
 #' individual, and the proposed vector of edge directions, new individual.
 #'
+#' @param current A vector of edge directions. This is the graph from
+#' the start of the current interation.
+#'
+#' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
+#' a gv-gv or ge-ge edge (1).
+#'
 #' @param m The length of the individual vector. This is the number of edges in
 #' the graph and the fitness of the graph.
 #'
+#' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
+#' Principle of Mendelian Randomization, PMR. This prevents the direction of an
+#' edge pointing from a gene expression node to a genetic variant node.
+#'
 #' @param proposed A vector of edge directions. This the the proposed
 #' vector of edge directions.
-#'
-#' @param current A vector of edge directions. This is the graph from
-#' the start of the current interation.
 #'
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
@@ -25,9 +32,11 @@
 #'
 #' @export
 #'
-caRatio <- function (m,
+caRatio <- function (current,
+                     edgeType,
+                     m,
+                     pmr,
                      proposed,
-                     current,
                      prior,
                      scoreFun) {
 
@@ -42,6 +51,9 @@ caRatio <- function (m,
   edgeDirP <- proposed[1:(m - 1)][difference]
   edgeDirC <- current[1:(m - 1)][difference]
 
+  # Extract the edge type for the edges that have changed.
+  etDiff <- edgeType[difference]
+
   # After getting the edge directions for each edge that is different between
   # the current and proposed graphs we need to get the prior probability
   # associated with each edge direction.
@@ -55,7 +67,6 @@ caRatio <- function (m,
   transProbP <- c()
   transProbC <- c()
 
-
   # Attach the correct prior probability to each edge direction for both the old
   # and new individuals.
   for(e in 1:length(edgeDirP)) {
@@ -65,13 +76,28 @@ caRatio <- function (m,
     # example, if the edge direction is 0 the corresponding prior is in the
     # first position of the prior vector so prior[[0 + 1]] will give 0.05 which
     # is the default prior for an edge being 0.
-    priorP[[e]] <- log(prior[[edgeDirP[[e]] + 1]])
-    transProbP[[e]] <- log(prior[[edgeDirC[[e]] + 1]] /
-                             sum(prior[-(edgeDirP[[e]] + 1)]))
 
-    priorC[[e]] <- log(prior[[edgeDirC[[e]] + 1]])
-    transProbC[[e]] <- log(prior[[edgeDirP[[e]] + 1]] /
-                             sum(prior[-(edgeDirC[[e]] + 1)]))
+    # Calculate the log(prior) for the current edge state and the probability of
+    # moving from the proposed graph to the current graph.
+    ptProposed <- carPrior(edgeDir1 = edgeDirP[[e]],
+                           edgeDir2 = edgeDirC[[e]],
+                           edgeType = etDiff[[e]],
+                           pmr = pmr,
+                           prior = prior)
+
+    priorP[[e]] <- ptProposed[1]
+    transProbP[[e]] <- ptProposed[2]
+
+    # Calculate the log(prior) for the current edge state and the probability of
+    # moving from the current graph to the proposed graph.
+    ptCurrent <- carPrior(edgeDir1 = edgeDirC[[e]],
+                          edgeDir2 = edgeDirP[[e]],
+                          edgeType = etDiff[[e]],
+                          pmr = pmr,
+                          prior = prior)
+
+    priorC[[e]] <- ptCurrent[1]
+    transProbC[[e]] <- ptCurrent[2]
 
   }
 

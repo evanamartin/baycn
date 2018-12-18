@@ -1,4 +1,4 @@
-#' MHEdge
+#' mhEdge
 #'
 #' The main function for the Metropolis-Hastings algorithm. It returns the
 #' posterior distribution of the edge directions.
@@ -44,7 +44,7 @@
 #'
 #' # Run the Metropolis-Hastings algorithm with the Principle of Mendelian
 #' # Randomization (PMR).
-#' mh_m1_pmr <- MHEdge(adjMatrix = adjmatrix_m1,
+#' mh_m1_pmr <- mhEdge(adjMatrix = adjmatrix_m1,
 #'                     data = data_m1,
 #'                     iterations = 500,
 #'                     mutationRate = 1/2,
@@ -55,7 +55,7 @@
 #'
 #' # Run the Metropolis-Hastings algorithm on the same data as the previous
 #' # example but with pmr set to FALSE.
-#' mh_m1 <- MHEdge(adjMatrix = adjmatrix_m1,
+#' mh_m1 <- mhEdge(adjMatrix = adjmatrix_m1,
 #'                 data = data_m1,
 #'                 iterations = 500,
 #'                 mutationRate = 1/2,
@@ -66,7 +66,7 @@
 #'
 #' @export
 #'
-MHEdge <- function (adjMatrix,
+mhEdge <- function (adjMatrix,
                     data,
                     iterations,
                     mutationRate,
@@ -84,6 +84,12 @@ MHEdge <- function (adjMatrix,
   # Call the coordinates function to get the coordinates of all the nonzero
   # elements in the adjacency matrix and to create the DNA of the individuals.
   coord <- coordinates(adjMatrix = adjMatrix)
+
+  # Get the edge types for each edge in the graph. The two edge types are gv-ge
+  # or gv-gv, ge-ge.
+  edgeType <- detType(coord = coord,
+                      nGV = nGV,
+                      pmr = pmr)
 
   # Get the number of edges in the graph.
   nEdges <- dim(coord)[2]
@@ -114,9 +120,11 @@ MHEdge <- function (adjMatrix,
     # Remove any directed cycles in the graph.
     graph <- rmCycle(dnUnique = cp$dnUnique,
                      edgeNum = cp$edgeNum,
-                     wCycle = cp$wCycle,
+                     edgeType = edgeType,
+                     individual = graph,
+                     pmr = pmr,
                      prior = prior,
-                     individual = graph)
+                     wCycle = cp$wCycle)
 
   }
 
@@ -137,9 +145,11 @@ MHEdge <- function (adjMatrix,
   for (e in 2:iterations) {
 
     # Mutate the graph at each iteration.
-    mGraph <- mutate(graph = mcGraph[e - 1, ],
+    mGraph <- mutate(edgeType = edgeType,
+                     graph = mcGraph[e - 1, ],
                      m = m,
                      mutationRate = mutationRate,
+                     pmr = pmr,
                      prior = prior)
 
     # If there are potential directed cycles in the graph check if they are
@@ -149,9 +159,11 @@ MHEdge <- function (adjMatrix,
       # Remove any directed cycles in the graph.
       mGraph <- rmCycle(dnUnique = cp$dnUnique,
                         edgeNum = cp$edgeNum,
-                        wCycle = cp$wCycle,
+                        edgeType = edgeType,
+                        individual = mGraph,
+                        pmr = pmr,
                         prior = prior,
-                        individual = mGraph)
+                        wCycle = cp$wCycle)
 
     }
 
@@ -195,9 +207,11 @@ MHEdge <- function (adjMatrix,
     }
 
     # Determine whether to accept the new graph or the original graph.
-    acceptedGraph <- caRatio(m = m,
+    acceptedGraph <- caRatio(current = mcGraph[e - 1, ],
+                             edgeType = edgeType,
+                             m = m,
+                             pmr = pmr,
                              proposed = mGraph,
-                             current = mcGraph[e - 1, ],
                              prior = prior,
                              scoreFun = scoreFun)
 

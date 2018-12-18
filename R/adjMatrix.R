@@ -13,6 +13,14 @@ adjMatrix_h2 <- matrix(c(0, 1, 1, 0, 0,
                        byrow = TRUE,
                        nrow = 5)
 
+adjMatrix_h2_fe <- matrix(c(0, 1, 1, 0, 0,
+                            0, 0, 0, 1, 0,
+                            0, 0, 0, 1, 1,
+                            0, 0, 0, 0, 1,
+                            0, 0, 0, 0, 0),
+                          byrow = TRUE,
+                          nrow = 5)
+
 adjMatrix_layer <- matrix(c(0, 1, 1, 1, 0, 0, 0, 0,
                             0, 0, 0, 0, 1, 1, 0, 0,
                             0, 0, 0, 0, 0, 1, 1, 0,
@@ -30,11 +38,23 @@ adjMatrix_m1 <- matrix(c(0, 1, 0,
                        byrow = TRUE,
                        nrow = 3)
 
+adjMatrix_m1_fe <- matrix(c(0, 1, 1,
+                            0, 0, 1,
+                            0, 0, 0),
+                          byrow = TRUE,
+                          nrow = 3)
+
 adjMatrix_m2 <- matrix(c(0, 1, 0,
                          0, 0, 0,
                          0, 1, 0),
                        byrow = TRUE,
                        nrow = 3)
+
+adjMatrix_m2_fe <- matrix(c(0, 1, 1,
+                            0, 0, 0,
+                            0, 1, 0),
+                          byrow = TRUE,
+                          nrow = 3)
 
 adjMatrix_m3 <- matrix(c(0, 1, 1,
                          0, 0, 0,
@@ -71,12 +91,33 @@ adjMatrix_nc11 <- matrix(c(0,  1,  0,  0,  0,  0,  0,  0,  0,   0,   0,
                          byrow = TRUE,
                          nrow = 11)
 
+adjMatrix_nc11_fe <- matrix(c(0,  1,  0,  0,  1,  0,  0,  0,  0,   0,   1,
+                              1,  0,  1,  0,  0,  0,  0,  0,  0,   0,   0,
+                              0,  1,  0,  1,  0,  0,  0,  0,  0,   0,   0,
+                              0,  0,  1,  0,  1,  0,  0,  0,  0,   0,   0,
+                              0,  0,  0,  1,  0,  1,  0,  0,  0,   0,   0,
+                              0,  0,  0,  0,  0,  0,  0,  0,  0,   0,   0,
+                              0,  0,  0,  0,  0,  1,  0,  1,  0,   0,   0,
+                              0,  0,  0,  0,  0,  0,  1,  0,  1,   0,   0,
+                              0,  0,  0,  0,  0,  0,  0,  1,  0,   1,   0,
+                              0,  0,  0,  0,  0,  0,  0,  0,  1,   0,   1,
+                              0,  0,  0,  0,  0,  0,  0,  0,  0,   1,   0),
+                            byrow = TRUE,
+                            nrow = 11)
+
 adjMatrix_nc4 <- matrix(c(0, 0, 1, 0,
                           0, 0, 1, 0,
                           0, 0, 0, 1,
                           0, 0, 0, 0),
                         byrow = TRUE,
                         nrow = 4)
+
+adjMatrix_nc4_fe <- matrix(c(0, 0, 1, 0,
+                             0, 0, 1, 1,
+                             0, 0, 0, 1,
+                             0, 0, 0, 0),
+                           byrow = TRUE,
+                           nrow = 4)
 
 adjMatrix_pc <- matrix(c(0, 1, 0, 0, 0, 1, 0, 1,
                          0, 0, 1, 0, 1, 0, 0, 0,

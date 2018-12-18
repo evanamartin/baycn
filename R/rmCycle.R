@@ -9,8 +9,15 @@
 #' @param edgeNum A list containing the numbers for each of the edges in each of
 #' the potential cycles in the graph.
 #'
+#' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
+#' a gv-gv or ge-ge edge (1).
+#'
 #' @param individual A vector of the edge directions, and the log likelihood
 #' when the function is called within the populate function, of an individual.
+#'
+#' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
+#' Principle of Mendelian Randomization, PMR. This prevents the direction of an
+#' edge pointing from a gene expression node to a genetic variant node.
 #'
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
@@ -25,7 +32,9 @@
 #'
 rmCycle <- function (dnUnique,
                      edgeNum,
+                     edgeType,
                      individual,
+                     pmr,
                      prior,
                      wCycle) {
 
@@ -51,17 +60,29 @@ rmCycle <- function (dnUnique,
 
       if(individual[[whichEdge]] == 0) {
 
+        # Calculate the probability of moving to edge state 1 or 2 (location 2
+        # or 3 in the prior vector)
+        probability <- cPrior(edges = c(2, 3),
+                              edgeType = edgeType[[whichEdge]],
+                              pmr = pmr,
+                              prior = prior)
+
         individual[[whichEdge]] <- sample(x = c(1, 2),
                                           size = 1,
-                                          prob = c(prior[[2]],
-                                                   prior[[3]]))
+                                          prob = probability)
 
       } else {
 
+        # Calculate the probability of moving to edge state 0 or 2 (location 1
+        # or 3 in the prior vector)
+        probability <- cPrior(edges = c(1, 3),
+                              edgeType = edgeType[[whichEdge]],
+                              pmr = pmr,
+                              prior = prior)
+
         individual[[whichEdge]] <- sample(x = c(0, 2),
                                           size = 1,
-                                          prob = c(prior[[1]],
-                                                   prior[[3]]))
+                                          prob = probability)
 
       }
 

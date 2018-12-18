@@ -47,27 +47,6 @@ cllEdge <- function (coordinates,
                            graph = graph,
                            nNodes = nNodes)
 
-  # If there are genetic variants in the data and if pmr is TRUE then the
-  # adjacency matrix needs to be changed so there are no directed edges pointing
-  # from a gene expression node to a genetic variant node. If there was an edge
-  # from a ge node to a gv node it will be removed. This essentially increases
-  # the prior probability of not seeing an edge between the two nodes because
-  # when the edge directions are changed in the mutate function the direction
-  # from a ge node to a gv node will be changed to the edge not being present.
-  if (nGV != 0 & pmr == TRUE & any(adjMatrix[(nGV + 1):nNodes, 1:nGV] == 1)) {
-
-    # Remove any edges where a ge node is the parent of a gv node.
-    graph <- toED(adjMatrix = adjMatrix,
-                  coordinates = coordinates,
-                  graph = graph,
-                  nGV = nGV,
-                  nNodes = nNodes)
-
-    # change the adjacency matrix to match the edge directions.
-    adjMatrix[(nGV + 1):nNodes, 1:nGV] <- 0
-
-  }
-
   # Calculate the log likelihood for the genetic variant nodes.
   cllM <- cllMultinom(adjMatrix = adjMatrix,
                       data = data,

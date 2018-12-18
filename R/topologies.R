@@ -8,6 +8,7 @@
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 g2 <- function (N,
                 ss) {
 
@@ -50,6 +51,7 @@ g2 <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 h2 <- function (N,
                 ss) {
 
@@ -101,6 +103,7 @@ h2 <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 layer <- function (N,
                    p,
                    ss) {
@@ -173,6 +176,7 @@ layer <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 m1ge <- function (N,
                   ss) {
 
@@ -210,6 +214,7 @@ m1ge <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 m1gv <- function (N,
                   p,
                   ss) {
@@ -247,6 +252,7 @@ m1gv <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 m2ge <- function (N,
                   ss) {
 
@@ -281,6 +287,7 @@ m2ge <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 m2gv <- function (N,
                   p,
                   ss) {
@@ -317,6 +324,7 @@ m2gv <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 m3gv <- function (N,
                   p,
                   ss) {
@@ -354,6 +362,7 @@ m3gv <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 mpge <- function (N,
                   ss) {
 
@@ -392,6 +401,7 @@ mpge <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 mpgv <- function (N,
                   p,
                   ss) {
@@ -430,6 +440,7 @@ mpgv <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 me <- function (N,
                 ss) {
 
@@ -476,6 +487,7 @@ me <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 nc11 <- function (N,
                   ss) {
 
@@ -564,6 +576,7 @@ nc11 <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 nc4 <- function (N,
                  ss) {
 
@@ -603,6 +616,7 @@ nc4 <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 pc <- function (N,
                 ss) {
 
@@ -672,6 +686,7 @@ pc <- function (N,
 #' beta_0 + beta_1 * x_1. This term is referred to as the signal strength.
 #'
 #' @export
+#'
 star <- function (N,
                   p,
                   ss) {

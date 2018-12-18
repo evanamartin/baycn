@@ -4,9 +4,12 @@
 \alias{mutate}
 \title{mutate}
 \usage{
-mutate(graph, m, mutationRate, prior)
+mutate(edgeType, graph, m, mutationRate, pmr, prior)
 }
 \arguments{
+\item{edgeType}{A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
+a gv-gv or ge-ge edge (1).}
+
 \item{graph}{A vector containing the DNA of the graph who was
 selected by the selectBest function.}
 
@@ -15,6 +18,10 @@ graph plus the fitness of the graph.}
 
 \item{mutationRate}{A number between 0 and 1. As a rule of thumb the mutation
 rate should be 1 / length of the DNA.}
+
+\item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
+Principle of Mendelian Randomization, PMR. This prevents the direction of an
+edge pointing from a gene expression node to a genetic variant node.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
