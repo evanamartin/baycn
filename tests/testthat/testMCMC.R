@@ -5,7 +5,7 @@ test_that('the MHEdge function returns the correct matrix',{
   # Load the standards to test against.
   load(system.file('testdata',
                    'standards.RData',
-                   package = 'edgeFrequency'))
+                   package = 'baycn'))
 
   set.seed(338)
 
@@ -20,7 +20,7 @@ test_that('the MHEdge function returns the correct matrix',{
                          nrow = 3)
 
   # Run the MH algorithm with the edges from the true graph.
-  mh_m1ge_200_1 <- MHEdge(adjMatrix = adjMatrix_m1,
+  mh_m1ge_200_1 <- mhEdge(adjMatrix = adjMatrix_m1,
                           data = data_m1ge_200_1,
                           iterations = 100,
                           mutationRate = 1/2,
@@ -44,7 +44,7 @@ test_that('the MHEdge function returns the correct matrix',{
                          nrow = 5)
 
   # Run the MH algorithm with the edges from the true graph.
-  mh_h2_200_1 <- MHEdge(adjMatrix = adjMatrix_h2,
+  mh_h2_200_1 <- mhEdge(adjMatrix = adjMatrix_h2,
                         data = data_h2_200_1,
                         iterations = 100,
                         mutationRate = 1/5,

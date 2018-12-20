@@ -5,7 +5,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
   # Load the standards to test against.
   load(system.file('testdata',
                    'standardsGV.RData',
-                   package = 'edgeFrequency'))
+                   package = 'baycn'))
 
   set.seed(22)
 
@@ -22,7 +22,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                            nrow = 3)
 
   # Run the MH algorithm with the edges from the true graph with out pmr.
-  mh_m1gv_200_1 <- MHEdge(adjMatrix = adjMatrix_m1gv,
+  mh_m1gv_200_1 <- mhEdge(adjMatrix = adjMatrix_m1gv,
                           data = data_m1gv_200_1,
                           iterations = 100,
                           mutationRate = 1/2,
@@ -34,7 +34,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                           scoreFun = 'logLikelihood')
 
   # Run the MH algorithm with the edges from the true graph with pmr.
-  mh_m1gv_200_1_pmr <- MHEdge(adjMatrix = adjMatrix_m1gv,
+  mh_m1gv_200_1_pmr <- mhEdge(adjMatrix = adjMatrix_m1gv,
                               data = data_m1gv_200_1,
                               iterations = 100,
                               mutationRate = 1/2,
@@ -58,7 +58,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                            byrow = TRUE)
 
   # Run the MH algorithm with the edges from the true graph without pmr.
-  mh_m3gv_200_1 <- MHEdge(adjMatrix = adjMatrix_m3gv,
+  mh_m3gv_200_1 <- mhEdge(adjMatrix = adjMatrix_m3gv,
                           data = data_m3gv_200_1,
                           iterations = 100,
                           mutationRate = 1/2,
@@ -70,7 +70,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                           scoreFun = 'logLikelihood')
 
   # Run the MH algorithm with the edges from the true graph with pmr.
-  mh_m3gv_200_1_pmr <- MHEdge(adjMatrix = adjMatrix_m3gv,
+  mh_m3gv_200_1_pmr <- mhEdge(adjMatrix = adjMatrix_m3gv,
                               data = data_m3gv_200_1,
                               iterations = 100,
                               mutationRate = 1/2,
@@ -81,9 +81,9 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                                         0.9),
                               scoreFun = 'logLikelihood')
 
-  expect_identical(m1gv_standard, mh_m1gv_200_1)
-  expect_identical(m1gv_standard_pmr, mh_m1gv_200_1_pmr)
-  expect_identical(m3gv_standard, mh_m3gv_200_1)
-  expect_identical(m3gv_standard_pmr, mh_m3gv_200_1_pmr)
+  expect_identical(standard_m1gv, mh_m1gv_200_1)
+  expect_identical(standard_m1gv_pmr, mh_m1gv_200_1_pmr)
+  expect_identical(standard_m3gv, mh_m3gv_200_1)
+  expect_identical(standard_m3gv_pmr, mh_m3gv_200_1_pmr)
 
 })
