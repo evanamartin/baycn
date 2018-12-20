@@ -62,13 +62,6 @@ adjMatrix_m3 <- matrix(c(0, 1, 1,
                        nrow = 3,
                        byrow = TRUE)
 
-adjMatrix_mp <- matrix(c(0, 0, 0, 1,
-                         0, 0, 0, 1,
-                         0, 0, 0, 1,
-                         0, 0, 0, 0),
-                       byrow = TRUE,
-                       nrow = 4)
-
 adjMatrix_me <- matrix(c(0, 0, 1, 0, 0,
                          0, 0, 0, 1, 0,
                          0, 0, 0, 0, 1,
@@ -76,6 +69,27 @@ adjMatrix_me <- matrix(c(0, 0, 1, 0, 0,
                          0, 0, 0, 0, 0),
                        byrow = TRUE,
                        nrow = 5)
+
+adjMatrix_mp <- matrix(c(0, 0, 0, 1,
+                         0, 0, 0, 1,
+                         0, 0, 0, 1,
+                         0, 0, 0, 0),
+                       byrow = TRUE,
+                       nrow = 4)
+
+adjMatrix_nc4 <- matrix(c(0, 0, 1, 0,
+                          0, 0, 1, 0,
+                          0, 0, 0, 1,
+                          0, 0, 0, 0),
+                        byrow = TRUE,
+                        nrow = 4)
+
+adjMatrix_nc4_fe <- matrix(c(0, 0, 1, 0,
+                             0, 0, 1, 1,
+                             0, 0, 0, 1,
+                             0, 0, 0, 0),
+                           byrow = TRUE,
+                           nrow = 4)
 
 adjMatrix_nc11 <- matrix(c(0,  1,  0,  0,  0,  0,  0,  0,  0,   0,   0,
                            1,  0,  1,  0,  0,  0,  0,  0,  0,   0,   0,
@@ -104,20 +118,6 @@ adjMatrix_nc11_fe <- matrix(c(0,  1,  0,  0,  1,  0,  0,  0,  0,   0,   1,
                               0,  0,  0,  0,  0,  0,  0,  0,  0,   1,   0),
                             byrow = TRUE,
                             nrow = 11)
-
-adjMatrix_nc4 <- matrix(c(0, 0, 1, 0,
-                          0, 0, 1, 0,
-                          0, 0, 0, 1,
-                          0, 0, 0, 0),
-                        byrow = TRUE,
-                        nrow = 4)
-
-adjMatrix_nc4_fe <- matrix(c(0, 0, 1, 0,
-                             0, 0, 1, 1,
-                             0, 0, 0, 1,
-                             0, 0, 0, 0),
-                           byrow = TRUE,
-                           nrow = 4)
 
 adjMatrix_pc <- matrix(c(0, 1, 0, 0, 0, 1, 0, 1,
                          0, 0, 1, 0, 1, 0, 0, 0,
