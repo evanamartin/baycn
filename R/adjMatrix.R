@@ -5,6 +5,22 @@ adjMatrix_g2 <- matrix(c(0, 1, 1, 0,
                        byrow = TRUE,
                        nrow = 4)
 
+adjMatrix_gmac_s2 <- matrix(c(0, 1, 1, 0, 0,
+                              0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0,
+                              0, 1, 1, 0, 0,
+                              0, 1, 1, 0, 0),
+                            byrow = TRUE,
+                            nrow = 5)
+
+adjMatrix_gmac_s4 <- matrix(c(0, 1, 1, 0, 0,
+                              0, 0, 1, 0, 0,
+                              0, 0, 0, 0, 0,
+                              0, 1, 1, 0, 0,
+                              0, 1, 1, 0, 0),
+                            byrow = TRUE,
+                            nrow = 5)
+
 adjMatrix_h2 <- matrix(c(0, 1, 1, 0, 0,
                          0, 0, 0, 1, 0,
                          0, 0, 0, 0, 1,
@@ -43,6 +59,14 @@ adjMatrix_m1_fe <- matrix(c(0, 1, 1,
                             0, 0, 0),
                           byrow = TRUE,
                           nrow = 3)
+
+adjMatrix_m1_hidden <- matrix(c(0, 1, 0, 0, 0,
+                                0, 0, 1, 0, 0,
+                                0, 0, 0, 0, 0,
+                                0, 1, 1, 0, 0,
+                                0, 1, 1, 0, 0),
+                              byrow = TRUE,
+                              nrow = 5)
 
 adjMatrix_m2 <- matrix(c(0, 1, 0,
                          0, 0, 0,

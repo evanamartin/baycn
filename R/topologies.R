@@ -41,6 +41,116 @@ g2 <- function (N,
 
 }
 
+#' gmac_s2
+#'
+#' Simulates data under scenario two with two hidden variables from the gmac
+#' algorithm paper.
+#'
+#' @param N The number of observations to generate.
+#'
+#' @param p The frequency of the reference allele.
+#'
+#' @param beta_h The signal strength of the hidden variables on the cis- and
+#' trans- genes.
+#'
+#' @param beta_lc The signal strength of the eQTL on the cis-gene.
+#'
+#' @param beta_lt The signal strength of the eQTL on the trans-gene.
+#'
+#' @export
+#'
+gmac_s2 <- function (N,
+                     p,
+                     beta_h,
+                     beta_lc,
+                     beta_lt) {
+
+  # Generate data for the genetic variant
+  l2 <- sample(0:2,
+               size = N,
+               replace = TRUE,
+               prob = c(p^2,
+                        2 * p * (1 - p),
+                        (1 - p)^2))
+
+  # Generate data for the two hidden variables.
+  h21 <- rnorm(n = N,
+               mean = 0,
+               sd = 1)
+
+  h22 <- rnorm(n = N,
+               mean = 0,
+               sd = 1)
+
+  # Generate data for the cis-gene.
+  c2 <- rnorm(n = N,
+              mean = beta_lc * l2 + beta_h * h21 + beta_h * h22,
+              sd = 1)
+
+  # Generate data for the trans-gene.
+  t2 <- rnorm(n = N,
+              mean = beta_lt * l2 + beta_h * h21 + beta_h * h22,
+              sd = 1)
+
+  return (cbind(l2, c2, t2, h21, h22))
+
+}
+
+#' gmac_s4
+#'
+#' Simulates data under scenario four with two hidden variables from the gmac
+#' algorithm paper.
+#'
+#' @param N The number of observations to generate.
+#'
+#' @param p The frequency of the reference allele.
+#'
+#' @param beta_h The signal strength of the hidden variables on the cis- and
+#' trans- genes.
+#'
+#' @param beta_lc The signal strength of the eQTL on the cis-gene.
+#'
+#' @param beta_lt The signal strength of the eQTL on the trans-gene.
+#'
+#' @export
+#'
+gmac_s4 <- function (N,
+                     p,
+                     beta_h,
+                     beta_lc,
+                     beta_lt) {
+
+  # Generate data for the genetic variant
+  l4 <- sample(0:2,
+               size = N,
+               replace = TRUE,
+               prob = c(p^2,
+                        2 * p * (1 - p),
+                        (1 - p)^2))
+
+  # Generate data for the two hidden variables.
+  h41 <- rnorm(n = N,
+               mean = 0,
+               sd = 1)
+
+  h42 <- rnorm(n = N,
+               mean = 0,
+               sd = 1)
+
+  # Generate data for the cis-gene.
+  c4 <- rnorm(n = N,
+              mean = beta_lc * l4 + beta_h * h41 + beta_h * h42,
+              sd = 1)
+
+  # Generate data for the trans-gene.
+  t4 <- rnorm(n = N,
+              mean = beta_lt * l4 + beta_h * h41 + beta_h * h42,
+              sd = 1)
+
+  return (cbind(l4, c4, t4, h41, h42))
+
+}
+
 #' h2
 #'
 #' Simulates data under topology H2.
@@ -111,7 +221,9 @@ layer <- function (N,
   V <- sample(x = 0:2,
               size = N,
               replace = TRUE,
-              prob = c((1 - p)^2, 2 * p * (1 - p), p^2))
+              prob = c((1 - p)^2,
+                       2 * p * (1 - p),
+                       p^2))
 
   T1 <- rMParents(N = N,
                   mParents = 1,
@@ -222,7 +334,9 @@ m1gv <- function (N,
   V <- sample(x = 0:2,
               size = N,
               replace = TRUE,
-              prob = c((1 - p)^2, 2 * p * (1 - p), p^2))
+              prob = c((1 - p)^2,
+                       2 * p * (1 - p),
+                       p^2))
 
   T1 <- rMParents(N = N,
                   mParents = 1,
@@ -239,6 +353,59 @@ m1gv <- function (N,
                   s = 1)
 
   return (cbind(V, T1, T2))
+
+}
+
+#' m1_hidden
+#'
+#' Simulates data under topology M1 with two hidden variables.
+#'
+#' @param N The number of observations to generate.
+#'
+#' @param p The frequency of the reference allele.
+#'
+#' @param beta_h The signal strength of the hidden variables on T1 and T2.
+#'
+#' @param beta_t1 The signal strength of V on T1.
+#'
+#' @param beta_t2 The signal strength of T1 on T2.
+#'
+#' @export
+#'
+m1_hidden <- function (N,
+                       p,
+                       beta_h,
+                       beta_t1,
+                       beta_t2) {
+
+  # Generate data for the genetic variant.
+  V <- sample(0:2,
+              size = N,
+              replace = TRUE,
+              prob = c(p^2,
+                       2 * p * (1 - p),
+                       (1 - p)^2))
+
+  # Generate data for the hidden variables.
+  h1 <- rnorm(n = N,
+              mean = 0,
+              sd = 1)
+
+  h2 <- rnorm(n = N,
+              mean = 0,
+              sd = 1)
+
+  # Generate data for T1.
+  T1 <- rnorm(n = N,
+              mean = beta_t1 * V + beta_h * h1 + beta_h * h2,
+              sd = 1)
+
+  # Generate data for T2.
+  T2 <- rnorm(n = N,
+              mean = beta_t2 * T1 + beta_h * h1 + beta_h * h2,
+              sd = 1)
+
+  return (cbind(V, T1, T2, h1, h2))
 
 }
 
@@ -295,7 +462,9 @@ m2gv <- function (N,
   V <- sample(x = 0:2,
               size = N,
               replace = TRUE,
-              prob = c((1 - p)^2, 2 * p * (1 - p), p^2))
+              prob = c((1 - p)^2,
+                       2 * p * (1 - p),
+                       p^2))
 
   T2 <- rNoParents(N = N,
                    b0 = 0,
@@ -332,7 +501,9 @@ m3gv <- function (N,
   V <- sample(x = 0:2,
               size = N,
               replace = TRUE,
-              prob = c((1 - p)^2, 2 * p * (1 - p), p^2))
+              prob = c((1 - p)^2,
+                       2 * p * (1 - p),
+                       p^2))
 
   T1 <- rMParents(N = N,
                   mParents = 1,
@@ -409,7 +580,9 @@ mpgv <- function (N,
   V <- sample(x = 0:2,
               size = N,
               replace = TRUE,
-              prob = c((1 - p)^2, 2 * p * (1 - p), p^2))
+              prob = c((1 - p)^2,
+                       2 * p * (1 - p),
+                       p^2))
 
   T1 <- rNoParents(N = N,
                    b0 = 0,
@@ -694,7 +867,9 @@ star <- function (N,
   V <- sample(x = 0:2,
               size = N,
               replace = TRUE,
-              prob = c((1 - p)^2, 2 * p * (1 - p), p^2))
+              prob = c((1 - p)^2,
+                       2 * p * (1 - p),
+                       p^2))
 
   T1 <- rMParents(N = N,
                   mParents = 1,
