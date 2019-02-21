@@ -5,7 +5,7 @@
 \title{mhEdge}
 \usage{
 mhEdge(adjMatrix, data, iterations, mutationRate, nGV, pmr = FALSE,
-  prior = c(0.05, 0.05, 0.9), scoreFun)
+  prior = c(0.05, 0.05, 0.9))
 }
 \arguments{
 \item{adjMatrix}{The adjacency matrix returned by the MRPC algorithm. The
@@ -29,9 +29,6 @@ edge pointing from a gene expression node to a genetic variant node.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
-
-\item{scoreFun}{A character string indicating what method to use for
-calculating the fitness.}
 }
 \value{
 A matrix where the first m columns are the edge directions and the
@@ -60,8 +57,9 @@ mh_m1_pmr <- mhEdge(adjMatrix = adjmatrix_m1,
                     mutationRate = 1/2,
                     nGV = 1,
                     pmr = TRUE,
-                    prior = c(0.05, 0.05, 0.9),
-                    scoreFun = 'logLikelihood')
+                    prior = c(0.05,
+                              0.05,
+                              0.9))
 
 # Run the Metropolis-Hastings algorithm on the same data as the previous
 # example but with pmr set to FALSE.
@@ -71,7 +69,8 @@ mh_m1 <- mhEdge(adjMatrix = adjmatrix_m1,
                 mutationRate = 1/2,
                 nGV = 1,
                 pmr = FALSE,
-                prior = c(0.05, 0.05, 0.9),
-                scoreFun = 'logLikelihood')
+                prior = c(0.05,
+                          0.05,
+                          0.9))
 
 }

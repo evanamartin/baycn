@@ -4,7 +4,7 @@
 \alias{cllEdge}
 \title{cllEdge}
 \usage{
-cllEdge(coordinates, data, graph, m, nGV, nNodes, pmr, scoreFun)
+cllEdge(coordinates, data, graph, m, nGV, nNodes, pmr)
 }
 \arguments{
 \item{coordinates}{A matrix of the row and column numbers of the nonzero
@@ -26,9 +26,6 @@ graph plus the fitness of the graph.}
 \item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
 Principle of Mendelian Randomization, PMR. This prevents the direction of an
 edge pointing from a gene expression node to a genetic variant node.}
-
-\item{scoreFun}{A character string indicating what method to use for
-calculating the fitness.}
 }
 \value{
 The log likelihood of the graph according to the orientation of the

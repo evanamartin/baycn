@@ -25,9 +25,6 @@
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
 #'
-#' @param scoreFun A character string indicating what method to use for
-#' calculating the fitness.
-#'
 #' @return A matrix where the first m columns are the edge directions and the
 #' m + 1 column is the log likelihood. Each row represents one graph.
 #'
@@ -50,8 +47,9 @@
 #'                     mutationRate = 1/2,
 #'                     nGV = 1,
 #'                     pmr = TRUE,
-#'                     prior = c(0.05, 0.05, 0.9),
-#'                     scoreFun = 'logLikelihood')
+#'                     prior = c(0.05,
+#'                               0.05,
+#'                               0.9))
 #'
 #' # Run the Metropolis-Hastings algorithm on the same data as the previous
 #' # example but with pmr set to FALSE.
@@ -61,8 +59,9 @@
 #'                 mutationRate = 1/2,
 #'                 nGV = 1,
 #'                 pmr = FALSE,
-#'                 prior = c(0.05, 0.05, 0.9),
-#'                 scoreFun = 'logLikelihood')
+#'                 prior = c(0.05,
+#'                           0.05,
+#'                           0.9))
 #'
 #' @export
 #'
@@ -74,8 +73,7 @@ mhEdge <- function (adjMatrix,
                     pmr = FALSE,
                     prior = c(0.05,
                               0.05,
-                              0.9),
-                    scoreFun) {
+                              0.9)) {
 
   # Check for potential cycles in the graph and return the edge directions, edge
   # numbers, and the decimal numbers for each cycle if any exist.
@@ -135,8 +133,7 @@ mhEdge <- function (adjMatrix,
                    m = m,
                    nGV = nGV,
                    nNodes = nNodes,
-                   pmr = pmr,
-                   scoreFun = scoreFun)
+                   pmr = pmr)
 
   # The initial graph is the first graph in the Markov chain.
   mcGraph[1, ] <- graph
@@ -187,8 +184,7 @@ mhEdge <- function (adjMatrix,
                       m = m,
                       nGV = nGV,
                       nNodes = nNodes,
-                      pmr = pmr,
-                      scoreFun = scoreFun)
+                      pmr = pmr)
 
     # When pmr is set to true sometimes the graph that is passed to cllEdge
     # is different from the graph that is returned by cllEdge. This happens when
@@ -212,8 +208,7 @@ mhEdge <- function (adjMatrix,
                              m = m,
                              pmr = pmr,
                              proposed = mGraph,
-                             prior = prior,
-                             scoreFun = scoreFun)
+                             prior = prior)
 
     # Store the accepted graph at each iteration in the mcGraph matrix.
     mcGraph[e, ] <- acceptedGraph

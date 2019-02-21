@@ -7,7 +7,7 @@
 #' @param current A vector of edge directions. This is the graph from
 #' the start of the current interation.
 #'
-#' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
+#' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (0) or
 #' a gv-gv or ge-ge edge (1).
 #'
 #' @param m The length of the individual vector. This is the number of edges in
@@ -23,9 +23,6 @@
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
 #'
-#' @param scoreFun A character string indicating the fitness to be used. The
-#' fitness can either be BIC of the log likelihood.
-#'
 #' @return A vector of edge directions and the fitness of the individual
 #'
 #' @importFrom stats runif
@@ -37,8 +34,7 @@ caRatio <- function (current,
                      m,
                      pmr,
                      proposed,
-                     prior,
-                     scoreFun) {
+                     prior) {
 
   # To calculate the acceptance ratio we need to first have the prio probability
   # of the edges in the old individual and the new individual. Because they will
@@ -101,61 +97,26 @@ caRatio <- function (current,
 
   }
 
-  switch (scoreFun,
+  ratio <- ((sum(priorP) + proposed[[m]] + sum(transProbP))
+            - (sum(priorC) + current[[m]] + sum(transProbC)))
 
-          'logLikelihood' = {
+  # Generate log uniform(0, 1) to compare to alpha which is
+  # min(ratio, 0).
+  logU <- log(runif(n = 1,
+                    min = 0,
+                    max = 1))
 
-            ratio <- ((sum(priorP) + proposed[[m]] + sum(transProbP))
-                      - (sum(priorC) + current[[m]] + sum(transProbC)))
+  alpha <- min(ratio, 0)
 
-            # Generate log uniform(0, 1) to compare to alpha which is
-            # min(ratio, 0).
-            logU <- log(runif(n = 1,
-                              min = 0,
-                              max = 1))
+  # Determine if the proposed graph should be accepted.
+  if (logU < alpha) {
 
-            alpha <- min(ratio, 0)
+    return (proposed)
 
-            # Determine if the proposed graph should be accepted.
-            if (logU < alpha) {
+  } else {
 
-              return (proposed)
+    return (current)
 
-            } else {
-
-              return (current)
-
-            }
-
-          },
-
-          'BIC' = {
-
-            # Because we want to minimize the BIC the ratio will change from
-            # new/old to old/new. This will change the caRatio function from
-            # always accepting a higher value to always accepting a lower value.
-            ratio <- ((sum(priorC) + current[[m]])
-                      - (sum(priorP) + proposed[[m]]))
-
-            # Generate log uniform(0, 1) to compare to alpha which is
-            # min(ratio, 0).
-            logU <- log(runif(n = 1,
-                              min = 0,
-                              max = 1))
-
-            alpha <- min(ratio, 0)
-
-            # Determine if the proposed graph should be accepted.
-            if (logU < alpha) {
-
-              return (proposed)
-
-            } else {
-
-              return (current)
-
-            }
-
-          })
+  }
 
 }

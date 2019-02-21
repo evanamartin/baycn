@@ -28,8 +28,7 @@ test_that('the MHEdge function returns the correct matrix',{
                           pmr = FALSE,
                           prior = c(0.05,
                                     0.05,
-                                    0.9),
-                          scoreFun = 'logLikelihood')
+                                    0.9))
 
   # Generate data under topology H2
   data_h2_200_1 <- h2(N = 200, ss = 1)
@@ -52,8 +51,7 @@ test_that('the MHEdge function returns the correct matrix',{
                         pmr = FALSE,
                         prior = c(0.05,
                                   0.05,
-                                  0.9),
-                        scoreFun = 'logLikelihood')
+                                  0.9))
 
   expect_identical(standard_m1ge, mh_m1ge_200_1)
   expect_identical(standard_h2, mh_h2_200_1)

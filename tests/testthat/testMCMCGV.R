@@ -30,8 +30,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                           pmr = FALSE,
                           prior = c(0.05,
                                     0.05,
-                                    0.9),
-                          scoreFun = 'logLikelihood')
+                                    0.9))
 
   # Run the MH algorithm with the edges from the true graph with pmr.
   mh_m1gv_200_1_pmr <- mhEdge(adjMatrix = adjMatrix_m1gv,
@@ -42,8 +41,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                               pmr = TRUE,
                               prior = c(0.05,
                                         0.05,
-                                        0.9),
-                              scoreFun = 'logLikelihood')
+                                        0.9))
 
   # Generate data under topology M3 with one genetic variant.
   data_m3gv_200_1 <- m3gv(N = 200,
@@ -66,8 +64,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                           pmr = FALSE,
                           prior = c(0.05,
                                     0.05,
-                                    0.9),
-                          scoreFun = 'logLikelihood')
+                                    0.9))
 
   # Run the MH algorithm with the edges from the true graph with pmr.
   mh_m3gv_200_1_pmr <- mhEdge(adjMatrix = adjMatrix_m3gv,
@@ -78,8 +75,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                               pmr = TRUE,
                               prior = c(0.05,
                                         0.05,
-                                        0.9),
-                              scoreFun = 'logLikelihood')
+                                        0.9))
 
   expect_identical(standard_m1gv, mh_m1gv_200_1)
   expect_identical(standard_m1gv_pmr, mh_m1gv_200_1_pmr)

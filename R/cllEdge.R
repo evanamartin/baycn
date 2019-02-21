@@ -23,9 +23,6 @@
 #' Principle of Mendelian Randomization, PMR. This prevents the direction of an
 #' edge pointing from a gene expression node to a genetic variant node.
 #'
-#' @param scoreFun A character string indicating what method to use for
-#' calculating the fitness.
-#'
 #' @return The log likelihood of the graph according to the orientation of the
 #' edges denoted by the DNA of the current graph.
 #'
@@ -39,8 +36,7 @@ cllEdge <- function (coordinates,
                      m,
                      nGV,
                      nNodes,
-                     pmr,
-                     scoreFun) {
+                     pmr) {
 
   # Convert the DNA of the current graph to an adjacency matrix
   adjMatrix <- toAdjMatrix(coordinates = coordinates,
@@ -61,38 +57,9 @@ cllEdge <- function (coordinates,
                    nGV = nGV,
                    nNodes = nNodes)
 
-  switch(scoreFun,
+  # Add the log likelihood the the end of the graph vector.
+  graph[[m]] <- sum(cll$logLikelihood)
 
-         'logLikelihood' = {
-
-           # Add the log likelihood the the end of the graph vector.
-           graph[[m]] <- sum(cll$logLikelihood)
-
-           return (graph)
-
-         },
-
-         'BIC' = {
-
-           # Calculate the sample size. This will be used in calculating BIC.
-           n <- dim(data)[2]
-
-           # Vector to hold the BIC for each node in the graph.
-           bic <- c()
-
-           # Calculate BIC for each node in the graph.
-           for (e in 1:nNodes) {
-
-             bic[[e]] <- (log(n) *
-                            (cll$nParents[[e]] + 2) -
-                            2 * cll$logLikelihood[[e]])
-
-           }
-
-           graph[[m]] <- sum(bic)
-
-           return (graph)
-
-         })
+  return (graph)
 
 }

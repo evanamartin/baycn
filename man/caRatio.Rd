@@ -4,13 +4,13 @@
 \alias{caRatio}
 \title{caRatio}
 \usage{
-caRatio(current, edgeType, m, pmr, proposed, prior, scoreFun)
+caRatio(current, edgeType, m, pmr, proposed, prior)
 }
 \arguments{
 \item{current}{A vector of edge directions. This is the graph from
 the start of the current interation.}
 
-\item{edgeType}{A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
+\item{edgeType}{A 0 or 1 indicating whether the edge is a gv-ge edge (0) or
 a gv-gv or ge-ge edge (1).}
 
 \item{m}{The length of the individual vector. This is the number of edges in
@@ -25,9 +25,6 @@ vector of edge directions.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
-
-\item{scoreFun}{A character string indicating the fitness to be used. The
-fitness can either be BIC of the log likelihood.}
 }
 \value{
 A vector of edge directions and the fitness of the individual
