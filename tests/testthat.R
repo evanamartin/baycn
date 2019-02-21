@@ -1,4 +1,4 @@
 library(testthat)
-library(edgeFrequency)
+library(baycn)
 
-test_check("edgeFrequency")
+test_check("baycn")
