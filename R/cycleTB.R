@@ -6,8 +6,9 @@
 #'
 #' @param branches A matrix that holds all the branches of a tree.
 #'
-#' @return tBranches A list of trimmed branches. The branches in this list
-#' contain only the nodes that could form a cycle.
+#' @return A list. The first element, tBranches, is a list of trimmed
+#' branches. The second element, nBranches, is an integer of the total number of
+#' branches in the tree.
 #'
 #' @importFrom stats na.omit
 #'
@@ -15,17 +16,20 @@
 #'
 cycleTB <- function (branches) {
 
+  # Get the number of branches in the tree.
+  nBranches <- dim(branches)[2]
+
   # A list to hold each trimmed branch. A trimmed branch contains only the nodes
   # that appear in a cycle. The branches passed to this function may contain
   # nodes that are connected to the cycle but are not part of the cycle.
-  tBranches <- list()
+  tBranches <- vector('list', nBranches)
 
   # The following loop will take each branch, starting at the leaf, and move
   # toward the root along the nodes until it sees a node that matches the leaf.
   # These nodes will form a cycle and they will be stored in tBranches.
-  for (e in 1:dim(branches)[2]) {
+  for (e in 1:nBranches) {
 
-    # A vector of the nodes that form a cycle. They will be in reserse order
+    # A vector of the nodes that form a cycle. They will be in reverse order
     # from how they were listed in the branches matrix.
     branch <- c()
 
@@ -64,6 +68,7 @@ cycleTB <- function (branches) {
 
   }
 
-  return (tBranches)
+  return (list(nBranches = nBranches,
+               tBranches = tBranches))
 
 }

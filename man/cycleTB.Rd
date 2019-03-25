@@ -10,8 +10,9 @@ cycleTB(branches)
 \item{branches}{A matrix that holds all the branches of a tree.}
 }
 \value{
-tBranches A list of trimmed branches. The branches in this list
-contain only the nodes that could form a cycle.
+A list. The first element, tBranches, is a list of trimmed
+branches. The second element, nBranches, is an integer of the total number of
+branches in the tree.
 }
 \description{
 Takes the branches created by the cycleBranches function and trims them. The

@@ -4,39 +4,54 @@
 #' of a directed cycle and takes the names of the nodes in each cycle and
 #' creates a vector of edge directions that form a directed cycle.
 #'
+#' @param nBranches An integer. The number of branches in the tree.
+#'
 #' @param tBranches A list of cycles. Each element in the list is a vector of
 #' nodes that could form a directed cycle.
 #'
 #' @return A list with the coordinates of the adjacency matrix for each edge in
-#' each cycle as the first element and the direction of the edges that form a
-#' directed cycle as the second element.
+#' each cycle as the first element in the list, a vector of columns visited by
+#' the current cycle as the second element, and the direction of the edges that
+#' form a directed cycle as the third element.
 #'
 #' @export
 #'
-cycleCED <- function (tBranches) {
+cycleCED <- function (nBranches,
+                      tBranches) {
 
   # Create a list that will have a list for each edge in each directed cycle.
   # The first level of lists are for each cycle and the sublists are for each
   # edge in the cycle.
-  cCoord <- list()
+  cCoord <- vector('list', nBranches)
+
+  # A list that will hold the column indices of each column visited in the SaL
+  # matrix by the current cycle.
+  Columns <- vector('list', nBranches)
 
   # The edgeDir list will hold the vectors of the edge directions that will form
   # a cycle in the graph.
-  edgeDir <- list()
+  edgeDir <- vector('list', nBranches)
 
   # This for loop loops through each trimmed branch or cycle present in the
   # graph.
-  for (e in 1:length(tBranches)) {
+  for (e in 1:nBranches) {
 
     # A sublist that holds the coordinates of the directed edge for all the
     # edges in the eth cycle.
     cCoord[[e]] <- list()
 
+    # A sublist that holds the columns indices for each column visited in the
+    # current cycle.
+    Columns[[e]] <- list()
+
+    # Get the nubmer of edges in the current cycle
+    nEdges <- length(tBranches[[e]]) - 1
+
     # A vector to hold the directions of each edge for the directed cycle.
-    edgeDir[[e]] <- list()
+    edgeDir[[e]] <- numeric(nEdges)
 
     # This for loop gets the row and column indices for each edge in the cycle.
-    for (v in 1:(length(tBranches[[e]]) - 1)) {
+    for (v in 1:nEdges) {
 
       # The row index is for the parent node and the column index is for the
       # child node. These indices will be used to determine if a 0 or 1 should
@@ -44,6 +59,10 @@ cycleCED <- function (tBranches) {
       # directed cycle.
       #                        Row index            Column index
       cCoord[[e]][[v]] <- c(tBranches[[e]][[v]], tBranches[[e]][[v + 1]])
+
+      # Keep the columns visited by each edge in the current cycle. This will be
+      # used to determine if there are disjoint cycles in the graph.
+      Columns[[e]][[v]] <- tBranches[[e]][[v + 1]]
 
       # If the value of the first node is less than the value of the second node
       # the direction of the edge points from the node with a smaller index to
@@ -64,11 +83,13 @@ cycleCED <- function (tBranches) {
 
     }
 
-    edgeDir[[e]] <- unlist(edgeDir[[e]])
-
   }
 
+  # Get the unique column numbers for each column visited
+  uColumns <- as.numeric(unique(unlist(Columns)))
+
   return (list(cCoord = cCoord,
+               columns = uColumns,
                edgeDir = edgeDir))
 
 }

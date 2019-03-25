@@ -5,8 +5,7 @@
 #' @param adjMatrix The adjacency matrix of the graph.
 #'
 #' @return A list containing the unique decimal numbers for the cycles in the
-#' graph, the number of each edge in each cycle, and the location in the
-#' original cycleDN list where each unique cycle occurs. If there are no cycles
+#' graph and the indices of each edge in every cycle. If there are no cycles
 #' in the graph the function returns NULL.
 #'
 #' @export
@@ -19,36 +18,70 @@ cyclePrep <- function (adjMatrix) {
   # If there aren't any cycles return NULL.
   if (is.null(SaL)) {
 
-    return (list(dnUnique = NULL,
-                 edgeNum = NULL,
-                 wCycle = NULL))
+    return (list(cycleDN = NULL,
+                 edgeNum = NULL))
 
   }
 
-  # If there are potential cycles in the graph then carry out the remaining
-  # functions to remove them.
+  # Creates a branch as deep as possible for each child of the parent node.
   branches <- cycleBranches(SaL)
+
+  # Trim the branches starting at the leaf node to only the nodes that belong to
+  # the cycle.
   tBranches <- cycleTB(branches)
-  ced <- cycleCED(tBranches)
+
+  # Extract the coordinates in the adjacency matrix for each edge in each
+  # directed cycle and the edge states that create a directed cycle.
+  ced <- cycleCED(nBranches = tBranches$nBranches,
+                  tBranches = tBranches$tBranches)
+
+  # Extract the indicies of the edges that form a cycle.
   edgeNum <- cycleEN(adjMatrix,
                      ced$cCoord)
+
+  # Convert each directed cycle into a decimal number.
   cycleDN <- decimal(ced$edgeDir,
                      edgeNum)
 
-  # Keep only the unique values of the decimal numbers.
-  dnUnique <- unique(cycleDN)
+  # Keep the row names of the original SaL matrix. This will be used to check if
+  # every row in the matrix has been used.
+  rowNamesSaL <- as.numeric(row.names(SaL))
 
-  # Get the location in the cycleDN vector where each unique number occurs.
-  # If there are multiple matches take only the first match.
-  wCycle <- c()
-  for (e in 1:length(dnUnique)) {
+  # Column names visited so far
+  columnNamesSaL <- ced$columns
 
-    wCycle[[e]] <- which(cycleDN == dnUnique[[e]])[[1]]
+  # Check if all the disjoint cycles have been found (if any).
+  disjoint <- setequal(rowNamesSaL, columnNamesSaL)
+
+  # Loop through the previous funcions, eliminating rows from the SaL matrix at
+  # each iteration of the while loop, until all cycles are found.
+  while (!disjoint) {
+
+    SaL2 <- SaL[-c(columnNamesSaL), ]
+    branches <- cycleBranches(SaL2)
+    tBranches <- cycleTB(branches)
+    ced <- cycleCED(nBranches = tBranches$nBranches,
+                    tBranches = tBranches$tBranches)
+    edgeNum2 <- cycleEN(adjMatrix,
+                        ced$cCoord)
+    cycleDN2 <- decimal(ced$edgeDir,
+                        edgeNum2)
+
+    # Add the new cycles, columns, and decimals to edgeNum and cycleDN
+    edgeNum <- append(edgeNum, edgeNum2)
+    columnNamesSaL <- append(columnNamesSaL, ced$columns)
+    cycleDN <- append(cycleDN, cycleDN2)
+
+    # Update the disjoint test
+    disjoint <- setequal(rowNamesSaL, columnNamesSaL)
 
   }
 
-  return (list(dnUnique = dnUnique,
-               edgeNum = edgeNum,
-               wCycle = wCycle))
+  # Keep only the unique values of the decimal numbers.
+  uniqueDN <- unique(cycleDN)
+
+  # Return the unique decimals and directed cycles
+  return (list(cycleDN = uniqueDN,
+               edgeNum = edgeNum[match(uniqueDN, cycleDN)]))
 
 }

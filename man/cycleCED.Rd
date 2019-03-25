@@ -4,16 +4,19 @@
 \alias{cycleCED}
 \title{cycleCED}
 \usage{
-cycleCED(tBranches)
+cycleCED(nBranches, tBranches)
 }
 \arguments{
+\item{nBranches}{An integer. The number of branches in the tree.}
+
 \item{tBranches}{A list of cycles. Each element in the list is a vector of
 nodes that could form a directed cycle.}
 }
 \value{
 A list with the coordinates of the adjacency matrix for each edge in
-each cycle as the first element and the direction of the edges that form a
-directed cycle as the second element.
+each cycle as the first element in the list, a vector of columns visited by
+the current cycle as the second element, and the direction of the edges that
+form a directed cycle as the third element.
 }
 \description{
 Extracts the coordinates of the adjacency matrix for each edge that is part

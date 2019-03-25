@@ -18,14 +18,13 @@ test_that('cyclePrep returns the correct cycles',{
 
   cp <- cyclePrep(adjMatrix)
 
-  expect_identical(cp$dnUnique, c(91, 3269, 16, 3191, 50, 53))
+  expect_identical(cp$cycleDN, c(91, 3269, 16, 3191, 50, 53))
   expect_equal(cp$edgeNum, list(c(2, 4, 1),
                                 c(3, 7, 6, 5, 4, 1),
                                 c(1, 4, 2),
                                 c(3, 7, 6, 5, 2),
                                 c(2, 5, 6, 7, 3),
                                 c(1, 4, 5, 6, 7, 3)))
-  expect_equal(length(cp$wCycle), 6)
 
   # The following adjacency matrix is from topology H2
   adjMatrix <- matrix(c(0, 1, 1, 0, 0,
@@ -38,10 +37,28 @@ test_that('cyclePrep returns the correct cycles',{
 
   cp <- cyclePrep(adjMatrix)
 
-  expect_identical(cp$dnUnique, c(288, 105))
+  expect_identical(cp$cycleDN, c(288, 105))
   expect_equal(cp$edgeNum, list(c(2, 4, 5, 3, 1),
                                 c(1, 3, 5, 4, 2)))
-  expect_equal(length(cp$wCycle), 2)
+
+  # The following adjacency matrix is from a graph with two disjoint cycles.
+  adjMatrix <- matrix(c(0, 1, 1, 0, 0, 0,
+                        1, 0, 1, 0, 0, 0,
+                        1, 1, 0, 0, 0, 0,
+                        0, 0, 0, 0, 1, 1,
+                        0, 0, 0, 1, 0, 1,
+                        0, 0, 0, 1, 1, 0),
+                      nrow = 6,
+                      byrow = TRUE)
+
+  cp <- cyclePrep(adjMatrix)
+
+  expect_identical(cp$cycleDN, c(36, 15, 825, 258))
+  expect_equal(cp$edgeNum, list(c(2, 3, 1),
+                                c(1, 3, 2),
+                                c(5, 6, 4),
+                                c(4, 6, 5)))
+
 })
 
 test_that('cyclePrep returns NULL if there are no cycles in the graph', {
@@ -59,9 +76,8 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
 
   cp <- cyclePrep(adjMatrix)
 
-  expect_true(is.null(cp$dnUnique))
+  expect_true(is.null(cp$cycleDN))
   expect_true(is.null(cp$edgeNum))
-  expect_true(is.null(cp$wCycle))
 
   # The adjacency matrix for topology NC8
   # T1 - T3 - T5 - T7
@@ -80,8 +96,7 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
 
   cp <- cyclePrep(adjMatrix)
 
-  expect_true(is.null(cp$dnUnique))
+  expect_true(is.null(cp$cycleDN))
   expect_true(is.null(cp$edgeNum))
-  expect_true(is.null(cp$wCycle))
 
 })

@@ -4,15 +4,11 @@
 \alias{decimalCI}
 \title{decimalCI}
 \usage{
-decimalCI(edgeNum, wCycle, individual)
+decimalCI(edgeNum, individual)
 }
 \arguments{
-\item{edgeNum}{A list containing the number of each edge for each cycle in
+\item{edgeNum}{A list containing the index of each edge for each cycle in
 the graph.}
-
-\item{wCycle}{A vector of the locations in the cycleDN vector where each
-unique number occurs. The unique numbers refer to each of the unique cycles
-in the graph. This argument is NULL if there are no cycles in the graph.}
 
 \item{individual}{A vector containing the DNA and the log likelihood of the
 current individual.}

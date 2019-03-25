@@ -3,8 +3,8 @@
 #' Changes the edge direction of the current graph until there are no directed
 #' cylces.
 #'
-#' @param dnUnique A vector of unique decimal numbers for each potential cycle
-#' in the graph.
+#' @param cycleDN A vector of decimal numbers for each directed cycle in the
+#' graph.
 #'
 #' @param edgeNum A list containing the numbers for each of the edges in each of
 #' the potential cycles in the graph.
@@ -22,32 +22,26 @@
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
 #'
-#' @param wCycle A vector of the locations in the cycleDN vector where each
-#' unique number occurs. The unique numbers refer to each of the unique cycles
-#' in the graph. This argument is NULL if there are no cycles in the graph.
-#'
 #' @return A vector of the DNA of the individual with the cycles removed.
 #'
 #' @export
 #'
-rmCycle <- function (dnUnique,
+rmCycle <- function (cycleDN,
                      edgeNum,
                      edgeType,
                      individual,
                      pmr,
-                     prior,
-                     wCycle) {
+                     prior) {
 
   # Get the decimal numbers for each potential cycle in the current individual.
   dnCI <- decimalCI(edgeNum,
-                    wCycle,
                     individual)
 
   # If there is a cycle change the direction of an edge invovled in the cycle.
-  while (any(dnCI == dnUnique)) {
+  while (any(dnCI == cycleDN)) {
 
     # Get the edges that create a cycle in the current individual.
-    whichCycle <- which(dnCI == dnUnique)
+    whichCycle <- which(dnCI == cycleDN)
 
     for (e in 1:length(whichCycle)) {
 
@@ -91,7 +85,6 @@ rmCycle <- function (dnUnique,
     # Get the decimal numbers for each potential cycle in the current individual
     # after an edge in each cycle has been changed.
     dnCI <- decimalCI(edgeNum,
-                      wCycle,
                       individual)
 
   }

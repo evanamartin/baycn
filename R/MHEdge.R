@@ -113,16 +113,15 @@ mhEdge <- function (adjMatrix,
 
   # Check the output of the cyclePrep function. If there are cycles in the graph
   # run the rmCycle function to remove any directed cycles.
-  if (!is.null(cp$dnUnique)) {
+  if (!is.null(cp$cycleDN)) {
 
     # Remove any directed cycles in the graph.
-    graph <- rmCycle(dnUnique = cp$dnUnique,
+    graph <- rmCycle(cycleDN = cp$cycleDN,
                      edgeNum = cp$edgeNum,
                      edgeType = edgeType,
                      individual = graph,
                      pmr = pmr,
-                     prior = prior,
-                     wCycle = cp$wCycle)
+                     prior = prior)
 
   }
 
@@ -151,16 +150,15 @@ mhEdge <- function (adjMatrix,
 
     # If there are potential directed cycles in the graph check if they are
     # present and remove them if they are.
-    if (!is.null(cp$dnUnique)) {
+    if (!is.null(cp$cycleDN)) {
 
       # Remove any directed cycles in the graph.
-      mGraph <- rmCycle(dnUnique = cp$dnUnique,
+      mGraph <- rmCycle(cycleDN = cp$cycleDN,
                         edgeNum = cp$edgeNum,
                         edgeType = edgeType,
                         individual = mGraph,
                         pmr = pmr,
-                        prior = prior,
-                        wCycle = cp$wCycle)
+                        prior = prior)
 
     }
 

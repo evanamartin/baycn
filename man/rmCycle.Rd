@@ -4,11 +4,11 @@
 \alias{rmCycle}
 \title{rmCycle}
 \usage{
-rmCycle(dnUnique, edgeNum, edgeType, individual, pmr, prior, wCycle)
+rmCycle(cycleDN, edgeNum, edgeType, individual, pmr, prior)
 }
 \arguments{
-\item{dnUnique}{A vector of unique decimal numbers for each potential cycle
-in the graph.}
+\item{cycleDN}{A vector of decimal numbers for each directed cycle in the
+graph.}
 
 \item{edgeNum}{A list containing the numbers for each of the edges in each of
 the potential cycles in the graph.}
@@ -25,10 +25,6 @@ edge pointing from a gene expression node to a genetic variant node.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
-
-\item{wCycle}{A vector of the locations in the cycleDN vector where each
-unique number occurs. The unique numbers refer to each of the unique cycles
-in the graph. This argument is NULL if there are no cycles in the graph.}
 }
 \value{
 A vector of the DNA of the individual with the cycles removed.

@@ -11,8 +11,7 @@ cyclePrep(adjMatrix)
 }
 \value{
 A list containing the unique decimal numbers for the cycles in the
-graph, the number of each edge in each cycle, and the location in the
-original cycleDN list where each unique cycle occurs. If there are no cycles
+graph and the indices of each edge in every cycle. If there are no cycles
 in the graph the function returns NULL.
 }
 \description{
