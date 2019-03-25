@@ -342,23 +342,23 @@ m1gv <- function (N,
                   mParents = 1,
                   parentData = list(V),
                   b0 = 0,
-                  b1 = list(1),
+                  b1 = list(ss),
                   s = 1)
 
   T2 <- rMParents(N = N,
                   mParents = 1,
                   parentData = list(T1),
                   b0 = 0,
-                  b1 = list(1),
+                  b1 = list(ss),
                   s = 1)
 
   return (cbind(V, T1, T2))
 
 }
 
-#' m1_hidden
+#' m1_hidden_c
 #'
-#' Simulates data under topology M1 with two hidden variables.
+#' Simulates data under topology M1 with two hidden (confounder) variables.
 #'
 #' @param N The number of observations to generate.
 #'
@@ -372,13 +372,12 @@ m1gv <- function (N,
 #'
 #' @export
 #'
-m1_hidden <- function (N,
-                       p,
-                       beta_h,
-                       beta_t1,
-                       beta_t2) {
+m1_hidden_c <- function (N,
+                         p,
+                         beta_h,
+                         beta_t1,
+                         beta_t2) {
 
-  # Generate data for the genetic variant.
   V <- sample(0:2,
               size = N,
               replace = TRUE,
@@ -386,7 +385,6 @@ m1_hidden <- function (N,
                        2 * p * (1 - p),
                        (1 - p)^2))
 
-  # Generate data for the hidden variables.
   h1 <- rnorm(n = N,
               mean = 0,
               sd = 1)
@@ -395,15 +393,135 @@ m1_hidden <- function (N,
               mean = 0,
               sd = 1)
 
-  # Generate data for T1.
   T1 <- rnorm(n = N,
               mean = beta_t1 * V + beta_h * h1 + beta_h * h2,
               sd = 1)
 
-  # Generate data for T2.
   T2 <- rnorm(n = N,
               mean = beta_t2 * T1 + beta_h * h1 + beta_h * h2,
               sd = 1)
+
+  return (cbind(V, T1, T2, h1, h2))
+
+}
+
+#' m1_hidden_cc
+#'
+#' Simulates data under topology M1 with two hidden (common child) variables.
+#'
+#' @param N The number of observations to generate.
+#'
+#' @param p The frequency of the reference allele.
+#'
+#' @param beta_h The signal strength between the hidden variables and T1 and T2.
+#'
+#' @param beta_t1 The signal strength of V on T1.
+#'
+#' @param beta_t2 The signal strength of T1 on T2.
+#'
+#' @export
+#'
+m1_hidden_cc <- function (N,
+                          p,
+                          beta_h,
+                          beta_t1,
+                          beta_t2) {
+
+  V <- sample(x = 0:2,
+              size = N,
+              replace = TRUE,
+              prob = c((1 - p)^2,
+                       2 * p * (1 - p),
+                       p^2))
+
+  T1 <- rMParents(N = N,
+                  mParents = 1,
+                  parentData = list(V),
+                  b0 = 0,
+                  b1 = list(beta_t1),
+                  s = 1)
+
+  T2 <- rMParents(N = N,
+                  mParents = 1,
+                  parentData = list(T1),
+                  b0 = 0,
+                  b1 = list(beta_t2),
+                  s = 1)
+
+  h1 <- rMParents(N = N,
+                  mParents = 2,
+                  parentData = list(T1, T2),
+                  b0 = 0,
+                  b1 = list(beta_h, beta_h),
+                  s = 1)
+
+  h2 <- rMParents(N = N,
+                  mParents = 2,
+                  parentData = list(T1, T2),
+                  b0 = 0,
+                  b1 = list(beta_h, beta_h),
+                  s = 1)
+
+  return (cbind(V, T1, T2, h1, h2))
+
+}
+
+#' m1_hidden_i
+#'
+#' Simulates data under topology M1 with two hidden (intermediate) variables.
+#'
+#' @param N The number of observations to generate.
+#'
+#' @param p The frequency of the reference allele.
+#'
+#' @param beta_h The signal strength between the hidden variables and T1 and T2.
+#'
+#' @param beta_t1 The signal strength of V on T1.
+#'
+#' @param beta_t2 The signal strength of T1 on T2.
+#'
+#' @export
+#'
+m1_hidden_i <- function (N,
+                         p,
+                         beta_h,
+                         beta_t1,
+                         beta_t2) {
+
+  V <- sample(0:2,
+              size = N,
+              replace = TRUE,
+              prob = c(p^2,
+                       2 * p * (1 - p),
+                       (1 - p)^2))
+
+  T1 <- rMParents(N = N,
+                  mParents = 1,
+                  parentData = list(V),
+                  b0 = 0,
+                  b1 = list(beta_t1),
+                  s = 1)
+
+  h1 <- rMParents(N = N,
+                  mParents = 1,
+                  parentData = list(T1),
+                  b0 = 0,
+                  b1 = list(beta_h),
+                  s = 1)
+
+  h2 <- rMParents(N = N,
+                  mParents = 1,
+                  parentData = list(T1),
+                  b0 = 0,
+                  b1 = list(beta_h),
+                  s = 1)
+
+  T2 <- rMParents(N = N,
+                  mParents = 1,
+                  parentData = list(T1, h1, h2),
+                  b0 = 0,
+                  b1 = list(beta_t2, beta_h, beta_h),
+                  s = 1)
 
   return (cbind(V, T1, T2, h1, h2))
 
@@ -474,7 +592,7 @@ m2gv <- function (N,
                   mParents = 2,
                   parentData = list(V, T2),
                   b0 = 0,
-                  b1 = list(1, 1),
+                  b1 = list(ss, ss),
                   s = 1)
 
   return (cbind(V, T1, T2))
@@ -509,14 +627,14 @@ m3gv <- function (N,
                   mParents = 1,
                   parentData = list(V),
                   b0 = 0,
-                  b1 = list(1),
+                  b1 = list(ss),
                   s = 1)
 
   T2 <- rMParents(N = N,
                   mParents = 1,
                   parentData = list(V),
                   b0 = 0,
-                  b1 = list(1),
+                  b1 = list(ss),
                   s = 1)
 
   return (cbind(V, T1, T2))
