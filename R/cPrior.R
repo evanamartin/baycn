@@ -7,7 +7,7 @@
 #' edge states that the current edge can move to.
 #'
 #' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
-#' a gv-gv or ge-ge edge (1).
+#' a gv-gv or ge-ge edge (0).
 #'
 #' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
 #' Principle of Mendelian Randomization, PMR. This prevents the direction of an
