@@ -111,6 +111,14 @@ mhEdge <- function (adjMatrix,
                   replace = TRUE,
                   prob = prior)
 
+  # Check if any gv nodes have ge node parents.
+  if (pmr == TRUE) {
+
+    # Change the direction of the ge -> gv edges to gv -> ge.
+    graph[edgeType == 1 & graph == 1] <- 0
+
+  }
+
   # Check the output of the cyclePrep function. If there are cycles in the graph
   # run the rmCycle function to remove any directed cycles.
   if (!is.null(cp$cycleDN)) {
