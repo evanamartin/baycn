@@ -4,16 +4,13 @@
 \alias{cllNormal}
 \title{cllNormal}
 \usage{
-cllNormal(adjMatrix, data, k, logLikelihood, nGV, nNodes)
+cllNormal(adjMatrix, data, logLikelihood, nGV, nNodes)
 }
 \arguments{
 \item{adjMatrix}{The adjacency matrix according to the edge directions of the
 current graph.}
 
 \item{data}{The data matrix.}
-
-\item{k}{A vector containing the number of parents for each genetic variant
-node. This vector will be used if the scoreFun argument is set to 'BIC'.}
 
 \item{logLikelihood}{A vector containing the log likelihood for each genetic
 variant node.}
@@ -23,9 +20,7 @@ variant node.}
 \item{nNodes}{The total number of nodes in the graph.}
 }
 \value{
-A list containing two elements. The first element is a vector with
-the log likelihood for each node. The second element is a vector with the
-number of parents for each node.
+A vector with the log likelihood for each node.
 }
 \description{
 Calculates the log likelihood for a node with normal data.

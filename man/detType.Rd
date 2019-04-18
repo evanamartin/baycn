@@ -4,11 +4,13 @@
 \alias{detType}
 \title{detType}
 \usage{
-detType(coord, nGV, pmr)
+detType(coord, nEdges, nGV, pmr)
 }
 \arguments{
 \item{coord}{A matrix of row and column indices for each edge in the
 network. The indices are from the adjacency matrix.}
+
+\item{nEdges}{The number of edges in the graph.}
 
 \item{nGV}{The number of genetic variants in the graph.}
 

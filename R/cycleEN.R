@@ -21,18 +21,25 @@ cycleEN <- function (adjMatrix,
   # forming.
   position <- coordinates(adjMatrix)
 
+  # Number of directed cycles in the graph.
+  nCycles <- length(cCoord)
+
   # Stores the location of each edge for each cycle in the tBranches list
-  edgeNum <- list()
+  edgeNum <- vector(mode = 'list',
+                    length = nCycles)
 
   # The first for loop loops through each of the cycles present in the graph.
-  for (e in 1:length(cCoord)) {
+  for (e in 1:nCycles) {
+
+    nEdges <- length(cCoord[[e]])
 
     # Create a list to store the edge number for each edge in the cycle.
-    edgeNum[[e]] <- list()
+    edgeNum[[e]] <- vector(mode = 'numeric',
+                           length = nEdges)
 
     # This for loop is the length of the current cycle, the number of edges in
     # the cycle.
-    for (v in 1:length(cCoord[[e]])) {
+    for (v in 1:nEdges) {
 
       # This loops through all of the coordinates for each edge in the graph and
       # compares the coordinates of the current edge from the cycle to the
@@ -54,10 +61,8 @@ cycleEN <- function (adjMatrix,
 
     }
 
-    edgeNum[[e]] <- unlist(edgeNum[[e]])
-
   }
 
-  return (edgeNum)
+return (edgeNum)
 
 }

@@ -4,9 +4,11 @@
 \alias{toAdjMatrix}
 \title{toAdjMatrix}
 \usage{
-toAdjMatrix(coordinates, graph, nNodes)
+toAdjMatrix(amZero, coordinates, graph, nEdges)
 }
 \arguments{
+\item{amZero}{An adjacency matrix of zeros.}
+
 \item{coordinates}{A matrix with the row and column coordinates of the
 edges from the adjacency matrix from the MRPC function. The row numbers of
 each nonzero element make up the first row in the matrix and the column
@@ -15,10 +17,10 @@ numbers of each nonzero element make up the second row of the matrix.}
 \item{graph}{A vector containing the directions of the edges in the
 graph and the log likelihood of the graph.}
 
-\item{nNodes}{The number of nodes in the graph.}
+\item{nEdges}{The number of edges in the graph.}
 }
 \value{
-An adjacency matrix.
+An adjacency matrix given the current edge states.
 }
 \description{
 Creates an adjacency matrix from the DNA of the current graph. The DNA

@@ -21,7 +21,9 @@ decimalCI <- function (edgeNum,
   # These directions along with the edge numbers will be used to calculate a
   # decimal number for each potential cycle given the directions of the current
   # individual.
-  curDir <- vector('list', length(edgeNum))
+  curDir <- vector(mode = 'list',
+                   length =  length(edgeNum))
+
   for (e in 1:length(edgeNum)) {
 
     # Directions of the edges that could form a cycle from the current

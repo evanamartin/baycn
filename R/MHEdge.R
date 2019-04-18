@@ -83,14 +83,15 @@ mhEdge <- function (adjMatrix,
   # elements in the adjacency matrix and to create the DNA of the individuals.
   coord <- coordinates(adjMatrix = adjMatrix)
 
+  # Get the number of edges in the graph.
+  nEdges <- dim(coord)[2]
+
   # Get the edge types for each edge in the graph. The two edge types are gv-ge
   # or gv-gv, ge-ge.
   edgeType <- detType(coord = coord,
+                      nEdges = nEdges,
                       nGV = nGV,
                       pmr = pmr)
-
-  # Get the number of edges in the graph.
-  nEdges <- dim(coord)[2]
 
   # Get the number of nodes in the graph. This will be used in for loops
   # throughout the function.
@@ -138,9 +139,9 @@ mhEdge <- function (adjMatrix,
                    data = data,
                    graph = graph,
                    m = m,
+                   nEdges = nEdges,
                    nGV = nGV,
-                   nNodes = nNodes,
-                   pmr = pmr)
+                   nNodes = nNodes)
 
   # The initial graph is the first graph in the Markov chain.
   mcGraph[1, ] <- graph
@@ -188,25 +189,9 @@ mhEdge <- function (adjMatrix,
                       data = data,
                       graph = mGraph,
                       m = m,
+                      nEdges = nEdges,
                       nGV = nGV,
-                      nNodes = nNodes,
-                      pmr = pmr)
-
-    # When pmr is set to true sometimes the graph that is passed to cllEdge
-    # is different from the graph that is returned by cllEdge. This happens when
-    # a gv node is the child of a ge node . It is possible that the changes made
-    # to the graph in the cllEdge function revert the graph back to the graph at
-    # iteration e - 1. We need to check if the two graphs are equal and return
-    # the graph at iteration e - 1 if they are.
-    if (identical(mGraph[1:nEdges], mcGraph[e - 1, 1:nEdges])) {
-
-      # Add the e - 1 graph to the eth row of the mcGraph matrix.
-      mcGraph[e, ] <- mcGraph[e - 1, ]
-
-      # Skip the rest of the for loop and go to the next iteration.
-      next
-
-    }
+                      nNodes = nNodes)
 
     # Determine whether to accept the new graph or the original graph.
     acceptedGraph <- caRatio(current = mcGraph[e - 1, ],

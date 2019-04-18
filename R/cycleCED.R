@@ -22,30 +22,30 @@ cycleCED <- function (nBranches,
   # Create a list that will have a list for each edge in each directed cycle.
   # The first level of lists are for each cycle and the sublists are for each
   # edge in the cycle.
-  cCoord <- vector('list', nBranches)
+  cCoord <- vector(mode = 'list',
+                   length = nBranches)
 
   # A list that will hold the column indices of each column visited in the SaL
   # matrix by the current cycle.
-  Columns <- vector('list', nBranches)
+  Columns <- vector(mode = 'list',
+                    length = nBranches)
 
   # The edgeDir list will hold the vectors of the edge directions that will form
   # a cycle in the graph.
-  edgeDir <- vector('list', nBranches)
+  edgeDir <- vector(mode = 'list',
+                    length = nBranches)
 
-  # This for loop loops through each trimmed branch or cycle present in the
+  # Loop through each trimmed branch or cycle present in the
   # graph.
   for (e in 1:nBranches) {
 
-    # A sublist that holds the coordinates of the directed edge for all the
-    # edges in the eth cycle.
-    cCoord[[e]] <- list()
+    # Get the nubmer of edges in the current cycle
+    nEdges <- length(tBranches[[e]]) - 1
 
     # A sublist that holds the columns indices for each column visited in the
     # current cycle.
-    Columns[[e]] <- list()
-
-    # Get the nubmer of edges in the current cycle
-    nEdges <- length(tBranches[[e]]) - 1
+    Columns[[e]] <- vector(mode = 'integer',
+                           length = nEdges)
 
     # A vector to hold the directions of each edge for the directed cycle.
     edgeDir[[e]] <- numeric(nEdges)
@@ -62,7 +62,7 @@ cycleCED <- function (nBranches,
 
       # Keep the columns visited by each edge in the current cycle. This will be
       # used to determine if there are disjoint cycles in the graph.
-      Columns[[e]][[v]] <- tBranches[[e]][[v + 1]]
+      Columns[[e]][[v]] <- as.numeric(tBranches[[e]][[v + 1]])
 
       # If the value of the first node is less than the value of the second node
       # the direction of the edge points from the node with a smaller index to
@@ -86,7 +86,7 @@ cycleCED <- function (nBranches,
   }
 
   # Get the unique column numbers for each column visited
-  uColumns <- as.numeric(unique(unlist(Columns)))
+  uColumns <- unique(unlist(Columns))
 
   return (list(cCoord = cCoord,
                columns = uColumns,

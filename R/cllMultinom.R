@@ -11,9 +11,7 @@
 #'
 #' @param nNodes The total number of nodes in the graph.
 #'
-#' @return A list containing two elements. The first element is a vector with
-#' the log likelihood for each node. The second element is a vector with the
-#' number of parents for each node.
+#' @return A vector with the log likelihood for each node.
 #'
 #' @importFrom MASS polr
 #'
@@ -26,19 +24,16 @@ cllMultinom <- function (adjMatrix,
                          nGV,
                          nNodes){
 
-  # A vector to hold the number of parents for each node in the graph.
-  k <- c()
-
   # A vector to hold the log likelihood for each node in the graph.
-  logLikelihood <- c()
+  logLikelihood <- vector(mode = 'numeric',
+                          length = nNodes)
 
   # If there are no genetic variants in the data return an empty list for the
   # log likelihood and the number of parents for each node. This will be used by
   # the cllNormal function.
   if (nGV == 0) {
 
-    return(list(logLikelihood = logLikelihood,
-                nParents = k))
+    return(logLikelihood)
 
   }
 
@@ -59,19 +54,8 @@ cllMultinom <- function (adjMatrix,
       # Calculate the probability of each level of counts.
       lprob <- log(counts / sum(counts))
 
-      # Create a vector to hold the log of the probability of seeing each value
-      # the observed number of times.
-      lp <- c()
-
-      # Loop through each of the levels of the genetic variant to calculate the
-      # log likelihood.
-      for (v in 1:length(counts)) {
-
-        lp[[v]] <- lprob[[v]] * counts[[v]]
-
-      }
-
-      ll <- sum(lp)
+      # Store the log likelihood for the current node.
+      logLikelihood[[e]] <- sum(lprob * counts)
 
     } else {
 
@@ -85,20 +69,13 @@ cllMultinom <- function (adjMatrix,
       model <- polr(as.factor(y) ~ .,
                     data = parentData)
 
-      ll <- logLik(model)[1]
+      # Store the log likelihood for the current node.
+      logLikelihood[[e]] <- logLik(model)[1]
 
     }
 
-    # Store the number of parents for each node. This will be used if the
-    # scoreFun argument is set to 'BIC'.
-    k[[e]] <- nParents
-
-    # Store the log likelihood for the current node.
-    logLikelihood[[e]] <- ll
-
   }
 
-  return (list(logLikelihood = logLikelihood,
-               nParents = k))
+  return (logLikelihood)
 
 }

@@ -17,9 +17,7 @@ current graph.}
 \item{nNodes}{The total number of nodes in the graph.}
 }
 \value{
-A list containing two elements. The first element is a vector with
-the log likelihood for each node. The second element is a vector with the
-number of parents for each node.
+A vector with the log likelihood for each node.
 }
 \description{
 Calculates the log likelihood for a node with multinomial data.

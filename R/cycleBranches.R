@@ -22,14 +22,18 @@ cycleBranches <- function (SaL) {
   # Create a vector of the children of the root node.
   rChildren <- names(SaL[1, SaL[1, ] == 1])
 
+  # Get the number of children of the root node.
+  nChildren <- length(rChildren)
+
   # Create a list to hold the matrices of cycles. There will be one matrix for
   # each child of the root node.
-  tree <- list()
+  tree <- vector(mode = 'list',
+                 length = nChildren)
 
   # This for loop will go through each child of the root node and build a matrix
   # that contains all of the nodes that could form a directed cycle down the
   # columns of the matrix.
-  for (e in 1:length(rChildren)) {
+  for (e in 1:nChildren) {
 
     # A matrix that holds the cycles of the eth child of the root node.
     tree[[e]] <- matrix(nrow = nrow(SaL) + 1,

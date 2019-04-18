@@ -50,22 +50,29 @@ caRatio <- function (current,
   # Extract the edge type for the edges that have changed.
   etDiff <- edgeType[difference]
 
+  # Number of changed edges.
+  nDiff <- length(edgeDirP)
+
   # After getting the edge directions for each edge that is different between
   # the current and proposed graphs we need to get the prior probability
   # associated with each edge direction.
-  priorP <- c()
-  priorC <- c()
+  priorP <- vector(mode = 'numeric',
+                   length = nDiff)
+  priorC <- vector(mode = 'numeric',
+                   length = nDiff)
 
   # The following vectors will contain the transition probabilities for the
   # current and proposed graphs. transProbP will hold the probabilities for
   # moving from the proposed graph to the current graph and transProbC will hold
   # the probabilities of moving from the current graph to the proposed graph.
-  transProbP <- c()
-  transProbC <- c()
+  transProbP <- vector(mode = 'numeric',
+                       length = nDiff)
+  transProbC <- vector(mode = 'numeric',
+                       length = nDiff)
 
   # Attach the correct prior probability to each edge direction for both the old
   # and new individuals.
-  for(e in 1:length(edgeDirP)) {
+  for(e in 1:nDiff) {
 
     # I can use the edge direction (0, 1, or 2) to select the correct prior by
     # adding a 1 to it and using that number to subset the prior vector. For

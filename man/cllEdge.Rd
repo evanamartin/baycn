@@ -4,9 +4,11 @@
 \alias{cllEdge}
 \title{cllEdge}
 \usage{
-cllEdge(coordinates, data, graph, m, nGV, nNodes, pmr)
+cllEdge(amZero, coordinates, data, graph, m, nGV, nEdges, nNodes)
 }
 \arguments{
+\item{amZero}{An adjacency matrix of zeros.}
+
 \item{coordinates}{A matrix of the row and column numbers of the nonzero
 elements in the adjacency matrix. The row numbers make up the first row of
 the coordinates matrix and the column numbers make up the second row.}
@@ -21,11 +23,9 @@ graph plus the fitness of the graph.}
 
 \item{nGV}{The number of genetic variants in the graph.}
 
-\item{nNodes}{The number of nodes in the graph.}
+\item{nEdges}{The number of edges in the graph.}
 
-\item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
-Principle of Mendelian Randomization, PMR. This prevents the direction of an
-edge pointing from a gene expression node to a genetic variant node.}
+\item{nNodes}{The number of nodes in the graph.}
 }
 \value{
 The log likelihood of the graph according to the orientation of the

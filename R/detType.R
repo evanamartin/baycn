@@ -6,6 +6,8 @@
 #' @param coord A matrix of row and column indices for each edge in the
 #' network. The indices are from the adjacency matrix.
 #'
+#' @param nEdges The number of edges in the graph.
+#'
 #' @param nGV The number of genetic variants in the graph.
 #'
 #' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
@@ -17,17 +19,19 @@
 #' @export
 #'
 detType <- function (coord,
+                     nEdges,
                      nGV,
                      pmr) {
 
   if (pmr == TRUE) {
 
     # Vector to hold the edge type.
-    forbidden <- c()
+    forbidden <- vector(mode = 'integer',
+                        length = nEdges)
 
     # Loop through the coordinates matrix and determine the edge type based on
     # where the coordinates fall in the adjacency matrix.
-    for (e in 1:ncol(coord)) {
+    for (e in 1:nEdges) {
 
       # Look for edges in the lower left matrix. Where the adjacency matrix is
       # divided into four submatrices by the number of genetic variants present.
@@ -49,7 +53,7 @@ detType <- function (coord,
 
     # If pmr is set to false all edges will be edge type 0 because we don't care
     # to distinguish between the different edge types.
-    forbidden <- c(rep(0, ncol(coord)))
+    forbidden <- c(rep(0, nEdges))
 
   }
 

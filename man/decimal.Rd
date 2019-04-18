@@ -10,7 +10,7 @@ decimal(edgeDir, edgeNum)
 \item{edgeDir}{A list containing the directions of the edges for each cycle
 in the graph.}
 
-\item{edgeNum}{A list containing the edge number of each edge in each cycle
+\item{edgeNum}{A list containing the edge index of each edge in each cycle
 of the graph.}
 }
 \value{

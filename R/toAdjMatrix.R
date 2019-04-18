@@ -12,24 +12,28 @@
 #' @param graph A vector containing the directions of the edges in the
 #' graph and the log likelihood of the graph.
 #'
+#' @param nEdges The number of edges in the graph.
+#'
 #' @param nNodes The number of nodes in the graph.
 #'
-#' @return An adjacency matrix.
+#' @return An adjacency matrix given the current edge states.
 #'
 #' @export
 #'
 toAdjMatrix <- function (coordinates,
                          graph,
+                         nEdges,
                          nNodes) {
 
-  adjMatrix <- matrix(rep(0, nNodes^2),
+  # Create a pxp matrix of 0s to be converted to an adjacency matrix.
+  adjMatrix <- matrix(0,
                       nrow = nNodes,
                       ncol = nNodes)
 
   # create the adjacency matrix with the edges oriented according to the DNA.
   # This will be used in determining which function to use when calculating the
   # log likelihood for each node.
-  for(e in 1:(length(graph) - 1)) {
+  for(e in 1:nEdges) {
 
     if (graph[[e]] == 0) {
 

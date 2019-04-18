@@ -7,9 +7,6 @@
 #'
 #' @param data The data matrix.
 #'
-#' @param k A vector containing the number of parents for each genetic variant
-#' node. This vector will be used if the scoreFun argument is set to 'BIC'.
-#'
 #' @param logLikelihood A vector containing the log likelihood for each genetic
 #' variant node.
 #'
@@ -17,15 +14,12 @@
 #'
 #' @param nNodes The total number of nodes in the graph.
 #'
-#' @return A list containing two elements. The first element is a vector with
-#' the log likelihood for each node. The second element is a vector with the
-#' number of parents for each node.
+#' @return A vector with the log likelihood for each node.
 #'
 #' @importFrom stats lm logLik sd
 #'
 cllNormal <- function (adjMatrix,
                        data,
-                       k,
                        logLikelihood,
                        nGV,
                        nNodes){
@@ -41,10 +35,11 @@ cllNormal <- function (adjMatrix,
     # likelihood given the edge directions of the current graph.
     if (nParents == 0) {
 
-      ll <- sum(dnorm(x = data[, e],
-                      mean = mean(data[, e]),
-                      sd = sd(data[, e]),
-                      log = TRUE))
+      # Store the log likelihood for the current node.
+      logLikelihood[[e]] <- sum(dnorm(x = data[, e],
+                                      mean = mean(data[, e]),
+                                      sd = sd(data[, e]),
+                                      log = TRUE))
 
     } else {
 
@@ -56,20 +51,13 @@ cllNormal <- function (adjMatrix,
       model <- lm(y ~ .,
                   data = parentData)
 
-      ll <- logLik(model)[1]
+      # Store the log likelihood for the current node.
+      logLikelihood[[e]] <- logLik(model)[1]
 
     }
 
-    # Store the number of parents for each node. This will be used if the
-    # scoreFun argument is set to 'BIC'.
-    k[[e]] <- nParents
-
-    # Store the log likelihood for the current node.
-    logLikelihood[[e]] <- ll
-
   }
 
-  return (list(logLikelihood = logLikelihood,
-               nParents = k))
+  return (logLikelihood)
 
 }

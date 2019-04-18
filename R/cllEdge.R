@@ -15,13 +15,11 @@
 #' @param m The length of the graph vector. This is the number of edges in the
 #' graph plus the fitness of the graph.
 #'
+#' @param nEdges The number of edges in the graph.
+#'
 #' @param nGV The number of genetic variants in the graph.
 #'
 #' @param nNodes The number of nodes in the graph.
-#'
-#' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
-#' Principle of Mendelian Randomization, PMR. This prevents the direction of an
-#' edge pointing from a gene expression node to a genetic variant node.
 #'
 #' @return The log likelihood of the graph according to the orientation of the
 #' edges denoted by the DNA of the current graph.
@@ -35,12 +33,13 @@ cllEdge <- function (coordinates,
                      graph,
                      m,
                      nGV,
-                     nNodes,
-                     pmr) {
+                     nEdges,
+                     nNodes) {
 
   # Convert the DNA of the current graph to an adjacency matrix
   adjMatrix <- toAdjMatrix(coordinates = coordinates,
                            graph = graph,
+                           nEdges = nEdges,
                            nNodes = nNodes)
 
   # Calculate the log likelihood for the genetic variant nodes.
@@ -52,13 +51,12 @@ cllEdge <- function (coordinates,
   # Calculate the log likelihood for the gene expression nodes.
   cll <- cllNormal(adjMatrix = adjMatrix,
                    data = data,
-                   k = cllM$nParents,
-                   logLikelihood = cllM$logLikelihood,
+                   logLikelihood = cllM,
                    nGV = nGV,
                    nNodes = nNodes)
 
-  # Add the log likelihood the the end of the graph vector.
-  graph[[m]] <- sum(cll$logLikelihood)
+  # Add the log likelihood to the end of the graph vector.
+  graph[[m]] <- sum(cll)
 
   return (graph)
 

@@ -59,7 +59,7 @@ mutate <- function (edgeType,
                    replace = FALSE)
 
   # Loop through the edges to be mutated
-  for (e in 1:length(wEdges)) {
+  for (e in 1:nEdges) {
 
     if (newGraph[[wEdges[[e]]]] == 0) {
 
