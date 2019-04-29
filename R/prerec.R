@@ -31,7 +31,9 @@ prerec <- function (iMatrix,
   tTotal <- sum(tEdges)
 
   # Calculate the precision of the graph.
-  precision <- nCorrect / iTotal
+  precision <- ifelse(test = iTotal == 0,
+                      yes = 0,
+                      no = nCorrect / iTotal)
 
   # Calculate the recall of the graph.
   recall <- nCorrect / tTotal
