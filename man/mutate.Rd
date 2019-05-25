@@ -4,20 +4,15 @@
 \alias{mutate}
 \title{mutate}
 \usage{
-mutate(edgeType, graph, m, mutationRate, pmr, prior)
+mutate(edgeType, graph, nEdges, pmr, prior, ztbProb)
 }
 \arguments{
 \item{edgeType}{A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
-a gv-gv or ge-ge edge (1).}
+a gv-gv or ge-ge edge (0).}
 
-\item{graph}{A vector containing the DNA of the graph who was
-selected by the selectBest function.}
+\item{graph}{A vector containing the current edge states for each edge.}
 
-\item{m}{The length of the graph vector. This is the number of edges in the
-graph plus the fitness of the graph.}
-
-\item{mutationRate}{A number between 0 and 1. As a rule of thumb the mutation
-rate should be 1 / length of the DNA.}
+\item{nEdges}{The number of edges in the graph.}
 
 \item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
 Principle of Mendelian Randomization, PMR. This prevents the direction of an
@@ -25,11 +20,14 @@ edge pointing from a gene expression node to a genetic variant node.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
+
+\item{ztbProb}{A vector of probabilities for 1:nEdges from a zero truncated
+binomial distribution.}
 }
 \value{
 A vector of the edge directions and log likelihood.
 }
 \description{
-Takes the edge directions of the current graph mutates it according to the
-mutation rate passed to the function.
+Takes the current graph and changes at least one of the edges from its
+current edge state to a different edge state.
 }

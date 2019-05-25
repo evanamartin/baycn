@@ -4,8 +4,8 @@
 \alias{mhEdge}
 \title{mhEdge}
 \usage{
-mhEdge(adjMatrix, data, iterations, mutationRate, nGV, pmr = FALSE,
-  prior = c(0.05, 0.05, 0.9))
+mhEdge(adjMatrix, data, iterations, nGV, pmr = FALSE, prior = c(0.05,
+  0.05, 0.9))
 }
 \arguments{
 \item{adjMatrix}{The adjacency matrix returned by the MRPC algorithm. The
@@ -17,9 +17,6 @@ down the rows.}
 
 \item{iterations}{An integer for the number of iterations to run the MH
 algorithm.}
-
-\item{mutationRate}{A number between 0 and 1. As a rule of thumb the mutation
-rate should be 1 / (number of edges in the graph).}
 
 \item{nGV}{The number of genetic variants in the graph.}
 
@@ -54,7 +51,6 @@ adjmatrix_m1 <- matrix(c(0, 1, 0,
 mh_m1_pmr <- mhEdge(adjMatrix = adjmatrix_m1,
                     data = data_m1,
                     iterations = 500,
-                    mutationRate = 1/2,
                     nGV = 1,
                     pmr = TRUE,
                     prior = c(0.05,
@@ -66,7 +62,6 @@ mh_m1_pmr <- mhEdge(adjMatrix = adjmatrix_m1,
 mh_m1 <- mhEdge(adjMatrix = adjmatrix_m1,
                 data = data_m1,
                 iterations = 500,
-                mutationRate = 1/2,
                 nGV = 1,
                 pmr = FALSE,
                 prior = c(0.05,

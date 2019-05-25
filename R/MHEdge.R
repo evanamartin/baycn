@@ -13,9 +13,6 @@
 #' @param iterations An integer for the number of iterations to run the MH
 #' algorithm.
 #'
-#' @param mutationRate A number between 0 and 1. As a rule of thumb the mutation
-#' rate should be 1 / (number of edges in the graph).
-#'
 #' @param nGV The number of genetic variants in the graph.
 #'
 #' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
@@ -27,6 +24,8 @@
 #'
 #' @return A matrix where the first m columns are the edge directions and the
 #' m + 1 column is the log likelihood. Each row represents one graph.
+#'
+#' @importFrom stats dbinom
 #'
 #' @examples
 #' # Generate data under topology M1.
@@ -44,7 +43,6 @@
 #' mh_m1_pmr <- mhEdge(adjMatrix = adjmatrix_m1,
 #'                     data = data_m1,
 #'                     iterations = 500,
-#'                     mutationRate = 1/2,
 #'                     nGV = 1,
 #'                     pmr = TRUE,
 #'                     prior = c(0.05,
@@ -56,7 +54,6 @@
 #' mh_m1 <- mhEdge(adjMatrix = adjmatrix_m1,
 #'                 data = data_m1,
 #'                 iterations = 500,
-#'                 mutationRate = 1/2,
 #'                 nGV = 1,
 #'                 pmr = FALSE,
 #'                 prior = c(0.05,
@@ -68,7 +65,6 @@
 mhEdge <- function (adjMatrix,
                     data,
                     iterations,
-                    mutationRate,
                     nGV,
                     pmr = FALSE,
                     prior = c(0.05,
@@ -93,6 +89,12 @@ mhEdge <- function (adjMatrix,
                       nGV = nGV,
                       pmr = pmr)
 
+  # Calculate the probability for 1:nEdges from a zero truncated binomial
+  # distribution.
+  ztbProb <- dbinom(x = 1:nEdges,
+                    size = nEdges,
+                    prob = 1 / nEdges) / (1 - (1 - 1/nEdges)^nEdges)
+
   # Get the number of nodes in the graph. This will be used in for loops
   # throughout the function.
   nNodes <- ncol(adjMatrix)
@@ -103,8 +105,8 @@ mhEdge <- function (adjMatrix,
 
   # Create a matrix to hold the accepted graph at each iteration of the MH
   # algorithm.
-  mcGraph <- matrix(nrow = iterations,
-                    ncol = m)
+  MarkovChain <- matrix(nrow = iterations,
+                        ncol = m)
 
   # Randomly generate a starting graph.
   graph <- sample(x = c(0, 1, 2),
@@ -144,18 +146,18 @@ mhEdge <- function (adjMatrix,
                    nNodes = nNodes)
 
   # The initial graph is the first graph in the Markov chain.
-  mcGraph[1, ] <- graph
+  MarkovChain[1, ] <- graph
 
   # Run through the iterations of the Metropolis Hastings algorithm.
   for (e in 2:iterations) {
 
-    # Mutate the graph at each iteration.
+    # Change the current graph to a different graph at each iteration.
     mGraph <- mutate(edgeType = edgeType,
-                     graph = mcGraph[e - 1, ],
-                     m = m,
-                     mutationRate = mutationRate,
+                     graph = MarkovChain[e - 1, ],
+                     nEdges = nEdges,
                      pmr = pmr,
-                     prior = prior)
+                     prior = prior,
+                     ztbProb = ztbProb)
 
     # If there are potential directed cycles in the graph check if they are
     # present and remove them if they are.
@@ -174,17 +176,17 @@ mhEdge <- function (adjMatrix,
     # If the graph after mutation and removing directed cycles is the same as
     # the graph at the previous iteration then return that graph without
     # calculating the log likelihood.
-    if (identical(mGraph[1:nEdges], mcGraph[e - 1, 1:nEdges])) {
+    if (identical(MarkovChain[1:nEdges], MarkovChain[e - 1, 1:nEdges])) {
 
-      # Add the e - 1 graph to the eth row of the mcGraph matrix.
-      mcGraph[e, ] <- mcGraph[e - 1, ]
+      # Add the e - 1 graph to the eth row of the MarkovChain matrix.
+      MarkovChain[e, ] <- MarkovChain[e - 1, ]
 
       # Skip the rest of the for loop and go to the next iteration
       next
 
     }
 
-    # Calculate the log likelihood of the mutated graph
+    # Calculate the log likelihood of the changed graph
     mGraph <- cllEdge(coordinates = coord,
                       data = data,
                       graph = mGraph,
@@ -194,18 +196,18 @@ mhEdge <- function (adjMatrix,
                       nNodes = nNodes)
 
     # Determine whether to accept the new graph or the original graph.
-    acceptedGraph <- caRatio(current = mcGraph[e - 1, ],
+    acceptedGraph <- caRatio(current = MarkovChain[e - 1, ],
                              edgeType = edgeType,
                              m = m,
                              pmr = pmr,
                              proposed = mGraph,
                              prior = prior)
 
-    # Store the accepted graph at each iteration in the mcGraph matrix.
-    mcGraph[e, ] <- acceptedGraph
+    # Store the accepted graph at each iteration in the MarkovChain matrix.
+    MarkovChain[e, ] <- acceptedGraph
 
   }
 
-  return (mcGraph)
+  return (MarkovChain)
 
 }
