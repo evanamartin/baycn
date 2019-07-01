@@ -10,6 +10,9 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10)
-Imports: MASS
-RoxygenNote: 6.0.1
+Imports:
+  ggplot2,
+  MASS,
+  methods
+RoxygenNote: 6.1.1
 Suggests: testthat

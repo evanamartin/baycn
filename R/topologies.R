@@ -218,7 +218,7 @@ layer <- function (N,
                    p,
                    ss) {
 
-  V <- sample(x = 0:2,
+  U <- sample(x = 0:2,
               size = N,
               replace = TRUE,
               prob = c((1 - p)^2,
@@ -227,21 +227,21 @@ layer <- function (N,
 
   T1 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(ss),
                   s = 1)
 
   T2 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(ss),
                   s = 1)
 
   T3 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(ss),
                   s = 1)
@@ -274,7 +274,7 @@ layer <- function (N,
                   b1 = list(ss),
                   s = 1)
 
-  return (cbind(V, T1, T2, T3, T4, T5, T6, T7))
+  return (cbind(U, T1, T2, T3, T4, T5, T6, T7))
 
 }
 
@@ -331,7 +331,7 @@ m1gv <- function (N,
                   p,
                   ss) {
 
-  V <- sample(x = 0:2,
+  U <- sample(x = 0:2,
               size = N,
               replace = TRUE,
               prob = c((1 - p)^2,
@@ -340,7 +340,7 @@ m1gv <- function (N,
 
   T1 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(ss),
                   s = 1)
@@ -352,7 +352,7 @@ m1gv <- function (N,
                   b1 = list(ss),
                   s = 1)
 
-  return (cbind(V, T1, T2))
+  return (cbind(U, T1, T2))
 
 }
 
@@ -378,7 +378,7 @@ m1_hidden_c <- function (N,
                          beta_t1,
                          beta_t2) {
 
-  V <- sample(0:2,
+  U <- sample(0:2,
               size = N,
               replace = TRUE,
               prob = c(p^2,
@@ -394,14 +394,14 @@ m1_hidden_c <- function (N,
               sd = 1)
 
   T1 <- rnorm(n = N,
-              mean = beta_t1 * V + beta_h * h1 + beta_h * h2,
+              mean = beta_t1 * U + beta_h * h1 + beta_h * h2,
               sd = 1)
 
   T2 <- rnorm(n = N,
               mean = beta_t2 * T1 + beta_h * h1 + beta_h * h2,
               sd = 1)
 
-  return (cbind(V, T1, T2, h1, h2))
+  return (cbind(U, T1, T2, h1, h2))
 
 }
 
@@ -427,7 +427,7 @@ m1_hidden_cc <- function (N,
                           beta_t1,
                           beta_t2) {
 
-  V <- sample(x = 0:2,
+  U <- sample(x = 0:2,
               size = N,
               replace = TRUE,
               prob = c((1 - p)^2,
@@ -436,7 +436,7 @@ m1_hidden_cc <- function (N,
 
   T1 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(beta_t1),
                   s = 1)
@@ -462,7 +462,7 @@ m1_hidden_cc <- function (N,
                   b1 = list(beta_h, beta_h),
                   s = 1)
 
-  return (cbind(V, T1, T2, h1, h2))
+  return (cbind(U, T1, T2, h1, h2))
 
 }
 
@@ -488,7 +488,7 @@ m1_hidden_i <- function (N,
                          beta_t1,
                          beta_t2) {
 
-  V <- sample(0:2,
+  U <- sample(0:2,
               size = N,
               replace = TRUE,
               prob = c(p^2,
@@ -497,7 +497,7 @@ m1_hidden_i <- function (N,
 
   T1 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(beta_t1),
                   s = 1)
@@ -523,7 +523,7 @@ m1_hidden_i <- function (N,
                   b1 = list(beta_t2, beta_h, beta_h),
                   s = 1)
 
-  return (cbind(V, T1, T2, h1, h2))
+  return (cbind(U, T1, T2, h1, h2))
 
 }
 
@@ -577,7 +577,7 @@ m2gv <- function (N,
                   p,
                   ss) {
 
-  V <- sample(x = 0:2,
+  U <- sample(x = 0:2,
               size = N,
               replace = TRUE,
               prob = c((1 - p)^2,
@@ -590,12 +590,12 @@ m2gv <- function (N,
 
   T1 <- rMParents(N = N,
                   mParents = 2,
-                  parentData = list(V, T2),
+                  parentData = list(U, T2),
                   b0 = 0,
                   b1 = list(ss, ss),
                   s = 1)
 
-  return (cbind(V, T1, T2))
+  return (cbind(U, T1, T2))
 
 }
 
@@ -616,7 +616,7 @@ m3gv <- function (N,
                   p,
                   ss) {
 
-  V <- sample(x = 0:2,
+  U <- sample(x = 0:2,
               size = N,
               replace = TRUE,
               prob = c((1 - p)^2,
@@ -625,19 +625,19 @@ m3gv <- function (N,
 
   T1 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(ss),
                   s = 1)
 
   T2 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(ss),
                   s = 1)
 
-  return (cbind(V, T1, T2))
+  return (cbind(U, T1, T2))
 
 }
 
@@ -695,7 +695,7 @@ mpgv <- function (N,
                   p,
                   ss) {
 
-  V <- sample(x = 0:2,
+  U <- sample(x = 0:2,
               size = N,
               replace = TRUE,
               prob = c((1 - p)^2,
@@ -712,12 +712,12 @@ mpgv <- function (N,
 
   T3 <- rMParents(N = N,
                   mParents = 3,
-                  parentData = list(V, T1, T2),
+                  parentData = list(U, T1, T2),
                   b0 = 0,
                   b1 = list(ss, ss, ss),
                   s = 1)
 
-  return (cbind(V, T1, T2, T3))
+  return (cbind(U, T1, T2, T3))
 
 }
 
@@ -982,7 +982,7 @@ star <- function (N,
                   p,
                   ss) {
 
-  V <- sample(x = 0:2,
+  U <- sample(x = 0:2,
               size = N,
               replace = TRUE,
               prob = c((1 - p)^2,
@@ -991,7 +991,7 @@ star <- function (N,
 
   T1 <- rMParents(N = N,
                   mParents = 1,
-                  parentData = list(V),
+                  parentData = list(U),
                   b0 = 0,
                   b1 = list(ss),
                   s = 1)
@@ -1024,6 +1024,6 @@ star <- function (N,
                   b1 = list(ss),
                   s = 1)
 
-  return (cbind(V, T1, T2, T3, T4, T5))
+  return (cbind(U, T1, T2, T3, T4, T5))
 
 }
