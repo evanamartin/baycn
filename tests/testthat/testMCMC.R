@@ -21,13 +21,15 @@ test_that('the MHEdge function returns the correct matrix',{
 
   # Run the MH algorithm with the edges from the true graph.
   mh_m1ge_200_1 <- mhEdge(adjMatrix = adjMatrix_m1,
+                          burnIn = 0,
                           data = data_m1ge_200_1,
                           iterations = 100,
                           nGV = 0,
                           pmr = FALSE,
                           prior = c(0.05,
                                     0.05,
-                                    0.9))
+                                    0.9),
+                          thinTo = 100)
 
   # Generate data under topology H2
   data_h2_200_1 <- h2(N = 200, ss = 1)
@@ -43,15 +45,20 @@ test_that('the MHEdge function returns the correct matrix',{
 
   # Run the MH algorithm with the edges from the true graph.
   mh_h2_200_1 <- mhEdge(adjMatrix = adjMatrix_h2,
+                        burnIn = 0,
                         data = data_h2_200_1,
                         iterations = 100,
                         nGV = 0,
                         pmr = FALSE,
                         prior = c(0.05,
                                   0.05,
-                                  0.9))
+                                  0.9),
+                        thinTo = 100)
 
-  expect_identical(standard_m1ge, mh_m1ge_200_1)
-  expect_identical(standard_h2, mh_h2_200_1)
+  expect_identical(standard_m1ge@chain, mh_m1ge_200_1@chain)
+  expect_identical(standard_h2@chain, mh_h2_200_1@chain)
+
+  expect_identical(standard_m1ge@likelihood, mh_m1ge_200_1@likelihood)
+  expect_identical(standard_h2@likelihood, mh_h2_200_1@likelihood)
 
 })

@@ -4,11 +4,9 @@
 \alias{cllEdge}
 \title{cllEdge}
 \usage{
-cllEdge(amZero, coordinates, data, graph, m, nGV, nEdges, nNodes)
+cllEdge(coordinates, data, graph, m, nGV, nEdges, nNodes)
 }
 \arguments{
-\item{amZero}{An adjacency matrix of zeros.}
-
 \item{coordinates}{A matrix of the row and column numbers of the nonzero
 elements in the adjacency matrix. The row numbers make up the first row of
 the coordinates matrix and the column numbers make up the second row.}

@@ -7,6 +7,9 @@
 #' adjacency matrix is a matrix of zeros and ones. The ones represent an edge
 #' and also indicates the direction of that edge.
 #'
+#' @param burnIn A number between 0 and 1 indicating the percentage of the
+#' sample that will be discarded.
+#'
 #' @param data A matrix with the nodes across the columns and the observations
 #' down the rows.
 #'
@@ -22,8 +25,13 @@
 #' @param prior A vector containing the prior probability of seeing each edge
 #' direction.
 #'
+#' @param thinTo An integer indicating the number of observations the sample
+#' should be thinned to.
+#'
 #' @return A matrix where the first m columns are the edge directions and the
 #' m + 1 column is the log likelihood. Each row represents one graph.
+#'
+#' @importFrom methods new
 #'
 #' @importFrom stats dbinom
 #'
@@ -63,13 +71,15 @@
 #' @export
 #'
 mhEdge <- function (adjMatrix,
+                    burnIn = 0.2,
                     data,
-                    iterations,
+                    iterations = 1000,
                     nGV,
                     pmr = FALSE,
                     prior = c(0.05,
                               0.05,
-                              0.9)) {
+                              0.9),
+                    thinTo = 200) {
 
   # Check for potential cycles in the graph and return the edge directions, edge
   # numbers, and the decimal numbers for each cycle if any exist.
@@ -103,10 +113,33 @@ mhEdge <- function (adjMatrix,
   # fitness of the individual.
   m <- nEdges + 1
 
+  # A vector of indices that indicate which iterations will be kept.
+  if (burnIn == 0) {
+
+    keep <- ceiling(seq(from = 1,
+                        to = iterations,
+                        length.out = thinTo))
+
+  } else {
+
+    keep <- ceiling(seq(from = burnIn * iterations,
+                        to = iterations,
+                        length.out = thinTo))
+
+  }
+
+
+  # A counter used to fill in the MarkovChain matrix.
+  counter <- 0
+
   # Create a matrix to hold the accepted graph at each iteration of the MH
   # algorithm.
-  MarkovChain <- matrix(nrow = iterations,
+  MarkovChain <- matrix(nrow = thinTo,
                         ncol = m)
+
+  # Create a vector to hold the decimal number for the accepted graph.
+  graphDecimal <- vector(mode = 'integer',
+                         length = thinTo)
 
   # Randomly generate a starting graph.
   graph <- sample(x = c(0, 1, 2),
@@ -145,15 +178,15 @@ mhEdge <- function (adjMatrix,
                    nGV = nGV,
                    nNodes = nNodes)
 
-  # The initial graph is the first graph in the Markov chain.
-  MarkovChain[1, ] <- graph
+  # Get the time that the for loop starts.
+  startTime <- Sys.time()
 
   # Run through the iterations of the Metropolis Hastings algorithm.
-  for (e in 2:iterations) {
+  for (e in 1:iterations) {
 
     # Change the current graph to a different graph at each iteration.
     mGraph <- mutate(edgeType = edgeType,
-                     graph = MarkovChain[e - 1, ],
+                     graph = graph,
                      nEdges = nEdges,
                      pmr = pmr,
                      prior = prior,
@@ -176,10 +209,21 @@ mhEdge <- function (adjMatrix,
     # If the graph after mutation and removing directed cycles is the same as
     # the graph at the previous iteration then return that graph without
     # calculating the log likelihood.
-    if (identical(MarkovChain[1:nEdges], MarkovChain[e - 1, 1:nEdges])) {
+    if (identical(mGraph[1:nEdges], graph[1:nEdges])) {
 
-      # Add the e - 1 graph to the eth row of the MarkovChain matrix.
-      MarkovChain[e, ] <- MarkovChain[e - 1, ]
+      # Store the accepted graph after burnin and thinning.
+      if (e %in% keep) {
+
+        # Update the counter if e is in the keep vector
+        counter <- counter + 1
+
+        # Store the accepted graph in the MarkovChain matrix
+        MarkovChain[counter, ] <- graph
+
+        # Calculate the decimal for the accepted graph.
+        graphDecimal[[counter]] <- sum(graph[1:nEdges] * 3^(1:nEdges))
+
+      }
 
       # Skip the rest of the for loop and go to the next iteration
       next
@@ -195,19 +239,42 @@ mhEdge <- function (adjMatrix,
                       nGV = nGV,
                       nNodes = nNodes)
 
-    # Determine whether to accept the new graph or the original graph.
-    acceptedGraph <- caRatio(current = MarkovChain[e - 1, ],
-                             edgeType = edgeType,
-                             m = m,
-                             pmr = pmr,
-                             proposed = mGraph,
-                             prior = prior)
+    # Determine whether to accept the proposed graph 'mGraph' or the original
+    # graph 'graph'.
+    graph <- caRatio(current = graph,
+                     edgeType = edgeType,
+                     m = m,
+                     pmr = pmr,
+                     proposed = mGraph,
+                     prior = prior)
 
-    # Store the accepted graph at each iteration in the MarkovChain matrix.
-    MarkovChain[e, ] <- acceptedGraph
+    # Store the accepted graph after burnin and thinning.
+    if (e %in% keep) {
+
+      # Update the counter if e is in the keep vector
+      counter <- counter + 1
+
+      # Store the accepted graph in the MarkovChain matrix
+      MarkovChain[counter, ] <- graph
+
+      # Calculate the decimal for the accepted graph.
+      graphDecimal[[counter]] <- sum(graph[1:nEdges] * 3^(1:nEdges))
+
+    }
 
   }
 
-  return (MarkovChain)
+  # Get the time the for loop ends
+  endTime <- Sys.time()
+
+  # Return an object of class mcmc
+  mcmcObj <- new('mcmc',
+                 chain = MarkovChain[, 1:nEdges],
+                 decimal = graphDecimal,
+                 likelihood = MarkovChain[, m],
+                 time = as.double((endTime - startTime),
+                                  units = 'secs'))
+
+  return (mcmcObj)
 
 }

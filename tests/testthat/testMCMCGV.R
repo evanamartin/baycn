@@ -23,23 +23,27 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
 
   # Run the MH algorithm with the edges from the true graph with out pmr.
   mh_m1gv_200_1 <- mhEdge(adjMatrix = adjMatrix_m1gv,
+                          burnIn = 0,
                           data = data_m1gv_200_1,
                           iterations = 100,
                           nGV = 1,
                           pmr = FALSE,
                           prior = c(0.05,
                                     0.05,
-                                    0.9))
+                                    0.9),
+                          thinTo = 100)
 
   # Run the MH algorithm with the edges from the true graph with pmr.
   mh_m1gv_200_1_pmr <- mhEdge(adjMatrix = adjMatrix_m1gv,
+                              burnIn = 0,
                               data = data_m1gv_200_1,
                               iterations = 100,
                               nGV = 1,
                               pmr = TRUE,
                               prior = c(0.05,
                                         0.05,
-                                        0.9))
+                                        0.9),
+                              thinTo = 100)
 
   # Generate data under topology M3 with one genetic variant.
   data_m3gv_200_1 <- m3gv(N = 200,
@@ -55,27 +59,36 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
 
   # Run the MH algorithm with the edges from the true graph without pmr.
   mh_m3gv_200_1 <- mhEdge(adjMatrix = adjMatrix_m3gv,
+                          burnIn = 0,
                           data = data_m3gv_200_1,
                           iterations = 100,
                           nGV = 1,
                           pmr = FALSE,
                           prior = c(0.05,
                                     0.05,
-                                    0.9))
+                                    0.9),
+                          thinTo = 100)
 
   # Run the MH algorithm with the edges from the true graph with pmr.
   mh_m3gv_200_1_pmr <- mhEdge(adjMatrix = adjMatrix_m3gv,
+                              burnIn = 0,
                               data = data_m3gv_200_1,
                               iterations = 100,
                               nGV = 1,
                               pmr = TRUE,
                               prior = c(0.05,
                                         0.05,
-                                        0.9))
+                                        0.9),
+                              thinTo = 100)
 
-  expect_identical(standard_m1gv, mh_m1gv_200_1)
-  expect_identical(standard_m1gv_pmr, mh_m1gv_200_1_pmr)
-  expect_identical(standard_m3gv, mh_m3gv_200_1)
-  expect_identical(standard_m3gv_pmr, mh_m3gv_200_1_pmr)
+  expect_identical(standard_m1gv@chain, mh_m1gv_200_1@chain)
+  expect_identical(standard_m1gv_pmr@chain, mh_m1gv_200_1_pmr@chain)
+  expect_identical(standard_m3gv@chain, mh_m3gv_200_1@chain)
+  expect_identical(standard_m3gv_pmr@chain, mh_m3gv_200_1_pmr@chain)
+
+  expect_identical(standard_m1gv@likelihood, mh_m1gv_200_1@likelihood)
+  expect_identical(standard_m1gv_pmr@likelihood, mh_m1gv_200_1_pmr@likelihood)
+  expect_identical(standard_m3gv@likelihood, mh_m3gv_200_1@likelihood)
+  expect_identical(standard_m3gv_pmr@likelihood, mh_m3gv_200_1_pmr@likelihood)
 
 })

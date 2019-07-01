@@ -4,13 +4,16 @@
 \alias{mhEdge}
 \title{mhEdge}
 \usage{
-mhEdge(adjMatrix, data, iterations, nGV, pmr = FALSE, prior = c(0.05,
-  0.05, 0.9))
+mhEdge(adjMatrix, burnIn = 0.2, data, iterations = 1000, nGV,
+  pmr = FALSE, prior = c(0.05, 0.05, 0.9), thinTo = 200)
 }
 \arguments{
 \item{adjMatrix}{The adjacency matrix returned by the MRPC algorithm. The
 adjacency matrix is a matrix of zeros and ones. The ones represent an edge
 and also indicates the direction of that edge.}
+
+\item{burnIn}{A number between 0 and 1 indicating the percentage of the
+sample that will be discarded.}
 
 \item{data}{A matrix with the nodes across the columns and the observations
 down the rows.}
@@ -26,6 +29,9 @@ edge pointing from a gene expression node to a genetic variant node.}
 
 \item{prior}{A vector containing the prior probability of seeing each edge
 direction.}
+
+\item{thinTo}{An integer indicating the number of observations the sample
+should be thinned to.}
 }
 \value{
 A matrix where the first m columns are the edge directions and the
