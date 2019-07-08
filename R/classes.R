@@ -1,18 +1,39 @@
 #' mcmc class
 #'
+#' @slot burnIn The percentage of MCMC iterations that will be discarded from
+#' the beginning of the chain.
+#'
 #' @slot chain A matrix where the rows contain the vector of edge states for the
-#' graph that is accepted at each iteration.
+#' accepted graph.
 #'
-#' @slot decimal A vector where each element is the decimal number of the graph
-#' accepted at each iteration of the MH algorithm.
+#' @slot decimal A vector of decimal numbers. Each element in the vector is the
+#' decimal of the accepted graph.
 #'
-#' @slot likelihood A vector where each element is the likelihood of the graph
-#' accepted at each iteration of the MH algorithm.
+#' @slot iterations The number of iterations for which the Metropolis-Hastings
+#' algorithm is run.
 #'
-#' @slot time The time in seconds it took the MH algorithm to run.
+#' @slot posteriorES A matrix of posterior probabilities for all three edge
+#' states for each edge in the network.
+#'
+#' @slot posteriorPM A posterior probability adjacency matrix.
+#'
+#' @slot likelihood A vector of log likelihood values. Each element in the
+#' vector is the log likelihood of the accepted graph.
+#'
+#' @slot stepSize The number of iterations discarded between each iteration that
+#' is kept.
+#'
+#' @slot time The runtime of the Metropolis-Hastings algorithm in seconds.
+#'
+#' @exportClass mcmc
 #'
 setClass(Class = 'mcmc',
-         slots = c(chain = 'matrix',
+         slots = c(burnIn = 'numeric',
+                   chain = 'matrix',
                    decimal = 'numeric',
+                   iterations = 'numeric',
+                   posteriorES = 'data.frame',
+                   posteriorPM = 'matrix',
                    likelihood = 'numeric',
+                   stepSize = 'numeric',
                    time = 'numeric'))

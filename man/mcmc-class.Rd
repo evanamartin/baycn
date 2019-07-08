@@ -10,15 +10,29 @@ mcmc class
 \section{Slots}{
 
 \describe{
+\item{\code{burnIn}}{The percentage of MCMC iterations that will be discarded from
+the beginning of the chain.}
+
 \item{\code{chain}}{A matrix where the rows contain the vector of edge states for the
-graph that is accepted at each iteration.}
+accepted graph.}
 
-\item{\code{decimal}}{A vector where each element is the decimal number of the graph
-accepted at each iteration of the MH algorithm.}
+\item{\code{decimal}}{A vector of decimal numbers. Each element in the vector is the
+decimal of the accepted graph.}
 
-\item{\code{likelihood}}{A vector where each element is the likelihood of the graph
-accepted at each iteration of the MH algorithm.}
+\item{\code{iterations}}{The number of iterations for which the Metropolis-Hastings
+algorithm is run.}
 
-\item{\code{time}}{The time in seconds it took the MH algorithm to run.}
+\item{\code{posteriorES}}{A matrix of posterior probabilities for all three edge
+states for each edge in the network.}
+
+\item{\code{posteriorPM}}{A posterior probability adjacency matrix.}
+
+\item{\code{likelihood}}{A vector of log likelihood values. Each element in the
+vector is the log likelihood of the accepted graph.}
+
+\item{\code{stepSize}}{The number of iterations discarded between each iteration that
+is kept.}
+
+\item{\code{time}}{The runtime of the Metropolis-Hastings algorithm in seconds.}
 }}
 

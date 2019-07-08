@@ -4,19 +4,19 @@
 \alias{mhEdge}
 \title{mhEdge}
 \usage{
-mhEdge(adjMatrix, burnIn = 0.2, data, iterations = 1000, nGV,
+mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nGV,
   pmr = FALSE, prior = c(0.05, 0.05, 0.9), thinTo = 200)
 }
 \arguments{
+\item{data}{A matrix with the nodes across the columns and the observations
+down the rows.}
+
 \item{adjMatrix}{The adjacency matrix returned by the MRPC algorithm. The
 adjacency matrix is a matrix of zeros and ones. The ones represent an edge
 and also indicates the direction of that edge.}
 
 \item{burnIn}{A number between 0 and 1 indicating the percentage of the
 sample that will be discarded.}
-
-\item{data}{A matrix with the nodes across the columns and the observations
-down the rows.}
 
 \item{iterations}{An integer for the number of iterations to run the MH
 algorithm.}
@@ -42,36 +42,62 @@ The main function for the Metropolis-Hastings algorithm. It returns the
 posterior distribution of the edge directions.
 }
 \examples{
-# Generate data under topology M1.
-data_m1 <- m1gv(N = 200, p = 0.27, ss = 1)
+# Generate data under topology m1_gv.
+data_m1 <- simdata(b0 = 0,
+                   N = 200,
+                   s = 1,
+                   graph = 'm1_gv',
+                   ss = 1,
+                   p = 0.27)
 
-# Use the true edges as the inferred edges.
-adjmatrix_m1 <- matrix(c(0, 1, 0,
-                         0, 0, 1,
-                         0, 0, 0),
-                       byrow = TRUE,
-                       nrow = 3)
+# Use the true edges for the inferred edges.
+am_m1 <- matrix(c(0, 1, 0,
+                  0, 0, 1,
+                  0, 0, 0),
+                byrow = TRUE,
+                nrow = 3)
 
 # Run the Metropolis-Hastings algorithm with the Principle of Mendelian
 # Randomization (PMR).
-mh_m1_pmr <- mhEdge(adjMatrix = adjmatrix_m1,
-                    data = data_m1,
-                    iterations = 500,
+mh_m1_pmr <- mhEdge(data = data_m1,
+                    adjMatrix = am_m1,
+                    burnIn = 0.2,
+                    iterations = 1000,
                     nGV = 1,
                     pmr = TRUE,
                     prior = c(0.05,
                               0.05,
-                              0.9))
+                              0.9),
+                    thinTo = 200)
 
-# Run the Metropolis-Hastings algorithm on the same data as the previous
-# example but with pmr set to FALSE.
-mh_m1 <- mhEdge(adjMatrix = adjmatrix_m1,
-                data = data_m1,
-                iterations = 500,
-                nGV = 1,
-                pmr = FALSE,
-                prior = c(0.05,
-                          0.05,
-                          0.9))
+summary(mh_m1_pmr)
+
+# Generate data under topology m1_gv.
+data_gn4 <- simdata(b0 = 0,
+                    N = 200,
+                    s = 1,
+                    graph = 'gn4',
+                    ss = 1)
+
+# Use the true edges for the inferred edges.
+am_gn4 <- matrix(c(0, 1, 1, 0,
+                   0, 0, 0, 1,
+                   0, 0, 0, 0,
+                   0, 0, 1, 0),
+                 byrow = TRUE,
+                 nrow = 4)
+
+mh_gn4 <- mhEdge(data = data_gn4,
+                 adjMatrix = am_gn4,
+                 burnIn = 0.2,
+                 iterations = 1000,
+                 nGV = 0,
+                 pmr = FALSE,
+                 prior = c(0.05,
+                           0.05,
+                           0.9),
+                 thinTo = 200)
+
+summary(mh_gn4)
 
 }

@@ -36,34 +36,7 @@ setMethod('summary',
             # Get the number of samples kept.
             nRow <- nrow(object@chain)
 
-            # Create a matrix to hold the posterior probability of each edge.
-            posteriorProb <- matrix(nrow = nEdges,
-                                    ncol = 3)
-
-            # zero - the edge points from the node with a smaller index to the
-            # node with a larger index
-            # one - the edge points from the node with a larger index to the
-            # node with a smaller index
-            # two - the edge is absent between the two nodes
-            colnames(posteriorProb) <- c('zero', 'one', 'two')
-
-            rownames(posteriorProb) <- paste('edge', 1:nEdges, sep = '')
-
-            # Calculate the proportion of 0, 1, and 2 for each edge in the
-            # network.
-            for (e in 1:nEdges) {
-
-              edge_0 <- sum(object@chain[, e] == 0)
-              edge_1 <- sum(object@chain[, e] == 1)
-              edge_2 <- sum(object@chain[, e] == 2)
-
-              posteriorProb[e, ] <- c(round(edge_0 / nRow, 4),
-                                      round(edge_1 / nRow, 4),
-                                      round(edge_2 / nRow, 4))
-
-            }
-
-            returned$posterior <- posteriorProb
+            returned$posterior <- object@posteriorES
 
             # Create a matrix for the summary of the likelihood.
             logLikSummary <- matrix(nrow = 1,
@@ -83,7 +56,13 @@ setMethod('summary',
 
             returned$graphs <- nGraphs
 
+            # Add the runtime in seconds to the returned list.
             returned$runtime <- object@time
+
+            # Add the iterations, burn in, and step size to the returned list.
+            returned$iterations <- object@iterations
+            returned$burnIn <- object@burnIn
+            returned$stepSize <- object@stepSize
 
             class(returned) <- 'summary.mcmc'
 
@@ -102,19 +81,38 @@ print.summary.mcmc <- function (x, ...) {
 
   # Display the min, 1q, median, 3q, and max.
   cat('\n',
-      'log likelihood: \n')
+      'Log likelihood: \n',
+      sep = '')
   print(x$likelihood)
 
   # Display the number of unique graphs
   cat('\n',
-      'number of unique graphs: \n',
+      'Number of unique graphs: ',
       x$graphs,
-      '\n')
+      sep = '')
 
   # Display the amount of time it took to complete.
   cat('\n',
-      'Run time in seconds: \n',
-      x$runtime)
+      'Run time in seconds: ',
+      x$runtime,
+      sep = '')
+
+  # Display the number of iterations, burn in, and step size
+  cat('\n',
+      'Iterations: ',
+      x$iterations,
+      sep = '')
+
+  cat('\n',
+      'Burn in: ',
+      x$burnIn,
+      '%',
+      sep = '')
+
+  cat('\n',
+      'Step size: ',
+      x$stepSize,
+      sep = '')
 
 }
 
@@ -133,6 +131,8 @@ setMethod('plot',
           signature(x = 'mcmc'),
           definition = function (x, y, ...) {
 
+            likelihood <- NULL
+
             # Number of samples kept
             nSamples <- length(x@likelihood)
 
@@ -145,6 +145,10 @@ setMethod('plot',
             # Create the trace plot for the likelihood.
             p <- ggplot(logLikelihood, aes(x = 1:nSamples,
                                            y = likelihood)) +
+              theme(panel.background = element_blank(),
+                    panel.grid.major = element_blank(),
+                    panel.grid.minor = element_blank(),
+                    axis.line = element_line(color = 'black')) +
               geom_line(color = '#5500cc',
                         size = 1) +
               labs(x = '') +
@@ -154,6 +158,10 @@ setMethod('plot',
             # Create the trace plot for the decimal number.
             g <- ggplot(decimalNum, aes(x = 1:nSamples,
                                         y = decimal)) +
+              theme(panel.background = element_blank(),
+                    panel.grid.major = element_blank(),
+                    panel.grid.minor = element_blank(),
+                    axis.line = element_line(color = 'black')) +
               geom_line(color = '#cc5500',
                         size = 1) +
               labs(x = '') +
