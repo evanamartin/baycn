@@ -13,8 +13,6 @@
 #'
 #' @importFrom stats rnorm
 #'
-#' @export
-#'
 rNoParents <- function (N,
                        b0,
                        s) {
@@ -37,15 +35,13 @@ rNoParents <- function (N,
 #' @param b0 The slope of the linear model
 #' b0 + b1[[1]] * parentData[[1]] + b1[[2]] * parentData[[2]] + ...
 #'
-#' @param b1 A list containing the regression coefficients of the parents of the
-#' gene for which data is being simulated.
+#' @param b1 A vector containing the regression coefficients of the parents of
+#' the gene for which data is being simulated.
 #'
 #' @param s The standard deviation of the gene for which data is being
 #' simulated.
 #'
 #' @importFrom stats as.formula rnorm
-#'
-#' @export
 #'
 rMParents <- function (N,
                        mParents,

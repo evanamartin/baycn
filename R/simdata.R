@@ -1,0 +1,797 @@
+#' mhEdge
+#'
+#' The main function for the Metropolis-Hastings algorithm. It returns the
+#' posterior distribution of the edge directions.
+#'
+#' @param b0 The mean of the variable if it does not have any parents. If the
+#' variable has one or more parents it is the slope in the linear model that is
+#' the mean of the normally distributed variables.
+#'
+#' @param N The number of observations to simulate.
+#'
+#' @param s The standard deviation of the normal distribution.
+#'
+#' @param graph A character string of the graph for which data will be
+#' simulated. The graphs that can be chosen are m1_ge, m1_gv, m1_cp, m1_cc,
+#' m1_iv, m2_ge, m2_gv, m2_cp, m2_cc, m2_iv, mp_ge, mp_gv, gn4, gn5, gn8, gn11,
+#' layer, and star.
+#'
+#' The following figures show the graph for each of the topologies listed above.
+#' The nodes with a circle around the name of the node are normally distributed
+#' and the nodes with a diamond around the name are distributed multinomial. The
+#' nodes labeled with a C represent confounding variables and the nodes labeled
+#' with a U represent genetic variants.
+#'
+#' m1_ge
+#' \figure{m1_ge.pdf}
+#'
+#' m1_gv
+#' \figure{m1_gv.pdf}
+#'
+#' @param ss The coefficient of the parent nodes (if there are any) in the
+#' linear model that is the mean of the normally distributed variables. This
+#' coefficient is referred to as the signal strength.
+#'
+#' @param p The frequency of the reference allele.
+#'
+#' @param ssc The signal strength of the confounding variables.
+#'
+#' @param nConfounding The number of confounding variables to simulate.
+#'
+#' @return A matrix with the variables across the columns and the observations
+#' down the rows.
+#'
+#' @examples
+#' # Generate data under topology GN4.
+#' data_gn4 <- simdata(b0 = 1,
+#'                     N = 500,
+#'                     s = 1,
+#'                     graph = 'gn4',
+#'                     ss = 1)
+#'
+#' # Display the first few rows of the data.
+#' data_gn4[1:5, ]
+#'
+#' # Generate data under topology M1 with 3 intermediate confounding variables.
+#' data_m1_iv <- simdata(b0 = 0,
+#'                       N = 500,
+#'                       s = 1,
+#'                       graph = 'm1_iv',
+#'                       ss = 1,
+#'                       p = 0.1,
+#'                       ssc = 0.2,
+#'                       nConfounding = 3)
+#'
+#' # Show the first few rows of the data.
+#' data_m1_iv[1:5, ]
+#'
+#' @export
+#'
+simdata <- function (b0 = 0,
+                     N = 500,
+                     s = 1,
+                     ss = 1,
+                     graph = 'gn4',
+                     p = 0.1,
+                     ssc = 0.2,
+                     nConfounding = 2) {
+
+  switch(graph,
+
+         #################################################
+         # m1_ge
+         #################################################
+
+         'm1_ge' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           return (cbind(T1, T2, T3))
+
+         },
+
+         #################################################
+         # m1_gv
+         #################################################
+
+         'm1_gv' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T1 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           return (cbind(U, T1, T2))
+
+         },
+
+         #################################################
+         # m1_cp
+         #################################################
+
+         'm1_cp' = {
+
+           U <- sample(0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c(p^2,
+                                2 * p * (1 - p),
+                                (1 - p)^2))
+
+           # create a vector with the signal strength of the parents for T1
+           ssT1 <- vector(mode = 'numeric',
+                          length = nConfounding + 1)
+
+           ssT1[[1]] <- ss
+
+           # Create a list with the data of the parents for T1 as the elements
+           # of the list.
+           parT1 <- vector(mode = 'list',
+                           length = nConfounding + 1)
+
+           parT1[[1]] <- U
+
+           # create a vector with the signal strength of the parents for T2
+           ssT2 <- vector(mode = 'numeric',
+                          length = nConfounding + 1)
+
+           ssT2[[1]] <- ss
+
+           # Create a list with the data of the parents for T2 as the elements
+           # of the list.
+           parT2 <- vector(mode = 'list',
+                           length = nConfounding + 1)
+
+           # create a list to hold the data for the confounding variables
+           con <- as.data.frame(matrix(nrow = N,
+                                       ncol = nConfounding))
+
+           # Simulate the data for the hidden variables
+           for (a in 1:nConfounding) {
+
+             con[, a] <- rnorm(n = N,
+                               mean = b0,
+                               sd = s)
+
+             names(con)[a] <- paste0('C', a)
+
+             # Add the signal strength of the confounding variable to the ssT1
+             # vector.
+             ssT1[[a + 1]] <- ssc
+
+             # Add the data of the current confounding variable to the parT2
+             # list.
+             parT1[[a + 1]] <- con[, a]
+
+             # Add the signal strength of the confounding variable to the ssT2
+             # vector.
+             ssT2[[a + 1]] <- ssc
+
+             # Add the data of the current confounding variable to the parT2
+             # list.
+             parT2[[a + 1]] <- con[, a]
+
+           }
+
+           T1 <- rMParents(N = N,
+                           mParents = (nConfounding + 1),
+                           parentData = parT1,
+                           b0 = b0,
+                           b1 = ssT1,
+                           s = s)
+           # Fill in the first element of parT2 with data generated from T1.
+           parT2[[1]] <- T1
+
+           T2 <- rMParents(N = N,
+                           mParents = (nConfounding + 1),
+                           parentData = parT2,
+                           b0 = b0,
+                           b1 = ssT2,
+                           s = s)
+
+           return (cbind(U, T1, T2, con))
+
+         },
+
+         #################################################
+         # m1_cc
+         #################################################
+
+         'm1_cc' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T1 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           # create a list to hold the data for the confounding variables
+           con <- as.data.frame(matrix(nrow = N,
+                                       ncol = nConfounding))
+
+           # Simulate the data for the hidden variables
+           for (a in 1:nConfounding) {
+
+             con[, a] <- rMParents(N = N,
+                                   mParents = 2,
+                                   parentData = list(T1, T2),
+                                   b0 = 0,
+                                   b1 = c(ssc, ssc),
+                                   s = s)
+
+             names(con)[a] <- paste0('C', a)
+
+           }
+
+           return (cbind(U, T1, T2, con))
+
+         },
+
+         #################################################
+         # m1_iv
+         #################################################
+
+         'm1_iv' = {
+
+           U <- sample(0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c(p^2,
+                                2 * p * (1 - p),
+                                (1 - p)^2))
+
+           T1 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           # create a list to hold the data for the confounding variables
+           con <- as.data.frame(matrix(nrow = N,
+                                       ncol = nConfounding))
+
+           # create a vector with the signal strength of the parents for T2
+           ssT2 <- vector(mode = 'numeric',
+                          length = nConfounding + 1)
+
+           ssT2[[1]] <- ss
+
+           # Create a list with the data of the parents for T2 as the elements
+           # of the list.
+           parT2 <- vector(mode = 'list',
+                           length = nConfounding + 1)
+
+           parT2[[1]] <- T1
+
+           # Simulate the data for the hidden variables
+           for (a in 1:nConfounding) {
+
+             con[, a] <- rMParents(N = N,
+                                   mParents = 1,
+                                   parentData = list(T1),
+                                   b0 = b0,
+                                   b1 = c(ssc),
+                                   s = s)
+
+             names(con)[a] <- paste0('C', a)
+
+             # Add the signal strength of the confounding variable to the ssT2
+             # vector.
+             ssT2[[a + 1]] <- ssc
+
+             # Add the data of the current confounding variable to the parT2
+             # list.
+             parT2[[a + 1]] <- con[, a]
+
+           }
+
+           T2 <- rMParents(N = N,
+                           mParents = (nConfounding + 1),
+                           parentData = parT2,
+                           b0 = b0,
+                           b1 = ssT2,
+                           s = s)
+
+           return (cbind(U, T1, T2, con))
+
+         },
+
+         #################################################
+         # m2_ge
+         #################################################
+
+         'm2_ge' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T3 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T1, T3),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           return (cbind(T1, T2, T3))
+
+         },
+
+         #################################################
+         # m2_gv
+         #################################################
+
+         'm2_gv' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T2 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T1 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(U, T2),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           return (cbind(U, T1, T2))
+
+         },
+
+         #################################################
+         # mp_ge
+         #################################################
+
+         'mp_ge' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T3 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 3,
+                           parentData = list(T1, T2, T3),
+                           b0 = b0,
+                           b1 = c(ss, ss, ss),
+                           s = s)
+
+           return (cbind(T1, T2, T3, T4))
+
+         },
+
+         #################################################
+         # mp_gv
+         #################################################
+
+         'mp_gv' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 3,
+                           parentData = list(U, T1, T2),
+                           b0 = b0,
+                           b1 = c(ss, ss, ss),
+                           s = s)
+
+           return (cbind(U, T1, T2, T3))
+
+         },
+
+         #################################################
+         # gn4
+         #################################################
+
+         'gn4' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T1, T4),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           return (cbind(T1, T2, T3, T4))
+
+         },
+
+         #################################################
+         # gn5
+         #################################################
+
+         'gn5' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T5 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T3, T4),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           return (cbind(T1, T2, T3, T4, T5))
+
+         },
+
+         #################################################
+         # gn8
+         #################################################
+
+         'gn8' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T5 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T6 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T1, T5),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           T7 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T6),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T8 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T1, T5),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           return (cbind(T1, T2, T3, T4, T5, T6, T7, T8))
+
+         },
+
+         #################################################
+         # gn11
+         #################################################
+
+         'gn11' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T7 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T3),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T5 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T4),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T8 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T7),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T9 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T8),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T10 <- rMParents(N = N,
+                            mParents = 1,
+                            parentData = list(T9),
+                            b0 = b0,
+                            b1 = c(ss),
+                            s = s)
+
+           T11 <- rMParents(N = N,
+                            mParents = 1,
+                            parentData = list(T10),
+                            b0 = b0,
+                            b1 = c(ss),
+                            s = s)
+
+           T6 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T5, T7),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           return (cbind(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11))
+
+         },
+
+         #################################################
+         # layer
+         #################################################
+
+         'layer' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T1 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T5 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T1, T2),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           T6 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T7 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T3),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7))
+
+         },
+
+         #################################################
+         # star
+         #################################################
+
+         'star' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T1 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T5 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           return (cbind(U, T1, T2, T3, T4, T5))
+
+         })
+
+}
