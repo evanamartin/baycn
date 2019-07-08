@@ -10,8 +10,6 @@
 #' @return A list containing the edge numbers for the edges that could form a
 #' directed cycle for each cycle in the graph.
 #'
-#' @export
-#'
 cycleEN <- function (adjMatrix,
                      cCoord) {
 

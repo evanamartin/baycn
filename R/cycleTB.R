@@ -12,8 +12,6 @@
 #'
 #' @importFrom stats na.omit
 #'
-#' @export
-#'
 cycleTB <- function (branches) {
 
   # Get the number of branches in the tree.

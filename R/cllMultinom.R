@@ -17,8 +17,6 @@
 #'
 #' @importFrom stats dmultinom logLik
 #'
-#' @export
-#'
 cllMultinom <- function (adjMatrix,
                          data,
                          nGV,

@@ -16,8 +16,6 @@
 #'
 #' @return A vector of edge types.
 #'
-#' @export
-#'
 detType <- function (coord,
                      nEdges,
                      nGV,

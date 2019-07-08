@@ -12,8 +12,6 @@
 #' @return The decimal numbers for each potential cycle given the edge
 #' directions of the current individual.
 #'
-#' @export
-#'
 decimalCI <- function (edgeNum,
                        individual) {
 

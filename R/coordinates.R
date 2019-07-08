@@ -13,8 +13,6 @@
 #' nonzero elements in the adjacency matrix and the second row holds the column
 #' locations of the nonzero elements in the adjacency matrix.
 #'
-#' @export
-#'
 coordinates <- function (adjMatrix) {
 
   # add the adjacency matrix to its transpose. I do this to make sure all of the

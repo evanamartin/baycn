@@ -14,8 +14,6 @@
 #' the current cycle as the second element, and the direction of the edges that
 #' form a directed cycle as the third element.
 #'
-#' @export
-#'
 cycleCED <- function (nBranches,
                       tBranches) {
 

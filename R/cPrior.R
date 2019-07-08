@@ -18,8 +18,6 @@
 #'
 #' @return The probability of the specified edge state
 #'
-#' @export
-#'
 cPrior <- function (edges,
                     edgeType,
                     pmr,

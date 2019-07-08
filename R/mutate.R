@@ -24,8 +24,6 @@
 #'
 #' @importFrom stats rbinom
 #'
-#' @export
-#'
 mutate <- function (edgeType,
                     graph,
                     nEdges,

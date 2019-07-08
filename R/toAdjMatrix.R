@@ -18,8 +18,6 @@
 #'
 #' @return An adjacency matrix given the current edge states.
 #'
-#' @export
-#'
 toAdjMatrix <- function (coordinates,
                          graph,
                          nEdges,

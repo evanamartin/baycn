@@ -24,8 +24,6 @@
 #'
 #' @return A vector of the DNA of the individual with the cycles removed.
 #'
-#' @export
-#'
 rmCycle <- function (cycleDN,
                      edgeNum,
                      edgeType,

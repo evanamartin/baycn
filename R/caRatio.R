@@ -27,8 +27,6 @@
 #'
 #' @importFrom stats runif
 #'
-#' @export
-#'
 caRatio <- function (current,
                      edgeType,
                      m,

@@ -6,8 +6,6 @@
 #'
 #' @return A vector containing the decimal number of each graph.
 #'
-#' @export
-#'
 toDecimal <- function(edgeDir) {
 
   # Store the edge directions and numbers that form a cycle as a decimal number.

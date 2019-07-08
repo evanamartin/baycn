@@ -12,8 +12,6 @@
 #'
 #' @importFrom stats na.omit
 #'
-#' @export
-#'
 cycleBranches <- function (SaL) {
 
   # Start by getting the name of the root node.

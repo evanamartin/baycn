@@ -11,8 +11,6 @@
 #'
 #' @return A vector containing the decimal number of each cycle.
 #'
-#' @export
-#'
 decimal <- function(edgeDir,
                     edgeNum) {
 

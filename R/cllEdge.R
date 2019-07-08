@@ -26,8 +26,6 @@
 #'
 #' @importFrom stats dnorm
 #'
-#' @export
-#'
 cllEdge <- function (coordinates,
                      data,
                      graph,

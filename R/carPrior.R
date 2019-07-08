@@ -19,8 +19,6 @@
 #'
 #' @return The probability of the specified edge state
 #'
-#' @export
-#'
 carPrior <- function (edgeDir1,
                       edgeDir2,
                       edgeType,

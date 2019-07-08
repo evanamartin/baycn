@@ -8,8 +8,6 @@
 #' graph and the indices of each edge in every cycle. If there are no cycles
 #' in the graph the function returns NULL.
 #'
-#' @export
-#'
 cyclePrep <- function (adjMatrix) {
 
   # Check for potential cycles in the graph.

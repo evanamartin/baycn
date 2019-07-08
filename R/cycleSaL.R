@@ -18,8 +18,6 @@
 #' and the column node. If there are no cycles in the graph the function returns
 #' NULL.
 #'
-#' @export
-#'
 cycleSaL <- function (adjMatrix) {
 
   # Add the adjacency matrix to its transpose to make all edges undirected.
