@@ -26,16 +26,134 @@ m1_iv, m2_ge, m2_gv, m2_cp, m2_cc, m2_iv, mp_ge, mp_gv, gn4, gn5, gn8, gn11,
 layer, and star.
 
 The following figures show the graph for each of the topologies listed above.
-The nodes with a circle around the name of the node are normally distributed
-and the nodes with a diamond around the name are distributed multinomial. The
-nodes labeled with a C represent confounding variables and the nodes labeled
-with a U represent genetic variants.
+The nodes with a circle around the name are normally distributed and the
+nodes with a diamond around the name are distributed multinomial. The nodes
+labeled with a C represent confounding variables. The Principle of Mendelian
+Randomization (PMR) can be used on graphs with discrete random variables,
+nodes labelled with a U. This introduces the constraint that the continuous
+random variables cannot be parents of discrete random variables and edges
+between these types of variables only have two states: absent and directed
+with the discrete random variable as the parent.
 
 m1_ge
-\figure{m1_ge.pdf}
+
+Topology M1 with three continuous random variables. In this case M1 has two
+other Markov equivalent graphs.
+
+\figure{m1_ge.jpg}{options: width=100}
 
 m1_gv
-\figure{m1_gv.pdf}}
+
+Topology M1 with one discrete random variable U and two continuous random
+variables. When using the PMR this graph does not have any other Markov
+equivalent graphs.
+
+\figure{m1_gv.jpg}{options: width=100}
+
+m1_cp
+
+Topology M1 with n common parent confounding variables.
+
+\figure{m1_cp.jpg}{options: width=100}
+
+m1_cc
+
+Topology M1 with n common child confounding variables.
+
+\figure{m1_cc.jpg}{options: width=100}
+
+m1_iv
+
+Topology M1 with n intermediate confounding variables.
+
+\figure{m1_iv.jpg}{options: width=100}
+
+m2_ge
+
+Topology M2 with three continuous random variables. This graph is a v
+structure and does not have any other Markov equivalent graphs.
+
+\figure{m2_ge.jpg}{options: width=100}
+
+m2_gv
+
+Topolog M2 with one discrete random variable U and two continuous random
+variables. This graph is a v structure and does not have any other Markov
+equivalent graphs.
+
+\figure{m2_gv.jpg}{options: width=100}
+
+m2_cp
+
+Topology M2 with n common parent confounding variables.
+
+\figure{m2_cp.jpg}{options: width=100}
+
+m2_cc
+
+Topology M2 with n common child confounding variables.
+
+\figure{m2_cc.jpg}{options: width=100}
+
+m2_iv
+
+Topology M2 with n intermediate confounding variables.
+
+\figure{m2_iv.jpg}{options: width=100}
+
+mp_ge
+
+The multi-parent topology with continuous random variables. This graph is
+made up of multiple v structures and has no other Markov equivalent graphs.
+
+\figure{mp_ge.jpg}{options: width=100}
+
+mp_gv
+
+The multi-parent topology with one discrete random variable. This graph is
+made up of multiple v structures and has no other Markov equivalent graphs.
+
+\figure{mp_gv.jpg}{options: width=100}
+
+gn4
+
+Topology GN4 is formed by combining topologies M1 and M2. The Markov
+equivalence class for this topology is made up of three different graphs.
+
+\figure{gn4.jpg}{options: width=100}
+
+gn5
+
+Topology GN5 has three other Markov equivalent graphs.
+
+\figure{gn5.jpg}{options: width=100}
+
+gn8
+
+Topology GN8 has three overlapping cycles, two v structures, and two other
+Markov equivalent graphs.
+
+\figure{gn8.jpg}{options: width=100}
+
+gn11
+
+Topology GN11 has two sub-graphs separated by a v structure at node T6.
+
+\figure{gn11.jpg}{options: width=100}
+
+layer
+
+The layer topology has no other Markov equivalent graphs when using the PMR
+and is made up of multiple M1 topologies.
+
+\figure{layer.jpg}{options: width=100}
+
+star
+
+The star topology has no other Markov equivalent graphs when using the PMR
+and is made up of multiple M1 topologies.
+
+\figure{star.jpg}{options: width=100}}
 
 \item{p}{The frequency of the reference allele.}
 

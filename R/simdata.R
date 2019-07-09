@@ -1,7 +1,7 @@
-#' mhEdge
+#' simdata
 #'
-#' The main function for the Metropolis-Hastings algorithm. It returns the
-#' posterior distribution of the edge directions.
+#' A function for simulating data under various topologies for continuous and
+#' mixed data.
 #'
 #' @param b0 The mean of the variable if it does not have any parents. If the
 #' variable has one or more parents it is the slope in the linear model that is
@@ -17,16 +17,134 @@
 #' layer, and star.
 #'
 #' The following figures show the graph for each of the topologies listed above.
-#' The nodes with a circle around the name of the node are normally distributed
-#' and the nodes with a diamond around the name are distributed multinomial. The
-#' nodes labeled with a C represent confounding variables and the nodes labeled
-#' with a U represent genetic variants.
+#' The nodes with a circle around the name are normally distributed and the
+#' nodes with a diamond around the name are distributed multinomial. The nodes
+#' labeled with a C represent confounding variables. The Principle of Mendelian
+#' Randomization (PMR) can be used on graphs with discrete random variables,
+#' nodes labelled with a U. This introduces the constraint that the continuous
+#' random variables cannot be parents of discrete random variables and edges
+#' between these types of variables only have two states: absent and directed
+#' with the discrete random variable as the parent.
 #'
 #' m1_ge
-#' \figure{m1_ge.pdf}
+#'
+#' Topology M1 with three continuous random variables. In this case M1 has two
+#' other Markov equivalent graphs.
+#'
+#' \figure{m1_ge.jpg}{options: width=100}
 #'
 #' m1_gv
-#' \figure{m1_gv.pdf}
+#'
+#' Topology M1 with one discrete random variable U and two continuous random
+#' variables. When using the PMR this graph does not have any other Markov
+#' equivalent graphs.
+#'
+#' \figure{m1_gv.jpg}{options: width=100}
+#'
+#' m1_cp
+#'
+#' Topology M1 with n common parent confounding variables.
+#'
+#' \figure{m1_cp.jpg}{options: width=100}
+#'
+#' m1_cc
+#'
+#' Topology M1 with n common child confounding variables.
+#'
+#' \figure{m1_cc.jpg}{options: width=100}
+#'
+#' m1_iv
+#'
+#' Topology M1 with n intermediate confounding variables.
+#'
+#' \figure{m1_iv.jpg}{options: width=100}
+#'
+#' m2_ge
+#'
+#' Topology M2 with three continuous random variables. This graph is a v
+#' structure and does not have any other Markov equivalent graphs.
+#'
+#' \figure{m2_ge.jpg}{options: width=100}
+#'
+#' m2_gv
+#'
+#' Topolog M2 with one discrete random variable U and two continuous random
+#' variables. This graph is a v structure and does not have any other Markov
+#' equivalent graphs.
+#'
+#' \figure{m2_gv.jpg}{options: width=100}
+#'
+#' m2_cp
+#'
+#' Topology M2 with n common parent confounding variables.
+#'
+#' \figure{m2_cp.jpg}{options: width=100}
+#'
+#' m2_cc
+#'
+#' Topology M2 with n common child confounding variables.
+#'
+#' \figure{m2_cc.jpg}{options: width=100}
+#'
+#' m2_iv
+#'
+#' Topology M2 with n intermediate confounding variables.
+#'
+#' \figure{m2_iv.jpg}{options: width=100}
+#'
+#' mp_ge
+#'
+#' The multi-parent topology with continuous random variables. This graph is
+#' made up of multiple v structures and has no other Markov equivalent graphs.
+#'
+#' \figure{mp_ge.jpg}{options: width=100}
+#'
+#' mp_gv
+#'
+#' The multi-parent topology with one discrete random variable. This graph is
+#' made up of multiple v structures and has no other Markov equivalent graphs.
+#'
+#' \figure{mp_gv.jpg}{options: width=100}
+#'
+#' gn4
+#'
+#' Topology GN4 is formed by combining topologies M1 and M2. The Markov
+#' equivalence class for this topology is made up of three different graphs.
+#'
+#' \figure{gn4.jpg}{options: width=100}
+#'
+#' gn5
+#'
+#' Topology GN5 has three other Markov equivalent graphs.
+#'
+#' \figure{gn5.jpg}{options: width=100}
+#'
+#' gn8
+#'
+#' Topology GN8 has three overlapping cycles, two v structures, and two other
+#' Markov equivalent graphs.
+#'
+#' \figure{gn8.jpg}{options: width=100}
+#'
+#' gn11
+#'
+#' Topology GN11 has two sub-graphs separated by a v structure at node T6.
+#'
+#' \figure{gn11.jpg}{options: width=100}
+#'
+#' layer
+#'
+#' The layer topology has no other Markov equivalent graphs when using the PMR
+#' and is made up of multiple M1 topologies.
+#'
+#' \figure{layer.jpg}{options: width=100}
+#'
+#' star
+#'
+#' The star topology has no other Markov equivalent graphs when using the PMR
+#' and is made up of multiple M1 topologies.
+#'
+#' \figure{star.jpg}{options: width=100}
 #'
 #' @param ss The coefficient of the parent nodes (if there are any) in the
 #' linear model that is the mean of the normally distributed variables. This
@@ -181,9 +299,9 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rnorm(n = N,
-                               mean = b0,
-                               sd = s)
+             con[, a] <- rNoParents(N = N,
+                                    b0 = b0,
+                                    s = s)
 
              names(con)[a] <- paste0('C', a)
 
@@ -206,16 +324,17 @@ simdata <- function (b0 = 0,
            }
 
            T1 <- rMParents(N = N,
-                           mParents = (nConfounding + 1),
+                           mParents = nConfounding + 1,
                            parentData = parT1,
                            b0 = b0,
                            b1 = ssT1,
                            s = s)
+
            # Fill in the first element of parT2 with data generated from T1.
            parT2[[1]] <- T1
 
            T2 <- rMParents(N = N,
-                           mParents = (nConfounding + 1),
+                           mParents = nConfounding + 1,
                            parentData = parT2,
                            b0 = b0,
                            b1 = ssT2,
@@ -262,7 +381,7 @@ simdata <- function (b0 = 0,
              con[, a] <- rMParents(N = N,
                                    mParents = 2,
                                    parentData = list(T1, T2),
-                                   b0 = 0,
+                                   b0 = b0,
                                    b1 = c(ssc, ssc),
                                    s = s)
 
@@ -334,7 +453,7 @@ simdata <- function (b0 = 0,
            }
 
            T2 <- rMParents(N = N,
-                           mParents = (nConfounding + 1),
+                           mParents = nConfounding + 1,
                            parentData = parT2,
                            b0 = b0,
                            b1 = ssT2,
@@ -394,6 +513,215 @@ simdata <- function (b0 = 0,
                            s = s)
 
            return (cbind(U, T1, T2))
+
+         },
+
+         #################################################
+         # m2_cp
+         #################################################
+
+         'm2_cp' = {
+
+           U <- sample(0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c(p^2,
+                                2 * p * (1 - p),
+                                (1 - p)^2))
+
+           # create a vector with the signal strength of the parents for T1
+           ssT1 <- vector(mode = 'numeric',
+                          length = nConfounding + 2)
+
+           # Fill in the first and second elements of the ssT1 vector. Both
+           # elements will be ss becasue the first two parents of T1 are U and
+           # T2.
+           ssT1[[1]] <- ss
+           ssT1[[2]] <- ss
+
+           # Create a list with the data of the parents for T1 as the elements
+           # of the list.
+           parT1 <- vector(mode = 'list',
+                           length = nConfounding + 2)
+
+           # The first parent of T1 is U.
+           parT1[[1]] <- U
+
+           # create a vector with the signal strength of the parents for T2
+           ssT2 <- vector(mode = 'numeric',
+                          length = nConfounding)
+
+           # Create a list with the data of the parents for T2 as the elements
+           # of the list.
+           parT2 <- vector(mode = 'list',
+                           length = nConfounding)
+
+           # create a list to hold the data for the confounding variables
+           con <- as.data.frame(matrix(nrow = N,
+                                       ncol = nConfounding))
+
+           # Simulate the data for the hidden variables
+           for (a in 1:nConfounding) {
+
+             con[, a] <- rNoParents(N = N,
+                                    b0 = b0,
+                                    s = s)
+
+             names(con)[a] <- paste0('C', a)
+
+             # Add the signal strength of the confounding variable to the ssT1
+             # vector.
+             ssT1[[a + 2]] <- ssc
+
+             # Add the data of the current confounding variable to the parT2
+             # list.
+             parT1[[a + 2]] <- con[, a]
+
+             # Add the signal strength of the confounding variable to the ssT2
+             # vector.
+             ssT2[[a]] <- ssc
+
+             # Add the data of the current confounding variable to the parT2
+             # list.
+             parT2[[a]] <- con[, a]
+
+           }
+
+           T2 <- rMParents(N = N,
+                           mParents = nConfounding,
+                           parentData = parT2,
+                           b0 = b0,
+                           b1 = ssT2,
+                           s = s)
+
+           # Fill in the second element of the parT1 list with the data from T2
+           parT1[[2]] <- T2
+
+           T1 <- rMParents(N = N,
+                           mParents = nConfounding + 2,
+                           parentData = parT1,
+                           b0 = b0,
+                           b1 = ssT1,
+                           s = s)
+
+           return (cbind(U, T1, T2, con))
+
+         },
+
+         #################################################
+         # m2_cc
+         #################################################
+
+         'm2_cc' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T2 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T1 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(U, T2),
+                           b0 = b0,
+                           b1 = c(ss, ss),
+                           s = s)
+
+           # create a list to hold the data for the confounding variables
+           con <- as.data.frame(matrix(nrow = N,
+                                       ncol = nConfounding))
+
+           # Simulate the data for the hidden variables
+           for (a in 1:nConfounding) {
+
+             con[, a] <- rMParents(N = N,
+                                   mParents = 2,
+                                   parentData = list(T1, T2),
+                                   b0 = b0,
+                                   b1 = c(ssc, ssc),
+                                   s = s)
+
+             names(con)[a] <- paste0('C', a)
+
+           }
+
+           return (cbind(U, T1, T2, con))
+
+         },
+
+         #################################################
+         # m2_iv
+         #################################################
+
+         'm2_iv' = {
+
+           U <- sample(0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c(p^2,
+                                2 * p * (1 - p),
+                                (1 - p)^2))
+
+           T2 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           # create a list to hold the data for the confounding variables
+           con <- as.data.frame(matrix(nrow = N,
+                                       ncol = nConfounding))
+
+           # create a vector with the signal strength of the parents for T1
+           ssT1 <- vector(mode = 'numeric',
+                          length = nConfounding + 2)
+
+           # The first two elements will be the signal strength of U and T2.
+           ssT1[[1]] <- ss
+           ssT1[[2]] <- ss
+
+           # Create a list with the data of the parents for T1 as the elements
+           # of the list.
+           parT1 <- vector(mode = 'list',
+                           length = nConfounding + 2)
+
+           # The first to elements will be the data from U and T2.
+           parT1[[1]] <- U
+           parT1[[2]] <- T2
+
+           # Simulate the data for the hidden variables
+           for (a in 1:nConfounding) {
+
+             con[, a] <- rMParents(N = N,
+                                   mParents = 1,
+                                   parentData = list(T2),
+                                   b0 = b0,
+                                   b1 = c(ssc),
+                                   s = s)
+
+             names(con)[a] <- paste0('C', a)
+
+             # Add the signal strength of the confounding variable to the ssT1
+             # vector.
+             ssT1[[a + 2]] <- ssc
+
+             # Add the data of the current confounding variable to the parT1
+             # list.
+             parT1[[a + 2]] <- con[, a]
+
+           }
+
+           T1 <- rMParents(N = N,
+                           mParents = nConfounding + 2,
+                           parentData = parT1,
+                           b0 = b0,
+                           b1 = ssT1,
+                           s = s)
+
+           return (cbind(U, T1, T2, con))
 
          },
 
