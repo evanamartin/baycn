@@ -1,1 +1,1 @@
-# baycn <img src='man/figures/baycn.png' align="right" height="139" /></a>
+# baycn <img src='man/figures/logo.png' align="right" height="139" /></a>
