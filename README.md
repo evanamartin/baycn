@@ -2,15 +2,15 @@
 
 baycn is a Bayesian hybrid approach for inferring a Directed Acyclic Graph (DAG) for continuous, discrete, and mixed data. To speed up the inference of the DAG baycn first uses a constraint-based method (e.g., the PC algorithm) to reduce the search space; a score-based search method is then used to infer the probability of direction for the edges in the network.
 
-# Installation
+## Installation
 
-To install baycn from github use the following function from the devtools package
+To install baycn from github use the following function from the devtools package.
 
 ``` r
 devtools::install_github('Evatar/baycn')
 ```
 
-# Examples - continuous data
+## Examples - continuous data
 
 The following R code simulates and analyzes data from topology GN4 which has four continuous random variables. The following figure shows the true graph for topology GN4.
 
@@ -46,7 +46,7 @@ mh_gn4 <- mhEdge(data = data_gn4,
 summary(mh_gn4)
 ```
 
-# Examples - mixed data
+## Examples - mixed data
 
 The following R code simulates and analyzes data from topology M1 which has one discrete random variable U and two continuous random variables. The following figure shows the true graph for topology M1.
 
