@@ -1,11 +1,14 @@
 Package: baycn
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Bayesian Inference of Graphical Models
 Version: 0.1.0
-Author: Evan A Martin
+Author: Evan A Martin, Audrey Qiuyan Fu
 Maintainer: Evan A Martin <evanamartin@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: A Bayesian hybrid approach for inferring a Directed Acyclic Graph
+    (DAG) for continuous, discrete, and mixed data. To speed up the inference of
+    the DAG the algorithm uses a constraint-based method (e.g., the PC algorithm)
+    to reduce the search space; a score-based search method is then used to
+    infer the probability of direction for the edges in the network.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

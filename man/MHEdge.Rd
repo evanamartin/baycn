@@ -11,31 +11,59 @@ mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nGV,
 \item{data}{A matrix with the nodes across the columns and the observations
 down the rows.}
 
-\item{adjMatrix}{The adjacency matrix returned by the MRPC algorithm. The
-adjacency matrix is a matrix of zeros and ones. The ones represent an edge
-and also indicates the direction of that edge.}
+\item{adjMatrix}{An adjacency matrix indicating the edges that will be
+considered by the Metropolis-Hastings algorithm. This can be the output from
+another algorithm (e.g., PC). An adjacency matrix is a matrix of zeros and
+ones. The ones represent an edge and its direction between two nodes.}
 
 \item{burnIn}{A number between 0 and 1 indicating the percentage of the
 sample that will be discarded.}
 
-\item{iterations}{An integer for the number of iterations to run the MH
+\item{iterations}{An intege for the number of iterations to run the MH
 algorithm.}
 
 \item{nGV}{The number of genetic variants in the graph.}
 
 \item{pmr}{Logical. If true the Metropolis-Hastings algorithm will use the
-Principle of Mendelian Randomization, PMR. This prevents the direction of an
+Principle of Mendelian Randomization (PMR). This prevents the direction of an
 edge pointing from a gene expression node to a genetic variant node.}
 
-\item{prior}{A vector containing the prior probability of seeing each edge
-direction.}
+\item{prior}{A vector containing the prior probability of each edge state.}
 
-\item{thinTo}{An integer indicating the number of observations the sample
+\item{thinTo}{An integer indicating the number of observations the chain
 should be thinned to.}
 }
 \value{
-A matrix where the first m columns are the edge directions and the
-m + 1 column is the log likelihood. Each row represents one graph.
+An object of class mcmc containing 9 elements:
+
+\itemize{
+
+\item burnIn -- The percentage of MCMC iterations that will be discarded from
+the beginning of the chain.
+
+\item chain -- A matrix where the rows contain the vector of edge states for the
+accepted graph.
+
+\item decimal -- A vector of decimal numbers. Each element in the vector is the
+decimal of the accepted graph.
+
+\item iterations -- The number of iterations for which the Metropolis-Hastings
+algorithm is run.
+
+\item posteriorES -- A matrix of posterior probabilities for all three edge
+states for each edge in the network.
+
+\item posteriorPM -- A posterior probability adjacency matrix.
+
+\item likelihood -- A vector of log likelihood values. Each element in the
+vector is the log likelihood of the accepted graph.
+
+\item stepSize -- The number of iterations discarded between each iteration that
+is kept.
+
+\item time -- The runtime of the Metropolis-Hastings algorithm in seconds.
+
+}
 }
 \description{
 The main function for the Metropolis-Hastings algorithm. It returns the
@@ -50,7 +78,7 @@ data_m1 <- simdata(b0 = 0,
                    ss = 1,
                    p = 0.27)
 
-# Use the true edges for the inferred edges.
+# Use the true edges for the input.
 am_m1 <- matrix(c(0, 1, 0,
                   0, 0, 1,
                   0, 0, 0),
@@ -72,14 +100,14 @@ mh_m1_pmr <- mhEdge(data = data_m1,
 
 summary(mh_m1_pmr)
 
-# Generate data under topology m1_gv.
+# Generate data under topology gn4.
 data_gn4 <- simdata(b0 = 0,
                     N = 200,
                     s = 1,
                     graph = 'gn4',
                     ss = 1)
 
-# Use the true edges for the inferred edges.
+# Use the true edges for the input.
 am_gn4 <- matrix(c(0, 1, 1, 0,
                    0, 0, 0, 1,
                    0, 0, 0, 0,
@@ -100,4 +128,7 @@ mh_gn4 <- mhEdge(data = data_gn4,
 
 summary(mh_gn4)
 
+}
+\references{
+arxiv
 }
