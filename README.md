@@ -12,7 +12,7 @@ devtools::install_github('Evatar/baycn')
 
 # Examples - continuous data
 
-Analyze data from topology GN4.
+The following R code simulates and analyzes data from topology GN4 which has four continuous random variables. The following figure shows the true graph for topology GN4.
 
 <img src='man/figures/gn4.jpg' align="center" width="100" />
 
@@ -48,7 +48,7 @@ summary(mh_gn4)
 
 # Examples - mixed data
 
-Analyze data from topology M1 with one discrete variable U and two continuous variables.
+The following R code simulates and analyzes data from topology M1 which has one discrete random variable U and two continuous random variables. The following figure shows the true graph for topology M1.
 
 <img src='man/figures/m1_gv.jpg' align="center" width="100" />
 
