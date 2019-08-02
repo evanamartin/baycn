@@ -127,6 +127,7 @@ print.summary.mcmc <- function (x, ...) {
 #' @import ggplot2
 #'
 #' @export
+#' @aliases plot,mcmc-method
 setMethod('plot',
           signature(x = 'mcmc'),
           definition = function (x, y, ...) {
