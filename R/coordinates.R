@@ -15,31 +15,20 @@
 #'
 coordinates <- function (adjMatrix) {
 
-  # add the adjacency matrix to its transpose. I do this to make sure all of the
-  # edges in the graph are in the upper triangle of the adjacency matrix.
-  AtA <- adjMatrix + t(adjMatrix)
-
-  # I need the location of the edges in the adjacency matrix. I will use this
-  # information in calculating the log likelihood.
-  # Use only the upper matrix to extract the positions of the edges in the
-  # graph and to create the DNA. The diagonal and the lower triangle will be
-  # zeros.
-  AtA[lower.tri(AtA)] <- 0
-
-  # Get the rows and columns of the nonzero entries of the upper AtA matrix
   Rows <- c()
   Columns <- c()
 
   i <- 1
 
-  for (e in 1:nrow(AtA)) {
+  for (e in 1:nrow(adjMatrix)) {
 
-    for (v in 1:ncol(AtA)) {
+    for (v in 1:ncol(adjMatrix)) {
 
-      if (AtA[e, v] != 0) {
+      if (e < v && (adjMatrix[e, v] != 0 || adjMatrix[v, e] != 0)) {
 
+        # Get the rows and columns of the nonzero entries of the upper
+        # triangular adjacency matrix.
         Rows[[i]] <- e
-
         Columns[[i]] <- v
 
         i <- i + 1
@@ -50,10 +39,6 @@ coordinates <- function (adjMatrix) {
 
   }
 
-  # Save the coordinates of the nonzero cells of the upper AtA matrix to use in
-  # determining which equation to use when calculating the log likelihood.
-  coordinates <- rbind(Rows, Columns)
-
-  return (coordinates)
+  return (rbind(Rows, Columns))
 
 }
