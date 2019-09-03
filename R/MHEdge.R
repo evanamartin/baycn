@@ -14,7 +14,7 @@
 #' @param burnIn A number between 0 and 1 indicating the percentage of the
 #' sample that will be discarded.
 #'
-#' @param iterations An intege for the number of iterations to run the MH
+#' @param iterations An integer for the number of iterations to run the MH
 #' algorithm.
 #'
 #' @param nGV The number of genetic variants in the graph.
@@ -35,14 +35,14 @@
 #' \item burnIn -- The percentage of MCMC iterations that will be discarded from
 #' the beginning of the chain.
 #'
-#' \item chain -- A matrix where the rows contain the vector of edge states for the
-#' accepted graph.
+#' \item chain -- A matrix where each row contains the vector of edge states for
+#' the accepted graph.
 #'
-#' \item decimal -- A vector of decimal numbers. Each element in the vector is the
-#' decimal of the accepted graph.
+#' \item decimal -- A vector of decimal numbers. Each element in the vector is
+#' the decimal of the accepted graph.
 #'
-#' \item iterations -- The number of iterations for which the Metropolis-Hastings
-#' algorithm is run.
+#' \item iterations -- The number of iterations for which the
+#' Metropolis-Hastings algorithm is run.
 #'
 #' \item posteriorES -- A matrix of posterior probabilities for all three edge
 #' states for each edge in the network.
@@ -52,8 +52,8 @@
 #' \item likelihood -- A vector of log likelihood values. Each element in the
 #' vector is the log likelihood of the accepted graph.
 #'
-#' \item stepSize -- The number of iterations discarded between each iteration that
-#' is kept.
+#' \item stepSize -- The number of MCMC iterations discarded between each
+#' accepted graph.
 #'
 #' \item time -- The runtime of the Metropolis-Hastings algorithm in seconds.
 #'
@@ -142,7 +142,7 @@ mhEdge <- function (data,
   cp <- cyclePrep(adjMatrix)
 
   # Call the coordinates function to get the coordinates of all the nonzero
-  # elements in the adjacency matrix and to create the DNA of the individuals.
+  # elements in the adjacency matrix.
   coord <- coordinates(adjMatrix = adjMatrix)
 
   # Get the number of edges in the graph.
@@ -323,6 +323,10 @@ mhEdge <- function (data,
     }
 
   }
+
+  #################################################
+  # End of the Metropolis-Hastings algorithm.
+  #################################################
 
   # Get the time the for loop ends
   endTime <- Sys.time()

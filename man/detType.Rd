@@ -19,7 +19,7 @@ Principle of Mendelian Randomization, PMR. This prevents the direction of an
 edge pointing from a gene expression node to a genetic variant node.}
 }
 \value{
-A vector of edge types.
+A vector of edge types: 1 if edge is between gv-ge and  0 otherwise.
 }
 \description{
 Determines the type of edge between two nodes. For example, gv-ge, gv-gv,

@@ -31,10 +31,6 @@ mutate <- function (edgeType,
                     prior,
                     ztbProb) {
 
-  # Create a new graph. This graph will be a copy of the original and
-  # it will be subject to mutation.
-  newGraph <- graph
-
   # Generate a zero truncated binomial random variable to determine the number
   # of edges to change states.
   nChange <- sample(x = 1:nEdges,
@@ -50,7 +46,7 @@ mutate <- function (edgeType,
   # Loop through the edges to be mutated
   for (e in 1:nChange) {
 
-    if (newGraph[[wEdges[[e]]]] == 0) {
+    if (graph[[wEdges[[e]]]] == 0) {
 
       # Calculate the probability of moving to edge state 1 or 2 (location 2 or
       # 3 in the prior vector)
@@ -59,11 +55,11 @@ mutate <- function (edgeType,
                             pmr = pmr,
                             prior = prior)
 
-      newGraph[[wEdges[[e]]]] <- sample(x = c(1, 2),
-                                        size = 1,
-                                        prob = probability)
+      graph[[wEdges[[e]]]] <- sample(x = c(1, 2),
+                                     size = 1,
+                                     prob = probability)
 
-    } else if (newGraph[[wEdges[[e]]]] == 1) {
+    } else if (graph[[wEdges[[e]]]] == 1) {
 
       # Calculate the probability of moving to edge state 0 or 2 (location 1 or
       # 3 in the prior vector)
@@ -72,9 +68,9 @@ mutate <- function (edgeType,
                             pmr = pmr,
                             prior = prior)
 
-      newGraph[[wEdges[[e]]]] <- sample(x = c(0, 2),
-                                        size = 1,
-                                        prob = probability)
+      graph[[wEdges[[e]]]] <- sample(x = c(0, 2),
+                                     size = 1,
+                                     prob = probability)
 
     } else {
 
@@ -85,14 +81,14 @@ mutate <- function (edgeType,
                             pmr = pmr,
                             prior = prior)
 
-      newGraph[[wEdges[[e]]]] <- sample(x = c(0, 1),
-                                        size = 1,
-                                        prob = probability)
+      graph[[wEdges[[e]]]] <- sample(x = c(0, 1),
+                                     size = 1,
+                                     prob = probability)
 
     }
 
   }
 
-  return (newGraph)
+  return (graph)
 
 }

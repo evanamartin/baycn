@@ -50,6 +50,7 @@ rmCycle <- function (cycleDN,
       whichEdge <- sample(x = curEdges,
                           size = 1)
 
+      # If there is a directed cycle the edge state is either a 0 or 1.
       if(individual[[whichEdge]] == 0) {
 
         # Calculate the probability of moving to edge state 1 or 2 (location 2
@@ -75,6 +76,17 @@ rmCycle <- function (cycleDN,
         individual[[whichEdge]] <- sample(x = c(0, 2),
                                           size = 1,
                                           prob = probability)
+
+      }
+
+      # Check for cycles after each iteration of the for loop. If there are no
+      # cycles break out of the for loop.
+      dnCI <- decimalCI(edgeNum,
+                        individual)
+
+      if (!any(dnCI == cycleDN)) {
+
+        break
 
       }
 
