@@ -43,16 +43,9 @@ cllNormal <- function (adjMatrix,
 
     } else {
 
-      # Take only the columns of the data that pertain to the child node and its
-      # parents.
-      parentData <- data.frame(y = data[, e],
-                               data[, which(adjMatrix[, e] != 0)])
-
-      model <- lm(y ~ .,
-                  data = parentData)
-
-      # Store the log likelihood for the current node.
-      logLikelihood[[e]] <- logLik(model)[1]
+      # Run a linear model on the current node given its parents and calculate
+      # the log likelihood.
+      logLikelihood[[e]] <- logLik(lm(data[, e] ~ data[, which(adjMatrix[, e] != 0)]))[1]
 
     }
 
