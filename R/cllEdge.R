@@ -1,29 +1,3 @@
-#' cllEdge
-#'
-#' Calculates the log likelihood of the current node when running a genetic
-#' algorithm on the direction of the edges in the graph.
-#'
-#' @param coordinates A matrix of the row and column numbers of the nonzero
-#' elements in the adjacency matrix. The row numbers make up the first row of
-#' the coordinates matrix and the column numbers make up the second row.
-#'
-#' @param data A matrix with the nodes across the columns and the observations
-#' along the rows.
-#'
-#' @param graph The edge directions of the current graph.
-#'
-#' @param m The length of the graph vector. This is the number of edges in the
-#' graph plus the fitness of the graph.
-#'
-#' @param nEdges The number of edges in the graph.
-#'
-#' @param nGV The number of genetic variants in the graph.
-#'
-#' @param nNodes The number of nodes in the graph.
-#'
-#' @return The log likelihood of the graph according to the orientation of the
-#' edges denoted by the DNA of the current graph.
-#'
 #' @importFrom stats dnorm
 #'
 cllEdge <- function (coordinates,
@@ -57,5 +31,100 @@ cllEdge <- function (coordinates,
   graph[[m]] <- sum(cll)
 
   return (graph)
+
+}
+
+#' @importFrom MASS polr
+#'
+#' @importFrom stats dmultinom logLik
+#'
+cllMultinom <- function (adjMatrix,
+                         data,
+                         nGV,
+                         nNodes){
+
+  # A vector to hold the log likelihood for each node in the graph.
+  logLikelihood <- vector(mode = 'numeric',
+                          length = nNodes)
+
+  # If there are no genetic variants in the data return an empty list for the
+  # log likelihood and the number of parents for each node. This will be used by
+  # the cllNormal function.
+  if (nGV == 0) {
+
+    return(logLikelihood)
+
+  }
+
+  # The log likelihood for the genetic variant nodes will start from 1 and go to
+  # the value of nGV.
+  for (e in 1:nGV) {
+
+    # Get the number of parents for the current node.
+    nParents <- sum(adjMatrix[, e])
+
+    # Loop through each of the genetic variant nodes and calculate the log
+    # likelihood given the edge directions of the current graph.
+    if (nParents == 0) {
+
+      # Calculate the counts for each level of the current genetic variant.
+      counts <- as.vector(table(data[, e]))
+
+      # Calculate the probability of each level of counts.
+      lprob <- log(counts / sum(counts))
+
+      # Store the log likelihood for the current node.
+      logLikelihood[[e]] <- sum(lprob * counts)
+
+    } else {
+
+      # Run ordered logistic regression on the current genetic variant given its
+      # parents and calculate the log likelihood.
+      logLikelihood[[e]] <- logLik(polr(as.factor(data[, e]) ~ data[, which(adjMatrix[, e] != 0)]))[1]
+
+    }
+
+  }
+
+  return (logLikelihood)
+
+}
+
+#' @importFrom stats lm logLik sd
+#'
+cllNormal <- function (adjMatrix,
+                       data,
+                       logLikelihood,
+                       nGV,
+                       nNodes){
+
+  # The log likelihood for the gene expression nodes will start from nGV+1 and
+  # go to the value of nNodes.
+  for (e in (nGV + 1):nNodes) {
+
+    # Get the number of parents for the current node.
+    nParents <- sum(adjMatrix[, e])
+
+    # Loop through each of the gene expression nodes and calculate the log
+    # likelihood given the edge directions of the current graph.
+    if (nParents == 0) {
+
+      # Store the log likelihood for the current node.
+      logLikelihood[[e]] <- sum(dnorm(x = data[, e],
+                                      mean = mean(data[, e]),
+                                      sd = sd(data[, e]),
+                                      log = TRUE))
+
+    } else {
+
+      # Run a linear model on the current node given its parents and calculate
+      # the log likelihood.
+      logLikelihood[[e]] <- logLik(lm(data[, e] ~ data[, which(adjMatrix[, e] != 0)]))[1]
+
+    }
+
+  }
+
+  return (logLikelihood)
 
 }

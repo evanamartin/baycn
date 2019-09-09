@@ -1,26 +1,3 @@
-#' toED
-#'
-#' Takes the adjacency matrix when there are genetic variants in the data and
-#' removes the edges if there are any genetic variant nodes that have parents
-#' that are gene expression nodes.
-#'
-#' @param adjMatrix The adjacency matrix returned by the MRPC algorithm. The
-#' adjacency matrix is a matrix of zeros and ones. The ones represent an edge
-#' and also indicates the direction of that edge.
-#'
-#' @param coordinates A matrix of the row and column numbers of the nonzero
-#' elements in the adjacency matrix. The row numbers make up the first row of
-#' the coordinates matrix and the column numbers make up the second row.
-#'
-#' @param graph A vector containing the edge directions of the current graph.
-#'
-#' @param nGV The number of genetic variants in the graph.
-#'
-#' @param nNodes The number of nodes in the graph.
-#'
-#' @return A vector of 0s, 1s, and 2s, indicating the directions of the edges
-#' for the current graph.
-#'
 toED <- function (adjMatrix,
                   coordinates,
                   graph,

@@ -1,23 +1,3 @@
-#' cPrior
-#'
-#' Calculates the prior depending on the current edge state and edge type for
-#' the mutate function. For example, gv-ge, gv-gv, ge-ge.
-#'
-#' @param edges A vector indicating the position in the prior vector of the two
-#' edge states that the current edge can move to.
-#'
-#' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
-#' a gv-gv or ge-ge edge (0).
-#'
-#' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
-#' Principle of Mendelian Randomization, PMR. This prevents the direction of an
-#' edge pointing from a gene expression node to a genetic variant node.
-#'
-#' @param prior A vector containing the prior probability of seeing each edge
-#' direction.
-#'
-#' @return The probability of the specified edge state
-#'
 cPrior <- function (edges,
                     edgeType,
                     pmr,

@@ -1,30 +1,3 @@
-#' caRatio
-#'
-#' Calculates the acceptance ratio for the Metropolis-Hastings and Genetic
-#' Algorithm. It takes the ratio of the original vector of edge directions, old
-#' individual, and the proposed vector of edge directions, new individual.
-#'
-#' @param current A vector of edge directions. This is the graph from
-#' the start of the current interation.
-#'
-#' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (0) or
-#' a gv-gv or ge-ge edge (1).
-#'
-#' @param m The length of the individual vector. This is the number of edges in
-#' the graph and the fitness of the graph.
-#'
-#' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
-#' Principle of Mendelian Randomization, PMR. This prevents the direction of an
-#' edge pointing from a gene expression node to a genetic variant node.
-#'
-#' @param proposed A vector of edge directions. This the the proposed
-#' vector of edge directions.
-#'
-#' @param prior A vector containing the prior probability of seeing each edge
-#' direction.
-#'
-#' @return A vector of edge directions and the fitness of the individual
-#'
 #' @importFrom stats runif
 #'
 caRatio <- function (current,

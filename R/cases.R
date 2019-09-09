@@ -1,16 +1,3 @@
-#' rNoParents
-#'
-#' Creates data from a normal distribution. This function is used for generating
-#' data for nodes with no parents.
-#'
-#' @param N The number of observations to simulate.
-#'
-#' @param b0 The mean of the normal distribution.
-#'
-#' @param s The standard deviation of the normal distribution.
-#'
-#' @return A vector containing the simulated data.
-#'
 #' @importFrom stats rnorm
 #'
 rNoParents <- function (N,
@@ -23,24 +10,6 @@ rNoParents <- function (N,
 
 }
 
-#' rMParents
-#'
-#' @param N The number of observations to simulate.
-#'
-#' @param mParents The number of parents of the current gene.
-#'
-#' @param parentData A list containing the data of the parents of the current
-#' gene.
-#'
-#' @param b0 The slope of the linear model
-#' b0 + b1[[1]] * parentData[[1]] + b1[[2]] * parentData[[2]] + ...
-#'
-#' @param b1 A vector containing the regression coefficients of the parents of
-#' the gene for which data is being simulated.
-#'
-#' @param s The standard deviation of the gene for which data is being
-#' simulated.
-#'
 #' @importFrom stats as.formula rnorm
 #'
 rMParents <- function (N,

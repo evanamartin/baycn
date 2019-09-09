@@ -1,27 +1,3 @@
-#' mutate
-#'
-#' Takes the current graph and changes at least one of the edges from its
-#' current edge state to a different edge state.
-#'
-#' @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
-#' a gv-gv or ge-ge edge (0).
-#'
-#' @param graph A vector containing the current edge states for each edge.
-#'
-#' @param nEdges The number of edges in the graph.
-#'
-#' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
-#' Principle of Mendelian Randomization, PMR. This prevents the direction of an
-#' edge pointing from a gene expression node to a genetic variant node.
-#'
-#' @param prior A vector containing the prior probability of seeing each edge
-#' direction.
-#'
-#' @param ztbProb A vector of probabilities for 1:nEdges from a zero truncated
-#' binomial distribution.
-#'
-#' @return A vector of the edge directions and log likelihood.
-#'
 #' @importFrom stats rbinom
 #'
 mutate <- function (edgeType,

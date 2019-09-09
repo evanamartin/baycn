@@ -1,14 +1,9 @@
-#' multiplot
-#'
-#' A function from the Cookbook for R website that prints multiple plots on one
-#' page.
-#'
-#' @param ... The graphs to be plotted on one page.
-#'
-#' @param cols The number of columns on the plot page.
-#'
 #' @import grid
 #'
+
+# A function from the Cookbook for R website that prints multiple plots on one
+# page.
+
 multiplot <- function(...,
                       cols = 1) {
 
