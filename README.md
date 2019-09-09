@@ -7,7 +7,7 @@ baycn is a Bayesian hybrid approach for inferring a Directed Acyclic Graph (DAG)
 To install baycn from github use the following function from the devtools package.
 
 ``` r
-devtools::install_github('Evatar/baycn')
+devtools::install_github('evanamartin/baycn')
 ```
 
 ## Examples - continuous data
