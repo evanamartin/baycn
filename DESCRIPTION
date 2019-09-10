@@ -2,9 +2,7 @@ Package: baycn
 Type: Package
 Title: Bayesian Inference for Graphical Models
 Version: 1.0.0
-Author: 
-  Evan A Martin [aut, cre],
-  Audrey Qiuyan Fu [aut]
+Author: Evan A Martin [aut, cre], Audrey Qiuyan Fu [aut]
 Maintainer: Evan A Martin <evanamartin@gmail.com>
 Description: A Bayesian hybrid approach for inferring a Directed Acyclic Graph
     (DAG) for continuous, discrete, and mixed data. To speed up the inference of
