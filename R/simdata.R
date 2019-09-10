@@ -39,8 +39,8 @@
 #'
 #' m1_iv - Topology M1 with n intermediate confounding variables.
 #'
-#' \if{html}{\figure{m1.png}{options: width="35\%" alt="Figure: m1.png"}}
-#' \if{latex}{\figure{m1.pdf}{options: width=5cm}}
+#' \if{html}{\figure{m1.png}{options: width="75\%" alt="Figure: m1.png"}}
+#' \if{latex}{\figure{m1.pdf}{options: width=14cm}}
 #'
 #' m2_ge - Topology M2 with three continuous random variables. This graph is a v
 #' structure and does not have any other Markov equivalent graphs.
@@ -55,8 +55,8 @@
 #'
 #' m2_iv - Topology M2 with n intermediate confounding variables.
 #'
-#' \if{html}{\figure{m2.png}{options: width="35\%" alt="Figure: m2.png"}}
-#' \if{latex}{\figure{m2.pdf}{options: width=5cm}}
+#' \if{html}{\figure{m2.png}{options: width="75\%" alt="Figure: m2.png"}}
+#' \if{latex}{\figure{m2.pdf}{options: width=14cm}}
 #'
 #' mp_ge - The multi-parent topology with continuous random variables. This
 #' graph is made up of multiple v structures and has no other Markov equivalent
@@ -66,8 +66,8 @@
 #' graph is made up of multiple v structures and has no other Markov equivalent
 #' graphs.
 #'
-#' \if{html}{\figure{mp.png}{options: width="25\%" alt="Figure: mp.png"}}
-#' \if{latex}{\figure{mp.pdf}{options: width=2.5cm}}
+#' \if{html}{\figure{mp.png}{options: width="55\%" alt="Figure: mp.png"}}
+#' \if{latex}{\figure{mp.pdf}{options: width=7cm}}
 #'
 #' gn4 - Topology GN4 is formed by combining topologies M1 and M2. The Markov
 #' equivalence class for this topology is made up of three different graphs.
@@ -79,8 +79,8 @@
 #'
 #' gn11 - Topology GN11 has two sub-graphs separated by a v structure at node T6.
 #'
-#' \if{html}{\figure{gn.png}{options: width="35\%" alt="Figure: gn.png"}}
-#' \if{latex}{\figure{gn.pdf}{options: width=5cm}}
+#' \if{html}{\figure{gn.png}{options: width="55\%" alt="Figure: gn.png"}}
+#' \if{latex}{\figure{gn.pdf}{options: width=7cm}}
 #'
 #' layer - The layer topology has no other Markov equivalent graphs when using
 #' the PMR and is made up of multiple M1 topologies.
