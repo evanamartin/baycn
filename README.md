@@ -1,6 +1,6 @@
 # baycn <img src='man/figures/logo.png' align="right" height="139" /></a>
 
-baycn is a Bayesian hybrid approach for inferring a Directed Acyclic Graph (DAG) for continuous, discrete, and mixed data. To speed up the inference of the DAG baycn first uses a constraint-based method (e.g., the PC algorithm) to reduce the search space; a score-based search method is then used to infer the probability of direction for the edges in the network.
+baycn is a Bayesian hybrid approach for inferring Directed Acyclic Graphs (DAGs) for continuous, discrete, and mixed data. The algorithm can use the graph inferred by another more efficient graph inference method as input; the input graph may contain false edges or undirected edges, but can help reduce the search space to a more manageable size. A Bayesian Markov chain Monte Carlo algorithm is then used to infer the probability of direction and absence for the edges in the network.
 
 ## Installation
 
