@@ -126,6 +126,8 @@ print.summary.mcmc <- function (x, ...) {
 #'
 #' @import ggplot2
 #'
+#' @importFrom egg ggarrange
+#'
 #' @export
 #' @aliases plot,mcmc-method
 setMethod('plot',
@@ -146,32 +148,34 @@ setMethod('plot',
             # Create the trace plot for the likelihood.
             p <- ggplot(logLikelihood, aes(x = 1:nSamples,
                                            y = likelihood)) +
+              ggtitle('log likelihood') +
               theme(panel.background = element_blank(),
                     panel.grid.major = element_blank(),
                     panel.grid.minor = element_blank(),
+                    plot.title = element_text(hjust = 0.5),
                     axis.line = element_line(color = 'black')) +
               geom_line(color = '#5500cc',
                         size = 1) +
               labs(x = '') +
-              labs(y = 'log likelihood') +
+              labs(y = '') +
               ylim(min(logLikelihood), max(logLikelihood))
 
             # Create the trace plot for the decimal number.
             g <- ggplot(decimalNum, aes(x = 1:nSamples,
                                         y = decimal)) +
+              ggtitle('decimal number') +
               theme(panel.background = element_blank(),
                     panel.grid.major = element_blank(),
                     panel.grid.minor = element_blank(),
+                    plot.title = element_text(hjust = 0.5),
                     axis.line = element_line(color = 'black')) +
               geom_line(color = '#cc5500',
                         size = 1) +
               labs(x = '') +
-              labs(y = 'decimal number') +
+              labs(y = '') +
               ylim(min(decimalNum), max(decimalNum))
 
             # print the two plots with one column and two rows.
-            multiplot(p,
-                      g,
-                      cols = 1)
+            egg::ggarrange(p, g, ncol = 1)
 
           })
