@@ -28,12 +28,13 @@ layer, and star.
 The following figures show the graph for each of the topologies listed above.
 The nodes with a circle around the name are normally distributed and the
 nodes with a diamond around the name are distributed multinomial. The nodes
-labeled with a C represent confounding variables. The Principle of Mendelian
-Randomization (PMR) can be used on graphs with discrete random variables,
-nodes labelled with a U. This introduces the constraint that the continuous
-random variables cannot be parents of discrete random variables and edges
-between these types of variables only have two states: absent and directed
-with the discrete random variable as the parent.
+labeled with a C represent confounding variables (Yang et al., 2017). The
+Principle of Mendelian Randomization (PMR) can be used on graphs with
+discrete random variables, nodes labelled with a U. This introduces the
+constraint that the continuous random variables cannot be parents of
+discrete random variables and edges between these types of variables only
+have two states: absent and directed with the discrete random variable as
+the parent.
 
 m1_ge - Topology M1 with three continuous random variables. In this case M1
 has two other Markov equivalent graphs.
@@ -49,14 +50,14 @@ m1_cc - Topology M1 with n common child confounding variables.
 m1_iv - Topology M1 with n intermediate confounding variables.
 
 \if{html}{\figure{m1.png}{options: width="75\%" alt="Figure: m1.png"}}
-\if{latex}{\figure{m1.pdf}{options: width=14cm}}
+\if{latex}{\figure{m1.pdf}{options: width=12cm}}
 
 m2_ge - Topology M2 with three continuous random variables. This graph is a v
 structure and does not have any other Markov equivalent graphs.
 
-m2_gv - Topolog M2 with one discrete random variable U and two continuous random
-variables. This graph is a v structure and does not have any other Markov
-equivalent graphs.
+m2_gv - Topolog M2 with one discrete random variable U and two continuous
+random variables. This graph is a v structure and does not have any other
+Markov equivalent graphs.
 
 m2_cp - Topology M2 with n common parent confounding variables.
 
@@ -65,7 +66,7 @@ m2_cc - Topology M2 with n common child confounding variables.
 m2_iv - Topology M2 with n intermediate confounding variables.
 
 \if{html}{\figure{m2.png}{options: width="75\%" alt="Figure: m2.png"}}
-\if{latex}{\figure{m2.pdf}{options: width=14cm}}
+\if{latex}{\figure{m2.pdf}{options: width=12cm}}
 
 mp_ge - The multi-parent topology with continuous random variables. This
 graph is made up of multiple v structures and has no other Markov equivalent
@@ -86,7 +87,8 @@ gn5 - Topology GN5 has three other Markov equivalent graphs.
 gn8 - Topology GN8 has three overlapping cycles, two v structures, and two
 other Markov equivalent graphs.
 
-gn11 - Topology GN11 has two sub-graphs separated by a v structure at node T6.
+gn11 - Topology GN11 has two sub-graphs separated by a v structure at node
+T6.
 
 \if{html}{\figure{gn.png}{options: width="55\%" alt="Figure: gn.png"}}
 \if{latex}{\figure{gn.pdf}{options: width=7cm}}
@@ -141,4 +143,10 @@ data_m1_iv <- simdata(b0 = 0,
 # Show the first few rows of the data.
 data_m1_iv[1:5, ]
 
+}
+\references{
+Yang, F., Wang, J., Pierce, B. L., Chen, L. S., Aguet, F.,
+Ardlie, K. G. et al. (2017).
+Identifying cis-mediators for trans-eQTLs across many human tissues using
+genomic mediation analysis. Genome research, 27(11), 1859-1871.
 }

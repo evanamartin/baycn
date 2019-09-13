@@ -130,5 +130,6 @@ summary(mh_gn4)
 
 }
 \references{
-arxiv
+Evan A Martin and Audrey Qiuyan Fu. A Bayesian approach to
+directed acyclic graph with a candidate graph.
 }

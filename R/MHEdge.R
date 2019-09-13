@@ -59,11 +59,14 @@
 #'
 #' }
 #'
-#' @references arxiv
+#' @references Evan A Martin and Audrey Qiuyan Fu. A Bayesian approach to
+#' directed acyclic graph with a candidate graph.
 #'
 #' @importFrom methods new
 #'
 #' @importFrom stats dbinom
+#'
+#' @importFrom utils setTxtProgressBar txtProgressBar
 #'
 #' @examples
 #' # Generate data under topology m1_gv.
@@ -241,6 +244,9 @@ mhEdge <- function (data,
   # Beginning of the Metropolis-Hastings algorithm.
   #################################################
 
+  # create progress bar
+  pb <- txtProgressBar(min = 0, max = iterations, style = 3)
+
   # Run through the iterations of the Metropolis Hastings algorithm.
   for (e in 1:iterations) {
 
@@ -322,7 +328,13 @@ mhEdge <- function (data,
 
     }
 
+    # Update progress bar
+    setTxtProgressBar(pb, e)
+
   }
+
+  # Close the progress bar
+  close(pb)
 
   #################################################
   # End of the Metropolis-Hastings algorithm.
