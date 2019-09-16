@@ -19,13 +19,12 @@
 #' The following figures show the graph for each of the topologies listed above.
 #' The nodes with a circle around the name are normally distributed and the
 #' nodes with a diamond around the name are distributed multinomial. The nodes
-#' labeled with a C represent confounding variables (Yang et al., 2017). The
-#' Principle of Mendelian Randomization (PMR) can be used on graphs with
-#' discrete random variables, nodes labelled with a U. This introduces the
-#' constraint that the continuous random variables cannot be parents of
-#' discrete random variables and edges between these types of variables only
-#' have two states: absent and directed with the discrete random variable as
-#' the parent.
+#' labeled with a C represent confounding variables. The Principle of Mendelian
+#' Randomization (PMR) can be used on graphs with discrete and continuous
+#' random variables. This introduces the constraint that the continuous random
+#' variables cannot be parents of discrete random variables and edges between
+#' these types of variables only have two states: absent and directed with the
+#' discrete random variable as the parent.
 #'
 #' m1_ge - Topology M1 with three continuous random variables. In this case M1
 #' has two other Markov equivalent graphs.
@@ -33,6 +32,8 @@
 #' m1_gv - Topology M1 with one discrete random variable U and two continuous
 #' random variables. When using the PMR this graph does not have any other
 #' Markov equivalent graphs.
+#'
+#' We consider three types of confounding variables (Yang et al., 2017):
 #'
 #' m1_cp - Topology M1 with n common parent confounding variables.
 #'

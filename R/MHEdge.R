@@ -60,7 +60,7 @@
 #' }
 #'
 #' @references Evan A Martin and Audrey Qiuyan Fu. A Bayesian approach to
-#' directed acyclic graph with a candidate graph.
+#' directed acyclic graphs with a candidate graph.
 #'
 #' @importFrom methods new
 #'
@@ -70,6 +70,7 @@
 #'
 #' @examples
 #' # Generate data under topology m1_gv.
+#' # Use ?simdata for a description and graph of m1_gv.
 #' data_m1 <- simdata(b0 = 0,
 #'                    N = 200,
 #'                    s = 1,
@@ -77,15 +78,15 @@
 #'                    ss = 1,
 #'                    p = 0.27)
 #'
-#' # Use the true edges for the input.
+#' # Create an adjacency matrix with the true edges.
 #' am_m1 <- matrix(c(0, 1, 0,
 #'                   0, 0, 1,
 #'                   0, 0, 0),
 #'                 byrow = TRUE,
 #'                 nrow = 3)
 #'
-#' # Run the Metropolis-Hastings algorithm with the Principle of Mendelian
-#' # Randomization (PMR).
+#' # Run the Metropolis-Hastings algorithm on the data from m1_gv using the
+#' # Principle of Mendelian Randomization (PMR) and the true edges as the input.
 #' mh_m1_pmr <- mhEdge(data = data_m1,
 #'                     adjMatrix = am_m1,
 #'                     burnIn = 0.2,
@@ -100,13 +101,14 @@
 #' summary(mh_m1_pmr)
 #'
 #' # Generate data under topology gn4.
+#' # Use ?simdata for a description and graph of gn4.
 #' data_gn4 <- simdata(b0 = 0,
 #'                     N = 200,
 #'                     s = 1,
 #'                     graph = 'gn4',
 #'                     ss = 1)
 #'
-#' # Use the true edges for the input.
+#' # Create an adjacency matrix with the true edges.
 #' am_gn4 <- matrix(c(0, 1, 1, 0,
 #'                    0, 0, 0, 1,
 #'                    0, 0, 0, 0,
@@ -114,6 +116,8 @@
 #'                  byrow = TRUE,
 #'                  nrow = 4)
 #'
+#' # Run the Metropolis-Hastings algorithm on the data from gn4 with the true
+#' # edges as the input.
 #' mh_gn4 <- mhEdge(data = data_gn4,
 #'                  adjMatrix = am_gn4,
 #'                  burnIn = 0.2,
