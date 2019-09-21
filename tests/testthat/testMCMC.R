@@ -33,6 +33,7 @@ test_that('the MHEdge function returns the correct matrix',{
                           prior = c(0.05,
                                     0.05,
                                     0.9),
+                          progress = FALSE,
                           thinTo = 100)
 
   # Generate data under topology H2
@@ -61,6 +62,7 @@ test_that('the MHEdge function returns the correct matrix',{
                         prior = c(0.05,
                                   0.05,
                                   0.9),
+                        progress = TRUE,
                         thinTo = 100)
 
   expect_identical(standard_m1ge@chain, mh_m1ge_200_1@chain)

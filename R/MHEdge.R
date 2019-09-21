@@ -25,6 +25,8 @@
 #'
 #' @param prior A vector containing the prior probability of each edge state.
 #'
+#' @param progress Logical. If TRUE a progress bar will be printed.
+#'
 #' @param thinTo An integer indicating the number of observations the chain
 #' should be thinned to.
 #'
@@ -96,6 +98,7 @@
 #'                     prior = c(0.05,
 #'                               0.05,
 #'                               0.9),
+#'                     progress = FALSE,
 #'                     thinTo = 200)
 #'
 #' summary(mh_m1_pmr)
@@ -127,6 +130,7 @@
 #'                  prior = c(0.05,
 #'                            0.05,
 #'                            0.9),
+#'                  progress = FALSE,
 #'                  thinTo = 200)
 #'
 #' summary(mh_gn4)
@@ -142,55 +146,41 @@ mhEdge <- function (data,
                     prior = c(0.05,
                               0.05,
                               0.9),
+                    progress = TRUE,
                     thinTo = 200) {
 
-  # Check for potential cycles in the graph and return the edge directions, edge
-  # numbers, and the decimal numbers for each cycle if any exist.
-  cp <- cyclePrep(adjMatrix)
+  # Set up ---------------------------------------------------------------------
 
-  # Call the coordinates function to get the coordinates of all the nonzero
-  # elements in the adjacency matrix.
+  # Determine the number of nodes in the graph.
+  nNodes <- ncol(adjMatrix)
+
+  # Get the coordinates of the non zero elements in the adjacency matrix.
   coord <- coordinates(adjMatrix = adjMatrix)
 
-  # Get the number of edges in the graph.
+  # Determine the number of edges in the network
   nEdges <- dim(coord)[2]
 
-  # Get the edge types for each edge in the graph. The two edge types are gv-ge
-  # or gv-gv, ge-ge.
+  # Determine the edge type for each edge in the graph (gv-ge or ge-ge, gv-gv)
   edgeType <- detType(coord = coord,
                       nEdges = nEdges,
                       nGV = nGV,
                       pmr = pmr)
 
-  # Calculate the probability for 1:nEdges from a zero truncated binomial
-  # distribution.
+  # Calculate the probability of choosing from 1 to nEdges.
   ztbProb <- dbinom(x = 1:nEdges,
                     size = nEdges,
                     prob = 1 / nEdges) / (1 - (1 - 1/nEdges)^nEdges)
 
-  # Get the number of nodes in the graph. This will be used in for loops
-  # throughout the function.
-  nNodes <- ncol(adjMatrix)
+  # A vector of integers that indicate which iterations will be kept.
+  keep <- whichIt(burnIn = burnIn,
+                  iterations = iterations,
+                  thinTo = thinTo)
 
-  # Create the length of the individual which is the number of edges plus the
-  # fitness of the individual.
-  m <- nEdges + 1
+  # Check for potential cycles in the graph and return the edge directions, edge
+  # numbers, and the decimal numbers for each cycle if any exist.
+  cp <- cyclePrep(adjMatrix)
 
-  # A vector of indices that indicate which iterations will be kept.
-  if (burnIn == 0) {
-
-    keep <- ceiling(seq(from = 1,
-                        to = iterations,
-                        length.out = thinTo))
-
-  } else {
-
-    keep <- ceiling(seq(from = burnIn * iterations,
-                        to = iterations,
-                        length.out = thinTo))
-
-  }
-
+  # Initialize vectors, lists, and matrices ------------------------------------
 
   # A counter used to fill in the MarkovChain matrix.
   counter <- 0
@@ -198,23 +188,44 @@ mhEdge <- function (data,
   # Create a matrix to hold the accepted graph at each iteration of the MH
   # algorithm.
   MarkovChain <- matrix(nrow = thinTo,
-                        ncol = m)
+                        ncol = nEdges)
+
+  # Create a vector to hold the likelihood for the whole graph.
+  likelihood <- vector(mode = 'numeric',
+                       length = thinTo)
 
   # Create a vector to hold the decimal number for the accepted graph.
   graphDecimal <- vector(mode = 'integer',
                          length = thinTo)
 
+  # Create a vector to hold the log likelihood for each node in the current
+  # graph.
+  currentLL <- vector(mode = 'numeric',
+                      length = nNodes)
+
+  # Create the likelihood dictionary -------------------------------------------
+
+  # Create a new environment that has the log likelihood for all possible parent
+  # combinations for each node. (LOG Likelihood Environment)
+  logle <- lookUp(data = data,
+                  adjMatrix = adjMatrix,
+                  nGV = nGV,
+                  nNodes = nNodes,
+                  pmr = pmr)
+
+  # Generate a starting graph --------------------------------------------------
+
   # Randomly generate a starting graph.
-  graph <- sample(x = c(0, 1, 2),
-                  size = nEdges,
-                  replace = TRUE,
-                  prob = prior)
+  currentES <- sample(x = c(0, 1, 2),
+                      size = nEdges,
+                      replace = TRUE,
+                      prob = prior)
 
   # Check if any gv nodes have ge node parents.
   if (pmr == TRUE) {
 
     # Change the direction of the ge -> gv edges to gv -> ge.
-    graph[edgeType == 1 & graph == 1] <- 0
+    currentES[edgeType == 1 & currentES == 1] <- 0
 
   }
 
@@ -223,63 +234,75 @@ mhEdge <- function (data,
   if (!is.null(cp$cycleDN)) {
 
     # Remove any directed cycles in the graph.
-    graph <- rmCycle(cycleDN = cp$cycleDN,
-                     edgeNum = cp$edgeNum,
-                     edgeType = edgeType,
-                     individual = graph,
-                     pmr = pmr,
-                     prior = prior)
+    currentES <- rmCycle(cycleDN = cp$cycleDN,
+                         edgeNum = cp$edgeNum,
+                         edgeType = edgeType,
+                         individual = currentES,
+                         pmr = pmr,
+                         prior = prior)
 
   }
 
-  # Calculate the log likelihood for the starting graph given the data.
-  graph <- cllEdge(coordinates = coord,
-                   data = data,
-                   graph = graph,
-                   m = m,
-                   nEdges = nEdges,
-                   nGV = nGV,
-                   nNodes = nNodes)
+  # Turn the current edge states in to an adjacency matrix.
+  currentAM <- toAdjMatrix(coordinates = coord,
+                           graph = currentES,
+                           nEdges = nEdges,
+                           nNodes = nNodes)
 
-  # Get the time that the for loop starts.
+  # Look up the log likelihood for each node.
+  currentLL <- lull(am = currentAM,
+                    likelihood = currentLL,
+                    llenv = logle,
+                    nNodes = nNodes,
+                    wNodes = 1:nNodes)
+
+  # Copy the currentLL vector to the proposedLL vector. They need to be the same
+  # before starting the MH algorithm because only the nodes that have different
+  # parents in the proposed graph will have the likelihood changed in the
+  # proposedLL vector.
+  proposedLL <- currentLL
+
+  # Start the Metropolis-Hastings algorithm ------------------------------------
+
+  # Get the time the Metropolis-Hastings algorithm starts.
   startTime <- Sys.time()
 
-  #################################################
-  # Beginning of the Metropolis-Hastings algorithm.
-  #################################################
+  # Create progress bar.
+  if (progress == TRUE) {
 
-  # create progress bar
-  pb <- txtProgressBar(min = 0, max = iterations, style = 3)
+    pb <- txtProgressBar(min = 0, max = iterations, style = 3)
+
+  }
 
   # Run through the iterations of the Metropolis Hastings algorithm.
   for (e in 1:iterations) {
 
     # Change the current graph to a different graph at each iteration.
-    mGraph <- mutate(edgeType = edgeType,
-                     graph = graph,
-                     nEdges = nEdges,
-                     pmr = pmr,
-                     prior = prior,
-                     ztbProb = ztbProb)
+    proposedES <- mutate(edgeType = edgeType,
+                         graph = currentES,
+                         nEdges = nEdges,
+                         pmr = pmr,
+                         prior = prior,
+                         ztbProb = ztbProb)
 
     # If there are potential directed cycles in the graph check if they are
     # present and remove them if they are.
     if (!is.null(cp$cycleDN)) {
 
       # Remove any directed cycles in the graph.
-      mGraph <- rmCycle(cycleDN = cp$cycleDN,
-                        edgeNum = cp$edgeNum,
-                        edgeType = edgeType,
-                        individual = mGraph,
-                        pmr = pmr,
-                        prior = prior)
+      proposedES <- rmCycle(cycleDN = cp$cycleDN,
+                            edgeNum = cp$edgeNum,
+                            edgeType = edgeType,
+                            individual = proposedES,
+                            pmr = pmr,
+                            prior = prior)
 
     }
 
     # If the graph after mutation and removing directed cycles is the same as
     # the graph at the previous iteration then return that graph without
     # calculating the log likelihood.
-    if (identical(mGraph[1:nEdges], graph[1:nEdges])) {
+    if (identical(proposedES, currentES)) {
 
       # Store the accepted graph after burnin and thinning.
       if (e %in% keep) {
@@ -288,10 +311,13 @@ mhEdge <- function (data,
         counter <- counter + 1
 
         # Store the accepted graph in the MarkovChain matrix
-        MarkovChain[counter, ] <- graph
+        MarkovChain[counter, ] <- currentES
+
+        # Store the accepted likelihood
+        likelihood[[counter]] <- sum(currentLL)
 
         # Calculate the decimal for the accepted graph.
-        graphDecimal[[counter]] <- sum(graph[1:nEdges] * 3^(1:nEdges))
+        graphDecimal[[counter]] <- sum(currentES * 3^(1:nEdges))
 
       }
 
@@ -300,23 +326,44 @@ mhEdge <- function (data,
 
     }
 
-    # Calculate the log likelihood of the changed graph
-    mGraph <- cllEdge(coordinates = coord,
-                      data = data,
-                      graph = mGraph,
-                      m = m,
-                      nEdges = nEdges,
-                      nGV = nGV,
-                      nNodes = nNodes)
+    # Get the indices for the edge states that are different between the current
+    # and proposed edge state vectors.
+    difference <- divergent(coordinates = coord,
+                            currentES = currentES,
+                            proposedES = proposedES)
 
-    # Determine whether to accept the proposed graph 'mGraph' or the original
-    # graph 'graph'.
-    graph <- caRatio(current = graph,
-                     edgeType = edgeType,
-                     m = m,
-                     pmr = pmr,
-                     proposed = mGraph,
-                     prior = prior)
+    proposedAM <- convertAM(adjMatrix = currentAM,
+                            coordinates = coord,
+                            edgeStates = proposedES,
+                            wEdges = difference$dEdges)
+
+    # Look up the log likelihood for each node whose parents have changed.
+    proposedLL <- lull(am = proposedAM,
+                       likelihood = currentLL,
+                       llenv = logle,
+                       nNodes = nNodes,
+                       wNodes = difference$dNodes)
+
+    # Determine whether to accept the proposed graph proposedES or the current
+    # graph currentES.
+    decision <- caRatio(current = currentES,
+                        currentLL = currentLL,
+                        edgeType = edgeType,
+                        pmr = pmr,
+                        proposed = proposedES,
+                        proposedLL = proposedLL,
+                        prior = prior,
+                        wEdges = difference$dEdges)
+
+    # If the proposed graph is accepted then change the currentES and currentLL
+    # vectors to the proposedES and proposedLL
+    if (decision == 'proposed') {
+
+      currentES <- proposedES
+      currentLL <- proposedLL
+      currentAM <- proposedAM
+
+    }
 
     # Store the accepted graph after burnin and thinning.
     if (e %in% keep) {
@@ -325,32 +372,36 @@ mhEdge <- function (data,
       counter <- counter + 1
 
       # Store the accepted graph in the MarkovChain matrix
-      MarkovChain[counter, ] <- graph
+      MarkovChain[counter, ] <- currentES
+
+      # Store the log likelihood of the accepted graph.
+      likelihood[[counter]] <- sum(currentLL)
 
       # Calculate the decimal for the accepted graph.
-      graphDecimal[[counter]] <- sum(graph[1:nEdges] * 3^(1:nEdges))
+      graphDecimal[[counter]] <- sum(currentES * 3^(1:nEdges))
 
     }
 
-    # Update progress bar
-    setTxtProgressBar(pb, e)
+    # Update progress bar.
+    if (progress == TRUE) {
+
+      setTxtProgressBar(pb, e)
+
+    }
 
   }
 
-  # Close the progress bar
-  close(pb)
+  # Close the progress bar.
+  if (progress == TRUE) {
 
-  #################################################
-  # End of the Metropolis-Hastings algorithm.
-  #################################################
+    close(pb)
 
-  # Get the time the for loop ends
+  }
+
+  # Get the time the Metropolis-Hastings algorithm ends
   endTime <- Sys.time()
 
-  #################################################
-  # Create the probability matrix for the three
-  # edge states.
-  #################################################
+  # Posterior probability matrix -----------------------------------------------
 
   # Create a matrix to hold the posterior probability of each edge.
   posteriorES <- as.data.frame(matrix(nrow = nEdges,
@@ -385,9 +436,7 @@ mhEdge <- function (data,
 
   }
 
-  #################################################
-  # Create the probabilistic adjacency matrix.
-  #################################################
+  # Posterior probability adjacency matrix -------------------------------------
 
   # Probabilities for upper triangular matrix
   upper <- posteriorES[, 2]
@@ -420,15 +469,15 @@ mhEdge <- function (data,
                      ceiling(iterations / thinTo),
                      ceiling(((1 - burnIn) * iterations) / thinTo))
 
-  # Return an object of class mcmc
+  # Create an mcmc object ------------------------------------------------------
   mcmcObj <- new('mcmc',
                  burnIn = burnIn * 100,
-                 chain = MarkovChain[, 1:nEdges],
+                 chain = MarkovChain,
                  decimal = graphDecimal,
                  iterations = iterations,
                  posteriorES = posteriorES,
                  posteriorPM = posteriorPM,
-                 likelihood = MarkovChain[, m],
+                 likelihood = likelihood,
                  stepSize = stepSize,
                  time = as.double((endTime - startTime),
                                   units = 'secs'))

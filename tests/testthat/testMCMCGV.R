@@ -34,6 +34,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                           prior = c(0.05,
                                     0.05,
                                     0.9),
+                          progress = TRUE,
                           thinTo = 100)
 
   # Run the MH algorithm with the edges from the true graph with pmr.
@@ -46,6 +47,7 @@ test_that('MHEdge returns the correct matrix with and without pmr',{
                               prior = c(0.05,
                                         0.05,
                                         0.9),
+                              progress = FALSE,
                               thinTo = 100)
 
   expect_identical(standard_m1gv@chain, mh_m1gv_200_1@chain)

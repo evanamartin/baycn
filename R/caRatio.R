@@ -1,25 +1,54 @@
+# caRatio
+#
+# Calculates the acceptance ratio for the Metropolis-Hastings and Genetic
+# Algorithm. It takes the ratio of the original vector of edge directions, old
+# individual, and the proposed vector of edge directions, new individual.
+#
+# @param current A vector of edge directions. This is the graph from
+# the start of the current interation.
+#
+# @param currentLL A vector containing the log likelihood for each node in the
+# current graph.
+#
+# @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (0) or
+# a gv-gv or ge-ge edge (1).
+#
+# @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
+# Principle of Mendelian Randomization, PMR. This prevents the direction of an
+# edge pointing from a gene expression node to a genetic variant node.
+#
+# @param proposed A vector of edge directions. This the the proposed
+# vector of edge directions.
+#
+# @param proposedLL A vector containing the log likelihood for each node in the
+# proposed graph.
+#
+# @param prior A vector containing the prior probability of seeing each edge
+# direction.
+#
+# @param wEdges A vector of edge indices for the edges that differ between the
+# current and proposed graphs.
+#
+# @return A vector of edge directions and the fitness of the individual
+#
 #' @importFrom stats runif
 #'
 caRatio <- function (current,
+                     currentLL,
                      edgeType,
-                     m,
                      pmr,
                      proposed,
-                     prior) {
-
-  # To calculate the acceptance ratio we need to first have the prio probability
-  # of the edges in the old individual and the new individual. Because they will
-  # be the same for most of the edges we only need to consider the probabilities
-  # of the edges that are different.
-  difference <- proposed[1:(m - 1)] != current[1:(m - 1)]
+                     proposedLL,
+                     prior,
+                     wEdges) {
 
   # Ater getting the locations of the differences of the edge directions between
   # the current and proposed graphs we need to get the directions of the edges.
-  edgeDirP <- proposed[1:(m - 1)][difference]
-  edgeDirC <- current[1:(m - 1)][difference]
+  edgeDirP <- proposed[wEdges]
+  edgeDirC <- current[wEdges]
 
   # Extract the edge type for the edges that have changed.
-  etDiff <- edgeType[difference]
+  etDiff <- edgeType[wEdges]
 
   # Number of changed edges.
   nDiff <- length(edgeDirP)
@@ -75,8 +104,8 @@ caRatio <- function (current,
 
   }
 
-  ratio <- ((sum(priorP) + proposed[[m]] + sum(transProbP))
-            - (sum(priorC) + current[[m]] + sum(transProbC)))
+  ratio <- ((sum(priorP) + sum(proposedLL) + sum(transProbP))
+            - (sum(priorC) + sum(currentLL) + sum(transProbC)))
 
   # Generate log uniform(0, 1) to compare to alpha which is
   # min(ratio, 0).
@@ -89,11 +118,11 @@ caRatio <- function (current,
   # Determine if the proposed graph should be accepted.
   if (logU < alpha) {
 
-    return (proposed)
+    return ('proposed')
 
   } else {
 
-    return (current)
+    return ('current')
 
   }
 

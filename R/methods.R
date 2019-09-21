@@ -124,12 +124,13 @@ print.summary.mcmc <- function (x, ...) {
 #'
 #' @param ... Other Arguments passed to methods.
 #'
+#' @aliases plot,mcmc-method
+#'
 #' @import ggplot2
 #'
 #' @importFrom egg ggarrange
 #'
 #' @export
-#' @aliases plot,mcmc-method
 setMethod('plot',
           signature(x = 'mcmc'),
           definition = function (x, y, ...) {

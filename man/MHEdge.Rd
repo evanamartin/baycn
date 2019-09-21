@@ -5,7 +5,8 @@
 \title{mhEdge}
 \usage{
 mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nGV,
-  pmr = FALSE, prior = c(0.05, 0.05, 0.9), thinTo = 200)
+  pmr = FALSE, prior = c(0.05, 0.05, 0.9), progress = TRUE,
+  thinTo = 200)
 }
 \arguments{
 \item{data}{A matrix with the nodes across the columns and the observations
@@ -29,6 +30,8 @@ Principle of Mendelian Randomization (PMR). This prevents the direction of an
 edge pointing from a gene expression node to a genetic variant node.}
 
 \item{prior}{A vector containing the prior probability of each edge state.}
+
+\item{progress}{Logical. If TRUE a progress bar will be printed.}
 
 \item{thinTo}{An integer indicating the number of observations the chain
 should be thinned to.}
@@ -97,6 +100,7 @@ mh_m1_pmr <- mhEdge(data = data_m1,
                     prior = c(0.05,
                               0.05,
                               0.9),
+                    progress = FALSE,
                     thinTo = 200)
 
 summary(mh_m1_pmr)
@@ -128,6 +132,7 @@ mh_gn4 <- mhEdge(data = data_gn4,
                  prior = c(0.05,
                            0.05,
                            0.9),
+                 progress = FALSE,
                  thinTo = 200)
 
 summary(mh_gn4)
