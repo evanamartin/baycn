@@ -45,6 +45,7 @@ mh_gn4 <- mhEdge(data = data_gn4,
                  prior = c(0.05,
                            0.05,
                            0.9),
+                 progress = TRUE,
                  thinTo = 200)
 
 summary(mh_gn4)
@@ -83,6 +84,7 @@ mh_m1_pmr <- mhEdge(data = data_m1,
                     prior = c(0.05,
                               0.05,
                               0.9),
+                    progress = TRUE,
                     thinTo = 200)
 
 summary(mh_m1_pmr)
