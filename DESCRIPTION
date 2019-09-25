@@ -11,6 +11,8 @@ Description: A Bayesian hybrid approach for inferring Directed Acyclic Graphs
     reduce the search space to a more manageable size. A Bayesian Markov chain
     Monte Carlo algorithm is then used to infer the probability of direction and
     absence for the edges in the network.
+    References:
+    Martin and Fu (2019) <arXiv:1909.10678>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
