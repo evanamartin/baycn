@@ -149,5 +149,5 @@ data_m1_iv[1:5, ]
 Yang, F., Wang, J., The GTEx Consortium, Pierce, B. L., and
 Chen, L. S. (2017).
 Identifying cis-mediators for trans-eQTLs across many human tissues using
-genomic mediation analysis. \emph{Genome research}, 27(11), 1859-1871.
+genomic mediation analysis. \emph{Genome Res.} 27, 1859-1871.
 }
