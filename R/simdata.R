@@ -243,8 +243,11 @@ simdata <- function (b0 = 0,
                            length = nConfounding + 1)
 
            # create a list to hold the data for the confounding variables
-           con <- as.data.frame(matrix(nrow = N,
-                                       ncol = nConfounding))
+           con <- matrix(nrow = N,
+                         ncol = nConfounding)
+
+           # add column names to the matrix of confounding variables
+           colnames(con) <- paste0('C', 1:nConfounding)
 
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
@@ -252,8 +255,6 @@ simdata <- function (b0 = 0,
              con[, a] <- rNoParents(N = N,
                                     b0 = b0,
                                     s = s)
-
-             names(con)[a] <- paste0('C', a)
 
              # Add the signal strength of the confounding variable to the ssT1
              # vector.
@@ -320,8 +321,11 @@ simdata <- function (b0 = 0,
                            s = s)
 
            # create a list to hold the data for the confounding variables
-           con <- as.data.frame(matrix(nrow = N,
-                                       ncol = nConfounding))
+           con <- matrix(nrow = N,
+                         ncol = nConfounding)
+
+           # add column names to the matrix of confounding variables
+           colnames(con) <- paste0('C', 1:nConfounding)
 
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
@@ -332,8 +336,6 @@ simdata <- function (b0 = 0,
                                    b0 = b0,
                                    b1 = c(ssc, ssc),
                                    s = s)
-
-             names(con)[a] <- paste0('C', a)
 
            }
 
@@ -360,8 +362,11 @@ simdata <- function (b0 = 0,
                            s = s)
 
            # create a list to hold the data for the confounding variables
-           con <- as.data.frame(matrix(nrow = N,
-                                       ncol = nConfounding))
+           con <- matrix(nrow = N,
+                         ncol = nConfounding)
+
+           # add column names to the matrix of confounding variables
+           colnames(con) <- paste0('C', 1:nConfounding)
 
            # create a vector with the signal strength of the parents for T2
            ssT2 <- vector(mode = 'numeric',
@@ -385,8 +390,6 @@ simdata <- function (b0 = 0,
                                    b0 = b0,
                                    b1 = c(ssc),
                                    s = s)
-
-             names(con)[a] <- paste0('C', a)
 
              # Add the signal strength of the confounding variable to the ssT2
              # vector.
@@ -497,8 +500,11 @@ simdata <- function (b0 = 0,
                            length = nConfounding)
 
            # create a list to hold the data for the confounding variables
-           con <- as.data.frame(matrix(nrow = N,
-                                       ncol = nConfounding))
+           con <- matrix(nrow = N,
+                         ncol = nConfounding)
+
+           # add column names to the matrix of confounding variables
+           colnames(con) <- paste0('C', 1:nConfounding)
 
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
@@ -506,8 +512,6 @@ simdata <- function (b0 = 0,
              con[, a] <- rNoParents(N = N,
                                     b0 = b0,
                                     s = s)
-
-             names(con)[a] <- paste0('C', a)
 
              # Add the signal strength of the confounding variable to the ssT1
              # vector.
@@ -571,8 +575,11 @@ simdata <- function (b0 = 0,
                            s = s)
 
            # create a list to hold the data for the confounding variables
-           con <- as.data.frame(matrix(nrow = N,
-                                       ncol = nConfounding))
+           con <- matrix(nrow = N,
+                         ncol = nConfounding)
+
+           # add column names to the matrix of confounding variables
+           colnames(con) <- paste0('C', 1:nConfounding)
 
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
@@ -583,8 +590,6 @@ simdata <- function (b0 = 0,
                                    b0 = b0,
                                    b1 = c(ssc, ssc),
                                    s = s)
-
-             names(con)[a] <- paste0('C', a)
 
            }
 
@@ -608,8 +613,11 @@ simdata <- function (b0 = 0,
                             s = s)
 
            # create a list to hold the data for the confounding variables
-           con <- as.data.frame(matrix(nrow = N,
-                                       ncol = nConfounding))
+           con <- matrix(nrow = N,
+                         ncol = nConfounding)
+
+           # add column names to the matrix of confounding variables
+           colnames(con) <- paste0('C', 1:nConfounding)
 
            # create a vector with the signal strength of the parents for T1
            ssT1 <- vector(mode = 'numeric',
@@ -637,8 +645,6 @@ simdata <- function (b0 = 0,
                                    b0 = b0,
                                    b1 = c(ssc),
                                    s = s)
-
-             names(con)[a] <- paste0('C', a)
 
              # Add the signal strength of the confounding variable to the ssT1
              # vector.
