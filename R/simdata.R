@@ -998,6 +998,156 @@ simdata <- function (b0 = 0,
 
          },
 
+         # layer_cp ------------------------------------------------------------
+
+         'layer_cp' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           C1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           C2 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           T1 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(U, C1),
+                           b0 = b0,
+                           b1 = c(ss, ssc),
+                           s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(U, C2),
+                           b0 = b0,
+                           b1 = c(ss, ssc),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T5 <- rMParents(N = N,
+                           mParents = 3,
+                           parentData = list(T1, T2, C1),
+                           b0 = b0,
+                           b1 = c(ss, ss, ssc),
+                           s = s)
+
+           T6 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T2, C2),
+                           b0 = b0,
+                           b1 = c(ss, ssc),
+                           s = s)
+
+           T7 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T3),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7, C1, C2))
+
+         },
+
+         # layer_iv ------------------------------------------------------------
+
+         'layer_iv' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           T1 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           C1 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ssc),
+                           s = s)
+
+           T2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           C2 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T2),
+                           b0 = b0,
+                           b1 = c(ssc),
+                           s = s)
+
+           T3 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(U),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T4 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T1),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           T5 <- rMParents(N = N,
+                           mParents = 3,
+                           parentData = list(T1, T2, C1),
+                           b0 = b0,
+                           b1 = c(ss, ss, ssc),
+                           s = s)
+
+           T6 <- rMParents(N = N,
+                           mParents = 2,
+                           parentData = list(T2, C2),
+                           b0 = b0,
+                           b1 = c(ss, ssc),
+                           s = s)
+
+           T7 <- rMParents(N = N,
+                           mParents = 1,
+                           parentData = list(T3),
+                           b0 = b0,
+                           b1 = c(ss),
+                           s = s)
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7, C1, C2))
+
+         },
+
          # star ----------------------------------------------------------------
 
          'star' = {
