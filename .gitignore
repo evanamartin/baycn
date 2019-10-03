@@ -38,4 +38,5 @@ rsconnect/
 
 # Local tests and simulations
 simulations/
-test/
+simdata_figs/
+baycn_logo/
