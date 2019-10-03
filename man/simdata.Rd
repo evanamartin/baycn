@@ -22,8 +22,8 @@ coefficient is referred to as the signal strength.}
 
 \item{graph}{A character string of the graph for which data will be
 simulated. The graphs that can be chosen are m1_ge, m1_gv, m1_cp, m1_cc,
-m1_iv, m2_ge, m2_gv, m2_cp, m2_cc, m2_iv, mp_ge, mp_gv, gn4, gn5, gn8, gn11,
-layer, and star.
+m1_iv, m2_ge, m2_gv, m2_cp, m2_cc, m2_iv, m3_gv, m3_cp, m3_cc, m3_iv, mp_ge,
+mp_gv, gn4, gn5, gn8, gn11, layer, layer_cp, layer_iv, and star.
 
 The following figures show the graph for each of the topologies listed above.
 The nodes with a circle around the name are normally distributed and the
@@ -69,6 +69,18 @@ m2_iv - Topology M2 with n intermediate confounding variables.
 \if{html}{\figure{m2.png}{options: width="75\%" alt="Figure: m2.png"}}
 \if{latex}{\figure{m2.pdf}{options: width=12cm}}
 
+m3_gv - Topolog M3 with one discrete random variable U and two continuous
+random variables.
+
+m3_cp - Topology M3 with n common parent confounding variables.
+
+m3_cc - Topology M3 with n common child confounding variables.
+
+m3_iv - Topology M3 with n intermediate confounding variables.
+
+\if{html}{\figure{m3.png}{options: width="75\%" alt="Figure: m3.png"}}
+\if{latex}{\figure{m3.pdf}{options: width=12cm}}
+
 mp_ge - The multi-parent topology with continuous random variables. This
 graph is made up of multiple v structures and has no other Markov equivalent
 graphs.
@@ -97,8 +109,12 @@ T6.
 layer - The layer topology has no other Markov equivalent graphs when using
 the PMR and is made up of multiple M1 topologies.
 
-\if{html}{\figure{layer.png}{options: width="25\%" alt="Figure: layer.png"}}
-\if{latex}{\figure{layer.pdf}{options: width=2.5cm}}
+layer_cp - The layer topology with 2 common parent confounding variables.
+
+layer_iv - The layer topology with 2 intermediate confounding variables.
+
+\if{html}{\figure{layer.png}{options: width="75\%" alt="Figure: layer.png"}}
+\if{latex}{\figure{layer.pdf}{options: width=12cm}}
 
 star - The star topology has no other Markov equivalent graphs when using the
 PMR and is made up of multiple M1 topologies.
