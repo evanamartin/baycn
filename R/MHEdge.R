@@ -30,7 +30,7 @@
 #' @param thinTo An integer indicating the number of observations the chain
 #' should be thinned to.
 #'
-#' @return An object of class mcmc containing 9 elements:
+#' @return An object of class baycn containing 9 elements:
 #'
 #' \itemize{
 #'
@@ -470,19 +470,19 @@ mhEdge <- function (data,
                      ceiling(iterations / thinTo),
                      ceiling(((1 - burnIn) * iterations) / thinTo))
 
-  # Create an mcmc object ------------------------------------------------------
-  mcmcObj <- new('mcmc',
-                 burnIn = burnIn * 100,
-                 chain = MarkovChain,
-                 decimal = graphDecimal,
-                 iterations = iterations,
-                 posteriorES = posteriorES,
-                 posteriorPM = posteriorPM,
-                 likelihood = likelihood,
-                 stepSize = stepSize,
-                 time = as.double((endTime - startTime),
-                                  units = 'secs'))
+  # Create a baycn object ------------------------------------------------------
+  baycnObj <- new('baycn',
+                  burnIn = burnIn * 100,
+                  chain = MarkovChain,
+                  decimal = graphDecimal,
+                  iterations = iterations,
+                  posteriorES = posteriorES,
+                  posteriorPM = posteriorPM,
+                  likelihood = likelihood,
+                  stepSize = stepSize,
+                  time = as.double((endTime - startTime),
+                                   units = 'secs'))
 
-  return (mcmcObj)
+  return (baycnObj)
 
 }

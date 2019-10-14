@@ -1,4 +1,4 @@
-#' mcmc class
+#' baycn class
 #'
 #' @slot burnIn The percentage of MCMC iterations that will be discarded from
 #' the beginning of the chain.
@@ -25,9 +25,9 @@
 #'
 #' @slot time The runtime of the Metropolis-Hastings algorithm in seconds.
 #'
-#' @exportClass mcmc
+#' @exportClass baycn
 #'
-setClass(Class = 'mcmc',
+setClass(Class = 'baycn',
          slots = c(burnIn = 'numeric',
                    chain = 'matrix',
                    decimal = 'numeric',

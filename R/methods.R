@@ -1,12 +1,12 @@
 #' show
 #'
-#' @param object An object of class mcmc.
+#' @param object An object of class baycn.
 #'
 #' @importFrom methods show
 #'
 #' @export
 setMethod('show',
-          signature = 'mcmc',
+          signature = 'baycn',
           definition = function (object) {
 
             cat('Object of class: ',
@@ -18,13 +18,13 @@ setMethod('show',
 
 #' summary
 #'
-#' @param object An object of class mcmc.
+#' @param object An object of class baycn.
 #'
 #' @param ... Other Arguments passed to methods.
 #'
 #' @export
 setMethod('summary',
-          signature(object = 'mcmc'),
+          signature(object = 'baycn'),
           definition = function (object, ...) {
 
             returned <- list()
@@ -64,16 +64,16 @@ setMethod('summary',
             returned$burnIn <- object@burnIn
             returned$stepSize <- object@stepSize
 
-            class(returned) <- 'summary.mcmc'
+            class(returned) <- 'summary.baycn'
 
             returned
 
           })
 
-#' @method print summary.mcmc
+#' @method print summary.baycn
 #'
 #' @export
-print.summary.mcmc <- function (x, ...) {
+print.summary.baycn <- function (x, ...) {
 
   # Display the posterior probability for each edge.
   cat('Posterior probability: \n')
@@ -118,13 +118,13 @@ print.summary.mcmc <- function (x, ...) {
 
 #' plot
 #'
-#' @param x An object of classs mcmc.
+#' @param x An object of classs baycn.
 #'
 #' @param y Optional if x is the appropriate structure.
 #'
 #' @param ... Other Arguments passed to methods.
 #'
-#' @aliases plot,mcmc-method
+#' @aliases plot,baycn-method
 #'
 #' @import ggplot2
 #'
@@ -132,7 +132,7 @@ print.summary.mcmc <- function (x, ...) {
 #'
 #' @export
 setMethod('plot',
-          signature(x = 'mcmc'),
+          signature(x = 'baycn'),
           definition = function (x, y, ...) {
 
             likelihood <- NULL

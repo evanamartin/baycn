@@ -37,7 +37,7 @@ edge pointing from a gene expression node to a genetic variant node.}
 should be thinned to.}
 }
 \value{
-An object of class mcmc containing 9 elements:
+An object of class baycn containing 9 elements:
 
 \itemize{
 
