@@ -917,6 +917,133 @@ simdata <- function (b0 = 0,
 
          },
 
+         # m4_ge ---------------------------------------------------------------
+
+         'm4_ge' = {
+
+           T1 <- rNoParents(N = N,
+                            b0 = b0,
+                            s = s)
+
+           # Generate data for T2 and T3 with a v structure at T3.
+           T2_a <- rMParents(N = N,
+                             mParents = 1,
+                             parentData = list(T1),
+                             b0 = b0,
+                             b1 = c(ss),
+                             s = s)
+
+           T3_a <- rMParents(N = N,
+                             mParents = 2,
+                             parentData = list(T1, T2_a),
+                             b0 = b0,
+                             b1 = c(ss, ss),
+                             s = s)
+
+           # Generate data for T2 and T3 with a v structure at T2.
+           T3_b <- rMParents(N = N,
+                             mParents = 1,
+                             parentData = list(T1),
+                             b0 = b0,
+                             b1 = c(ss),
+                             s = s)
+
+           T2_b <- rMParents(N = N,
+                             mParents = 2,
+                             parentData = list(T1, T3_b),
+                             b0 = b0,
+                             b1 = c(ss, ss),
+                             s = s)
+
+           # Create a vector representing a coin toss.
+           coin_flip <- sample(x = 0:1,
+                               size = N,
+                               replace = TRUE)
+
+           # Create empty vectors for T2 and T3.
+           T2 <- vector(mode = 'numeric',
+                        length = N)
+
+           T3 <- vector(mode = 'numeric',
+                        length = N)
+
+           # Create a vector for T2 that is a combination of T2_a and T2_b.
+           T2[coin_flip == 0] <- T2_a[coin_flip == 0]
+           T2[coin_flip == 1] <- T2_b[coin_flip == 1]
+
+           # Create a vector for T3 that is a combination of T3_a and T3_b.
+           T3[coin_flip == 0] <- T3_a[coin_flip == 0]
+           T3[coin_flip == 1] <- T3_b[coin_flip == 1]
+
+           return (cbind(T1, T2, T3))
+
+         },
+
+         # m4_gv ---------------------------------------------------------------
+
+         'm4_gv' = {
+
+           U <- sample(x = 0:2,
+                       size = N,
+                       replace = TRUE,
+                       prob = c((1 - p)^2,
+                                2 * p * (1 - p),
+                                p^2))
+
+           # Generate data for T1 and T2 with a v structure at T2.
+           T1_a <- rMParents(N = N,
+                             mParents = 1,
+                             parentData = list(U),
+                             b0 = b0,
+                             b1 = c(ss),
+                             s = s)
+
+           T2_a <- rMParents(N = N,
+                             mParents = 2,
+                             parentData = list(U, T1_a),
+                             b0 = b0,
+                             b1 = c(ss, ss),
+                             s = s)
+
+           # Generate data for T1 and T2 with a v structure at T1.
+           T2_b <- rMParents(N = N,
+                             mParents = 1,
+                             parentData = list(U),
+                             b0 = b0,
+                             b1 = c(ss),
+                             s = s)
+
+           T1_b <- rMParents(N = N,
+                             mParents = 2,
+                             parentData = list(U, T2_b),
+                             b0 = b0,
+                             b1 = c(ss, ss),
+                             s = s)
+
+           # Create a vector of 0s and 1s to represent flipping a coin.
+           coin_flip <- sample(x = 0:1,
+                               size = N,
+                               replace = TRUE)
+
+           # Create empty vectors for T1 and T2.
+           T1 <- vector(mode = 'numeric',
+                        length = N)
+
+           T2 <- vector(mode = 'numeric',
+                        length = N)
+
+           # Create a vector for T1 that is a combination of T1_a and T1_b.
+           T1[coin_flip == 0] <- T1_a[coin_flip == 0]
+           T1[coin_flip == 1] <- T1_b[coin_flip == 1]
+
+           # Create a vector for T2 that is a combination of T2_a and T2_b.
+           T2[coin_flip == 0] <- T2_a[coin_flip == 0]
+           T2[coin_flip == 1] <- T2_b[coin_flip == 1]
+
+           return (cbind(U, T1, T2))
+
+         },
+
          # mp_ge ---------------------------------------------------------------
 
          'mp_ge' = {
