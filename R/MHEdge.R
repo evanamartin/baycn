@@ -236,7 +236,7 @@ mhEdge <- function (data,
 
     # Remove any directed cycles in the graph.
     currentES <- rmCycle(cycleDN = cp$cycleDN,
-                         edgeNum = cp$edgeNum,
+                         edgeID = cp$edgeID,
                          edgeType = edgeType,
                          individual = currentES,
                          pmr = pmr,
@@ -292,7 +292,7 @@ mhEdge <- function (data,
 
       # Remove any directed cycles in the graph.
       proposedES <- rmCycle(cycleDN = cp$cycleDN,
-                            edgeNum = cp$edgeNum,
+                            edgeID = cp$edgeID,
                             edgeType = edgeType,
                             individual = proposedES,
                             pmr = pmr,

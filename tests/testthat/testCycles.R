@@ -2,31 +2,65 @@ context('Identify cycles')
 
 test_that('cyclePrep returns the correct cycles',{
 
-  # The following graph has three cycles two of which are nested in the largest
-  # cycle.
-  # T1 - T2 - T3 - T1
-  # T1 - T3 - T4 - T5 - T6 - T1
-  # T1 - T2 - T3 - T4 - T5 - T6 - T1
-  adjMatrix <- matrix(c(0, 1, 1, 0, 0, 1,
-                        1, 0, 1, 0, 0, 0,
-                        1, 1, 0, 1, 0, 0,
-                        0, 0, 1, 0, 1, 0,
-                        0, 0, 0, 1, 0, 1,
-                        1, 0, 0, 0, 1, 0),
-                      byrow = TRUE,
-                      nrow = 6)
+  # Nested cycles --------------------------------------------------------------
 
-  cp <- cyclePrep(adjMatrix)
+  # Fully connected four node graph.
+  adjMatrix<- matrix(1,
+                     nrow = 4,
+                     ncol = 4)
 
-  expect_identical(cp$cycleDN, c(91, 3269, 16, 3191, 50, 53))
-  expect_equal(cp$edgeNum, list(c(2, 4, 1),
-                                c(3, 7, 6, 5, 4, 1),
-                                c(1, 4, 2),
-                                c(3, 7, 6, 5, 2),
-                                c(2, 5, 6, 7, 3),
-                                c(1, 4, 5, 6, 7, 3)))
+  diag(adjMatrix) <- 0
 
-  # The following adjacency matrix is from topology H2
+  cp <- cyclePrep(adjMatrix = adjMatrix,
+                  nGV = 0,
+                  pmr = FALSE)
+
+  # Check that cycleDN and edgeID have the same length.
+  expect_true(length(cp$cycleDN) == length(cp$edgeID))
+  expect_true(length(cp$cycleDN[[1]]) == length(cp$edgeID[[1]]))
+  expect_true(length(cp$cycleDN[[2]]) == length(cp$edgeID[[2]]))
+  # Check that the correct number of cycle sizes is returned.
+  expect_true(length(cp$cycleDN) == 2)
+  # Check that the correct number of cycles for each cycle size is correct.
+  expect_true(length(cp$cycleDN[[1]]) == 8)
+  expect_true(length(cp$cycleDN[[2]]) == 6)
+  # Check that the correct cycles are found.
+  expect_setequal(cp$cycleDN, list(c(91, 255, 825, 258, 16, 749, 36, 38),
+                                   c(827, 260, 266, 752, 122, 41)))
+
+  # Disjoint cycles ------------------------------------------------------------
+
+  # Two disjoint cycles (one three node cycle and one four node cycle).
+  adjMatrix <- matrix(c(0, 1, 1, 0, 0, 0, 0,
+                        1, 0, 1, 0, 0, 0, 0,
+                        1, 1, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 1, 1, 0,
+                        0, 0, 0, 1, 0, 1, 1,
+                        0, 0, 0, 1, 1, 0, 1,
+                        0, 0, 0, 0, 1, 1, 0),
+                      nrow = 7,
+                      byrow = TRUE)
+
+  cp <- cyclePrep(adjMatrix = adjMatrix,
+                  nGV = 0,
+                  pmr = FALSE)
+
+  # Check that cycleDN and edgeID have the same length.
+  expect_true(length(cp$cycleDN) == length(cp$edgeID))
+  expect_true(length(cp$cycleDN[[1]]) == length(cp$edgeID[[1]]))
+  expect_true(length(cp$cycleDN[[2]]) == length(cp$edgeID[[2]]))
+  # Check that the correct number of cycle sizes is returned.
+  expect_true(length(cp$cycleDN) == 2)
+  # Check that the correct number of cycles for each cycle size is correct.
+  expect_true(length(cp$cycleDN[[1]]) == 6)
+  expect_true(length(cp$cycleDN[[2]]) == 2)
+  # Check that all the cycles are found.
+  expect_setequal(cp$cycleDN, list(c(36, 15, 825, 7311, 2208, 258),
+                                   c(2292, 6828)))
+
+  # Single cycle ---------------------------------------------------------------
+
+  # The following adjacency matrix is from topology GN5
   adjMatrix <- matrix(c(0, 1, 1, 0, 0,
                         0, 0, 0, 1, 0,
                         0, 0, 0, 0, 1,
@@ -35,35 +69,24 @@ test_that('cyclePrep returns the correct cycles',{
                       byrow = TRUE,
                       nrow = 5)
 
-  cp <- cyclePrep(adjMatrix)
+  cp <- cyclePrep(adjMatrix = adjMatrix,
+                  nGV = 0,
+                  pmr = FALSE)
 
-  expect_identical(cp$cycleDN, c(288, 105))
-  expect_equal(cp$edgeNum, list(c(2, 4, 5, 3, 1),
-                                c(1, 3, 5, 4, 2)))
-
-  # The following adjacency matrix is from a graph with two disjoint cycles.
-  adjMatrix <- matrix(c(0, 1, 1, 0, 0, 0,
-                        1, 0, 1, 0, 0, 0,
-                        1, 1, 0, 0, 0, 0,
-                        0, 0, 0, 0, 1, 1,
-                        0, 0, 0, 1, 0, 1,
-                        0, 0, 0, 1, 1, 0),
-                      nrow = 6,
-                      byrow = TRUE)
-
-  cp <- cyclePrep(adjMatrix)
-
-  expect_identical(cp$cycleDN, c(36, 15, 825, 258))
-  expect_equal(cp$edgeNum, list(c(2, 3, 1),
-                                c(1, 3, 2),
-                                c(5, 6, 4),
-                                c(4, 6, 5)))
+  # Check that cycleDN and edgeID have the same length.
+  expect_true(length(cp$cycleDN) == length(cp$edgeID))
+  expect_true(length(cp$cycleDN[[1]]) == length(cp$edgeID[[1]]))
+  # Check that the correct number of cycle sizes is returned.
+  expect_true(length(cp$cycleDN) == 1)
+  # Check that the correct number of cycles for each cycle size is correct.
+  expect_true(length(cp$cycleDN[[1]]) == 2)
+  # Check that all the cycles are found.
+  expect_setequal(cp$cycleDN, list(c(288, 105)))
 
 })
 
 test_that('cyclePrep returns NULL if there are no cycles in the graph', {
 
-  # adjacency matrix for topology NC4
   #           T4
   #           ^
   #     T1 -> T3 <- T2
@@ -74,12 +97,14 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
                       byrow = TRUE,
                       nrow = 4)
 
-  cp <- cyclePrep(adjMatrix)
+  cp <- cyclePrep(adjMatrix = adjMatrix,
+                  nGV = 0,
+                  pmr = FALSE)
 
-  expect_true(is.null(cp$cycleDN))
-  expect_true(is.null(cp$edgeNum))
+  # Check that NULL is returned when there are no cycles in the graph.
+  expect_null(cp$cycleDN)
+  expect_null(cp$edgeNum)
 
-  # The adjacency matrix for topology NC8
   # T1 - T3 - T5 - T7
   # |    |    |    |
   # T2   T4   T6   T8
@@ -94,9 +119,56 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
                       byrow = TRUE,
                       nrow = 8)
 
-  cp <- cyclePrep(adjMatrix)
+  cp <- cyclePrep(adjMatrix = adjMatrix,
+                  nGV = 0,
+                  pmr = FALSE)
 
-  expect_true(is.null(cp$cycleDN))
-  expect_true(is.null(cp$edgeNum))
+  # Check that NULL is returned when there are no cycles in the graph.
+  expect_null(cp$cycleDN)
+  expect_null(cp$edgeNum)
+
+})
+
+test_that('cyclePrep correctly uses the PMR', {
+
+  # Fully connected three node graph.
+  adjMatrix<- matrix(1,
+                     nrow = 3,
+                     ncol = 3)
+
+  diag(adjMatrix) <- 0
+
+  cp <- cyclePrep(adjMatrix = adjMatrix,
+                  nGV = 1,
+                  pmr = TRUE)
+
+  # Check that NULL is returned for a three node graph when using the PMR.
+  expect_null(cp$cycleDN)
+  expect_null(cp$edgeNum)
+
+  # Fully connected five node graph.
+  adjMatrix<- matrix(1,
+                     nrow = 5,
+                     ncol = 5)
+
+  diag(adjMatrix) <- 0
+
+  cp <- cyclePrep(adjMatrix = adjMatrix,
+                  nGV = 1,
+                  pmr = TRUE)
+
+  # Check that cycleDN and edgeID have the same length.
+  expect_true(length(cp$cycleDN) == length(cp$edgeID))
+  expect_true(length(cp$cycleDN[[1]]) == length(cp$edgeID[[1]]))
+  expect_true(length(cp$cycleDN[[2]]) == length(cp$edgeID[[2]]))
+  # Check that the correct number of cycle sizes is returned.
+  expect_true(length(cp$cycleDN) == 2)
+  # Check that the correct number of cycles for each cycle size is correct.
+  expect_true(length(cp$cycleDN[[1]]) == 8)
+  expect_true(length(cp$cycleDN[[2]]) == 6)
+  # Check that the correct cycles are found.
+  expect_setequal(cp$cycleDN, list(c(6823, 19947, 65637, 19710, 748, 59801,
+                                     2208, 2210),
+                                   c(65883, 19956, 20442, 59808, 8778, 2217)))
 
 })
