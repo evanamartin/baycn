@@ -1031,10 +1031,11 @@ rmCycle <- function (cycleDN,
       # eth cycle size.
       whichCycle[[e]] <- which(dnCI[[e]] == cycleDN[[e]])
 
+      # If there are no cycles for the current cycle size skip to the next cycle
+      # size.
       if (length(whichCycle[[e]]) == 0) {
 
-        # Exit the for loop
-        break
+        next
 
       }
 
