@@ -29,7 +29,8 @@
 # @param wEdges A vector of edge indices for the edges that differ between the
 # current and proposed graphs.
 #
-# @return A vector of edge directions and the fitness of the individual
+# @return A character string indicating whether the 'proposed' or 'current'
+# graph was accepted.
 #
 #' @importFrom stats runif
 #'

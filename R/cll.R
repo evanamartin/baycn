@@ -110,7 +110,7 @@ cllMultinom <- function (data,
 #
 # @param v The index of the for loop for the parent combinations
 #
-# @return A vector with the log likelihood for each node.
+# @return The log likelihood for the current node.
 #
 #' @importFrom stats lm logLik sd
 #'
