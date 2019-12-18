@@ -11,9 +11,13 @@ test_that('cyclePrep returns the correct cycles',{
 
   diag(adjMatrix) <- 0
 
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
   cp <- cyclePrep(adjMatrix = adjMatrix,
                   nGV = 0,
-                  pmr = FALSE)
+                  pmr = FALSE,
+                  position = coord)
 
   # Check that cycleDN and edgeID have the same length.
   expect_true(length(cp$cycleDN) == length(cp$edgeID))
@@ -41,9 +45,13 @@ test_that('cyclePrep returns the correct cycles',{
                       nrow = 7,
                       byrow = TRUE)
 
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
   cp <- cyclePrep(adjMatrix = adjMatrix,
                   nGV = 0,
-                  pmr = FALSE)
+                  pmr = FALSE,
+                  position = coord)
 
   # Check that cycleDN and edgeID have the same length.
   expect_true(length(cp$cycleDN) == length(cp$edgeID))
@@ -69,9 +77,13 @@ test_that('cyclePrep returns the correct cycles',{
                       byrow = TRUE,
                       nrow = 5)
 
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
   cp <- cyclePrep(adjMatrix = adjMatrix,
                   nGV = 0,
-                  pmr = FALSE)
+                  pmr = FALSE,
+                  position = coord)
 
   # Check that cycleDN and edgeID have the same length.
   expect_true(length(cp$cycleDN) == length(cp$edgeID))
@@ -97,9 +109,13 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
                       byrow = TRUE,
                       nrow = 4)
 
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
   cp <- cyclePrep(adjMatrix = adjMatrix,
                   nGV = 0,
-                  pmr = FALSE)
+                  pmr = FALSE,
+                  position = coord)
 
   # Check that NULL is returned when there are no cycles in the graph.
   expect_null(cp$cycleDN)
@@ -119,9 +135,13 @@ test_that('cyclePrep returns NULL if there are no cycles in the graph', {
                       byrow = TRUE,
                       nrow = 8)
 
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
   cp <- cyclePrep(adjMatrix = adjMatrix,
                   nGV = 0,
-                  pmr = FALSE)
+                  pmr = FALSE,
+                  position = coord)
 
   # Check that NULL is returned when there are no cycles in the graph.
   expect_null(cp$cycleDN)
@@ -138,9 +158,13 @@ test_that('cyclePrep correctly uses the PMR', {
 
   diag(adjMatrix) <- 0
 
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
   cp <- cyclePrep(adjMatrix = adjMatrix,
                   nGV = 1,
-                  pmr = TRUE)
+                  pmr = TRUE,
+                  position = coord)
 
   # Check that NULL is returned for a three node graph when using the PMR.
   expect_null(cp$cycleDN)
@@ -153,9 +177,13 @@ test_that('cyclePrep correctly uses the PMR', {
 
   diag(adjMatrix) <- 0
 
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
   cp <- cyclePrep(adjMatrix = adjMatrix,
                   nGV = 1,
-                  pmr = TRUE)
+                  pmr = TRUE,
+                  position = coord)
 
   # Check that cycleDN and edgeID have the same length.
   expect_true(length(cp$cycleDN) == length(cp$edgeID))

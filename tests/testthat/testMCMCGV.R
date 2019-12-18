@@ -1,59 +1,77 @@
-context('MCMC with genetic variants')
+context('baycn with genetic variants')
 
-test_that('MHEdge returns the correct matrix with and without pmr',{
+test_that('the mhEdge function infers the correct graph using PMR',{
 
-  # Load the standards to test against.
-  load(system.file('testdata',
-                   'standardsGV.RData',
-                   package = 'baycn'))
+  # Adjacency matrix for M1 - M4 -----------------------------------------------
 
-  set.seed(22)
+  # Fully connected adjacency matrix for M1 - M4
+  am_m <- matrix(c(0, 1, 1,
+                   0, 0, 1,
+                   0, 0, 0),
+                 byrow = TRUE,
+                 nrow = 3)
 
-  # Generate data under topology M1 with one genetic variant.
-  data_m1gv_200_1 <- simdata(b0 = 0,
-                             N = 200,
-                             s = 1,
-                             graph = 'm1_gv',
-                             ss = 1,
-                             p = 0.45)
+  # Run baycn on data simulated for M1 with GV ---------------------------------
 
-  # Adjacency matrix for toplogy M1
-  am_m1gv <- matrix(c(0, 1, 0,
-                      0, 0, 1,
-                      0, 0, 0),
-                    byrow = TRUE,
-                    nrow = 3)
+  set.seed(1)
 
-  # Run the MH algorithm with the edges from the true graph with out pmr.
-  mh_m1gv_200_1 <- mhEdge(adjMatrix = am_m1gv,
-                          burnIn = 0,
-                          data = data_m1gv_200_1,
-                          iterations = 100,
-                          nGV = 1,
-                          pmr = FALSE,
-                          prior = c(0.05,
-                                    0.05,
-                                    0.9),
-                          progress = TRUE,
-                          thinTo = 100)
+  data_m1 <- simdata(b0 = 0,
+                     N = 500,
+                     s = 1,
+                     ss = 1,
+                     graph = 'm1_gv')
 
-  # Run the MH algorithm with the edges from the true graph with pmr.
-  mh_m1gv_200_1_pmr <- mhEdge(adjMatrix = am_m1gv,
-                              burnIn = 0,
-                              data = data_m1gv_200_1,
-                              iterations = 100,
-                              nGV = 1,
-                              pmr = TRUE,
-                              prior = c(0.05,
-                                        0.05,
-                                        0.9),
-                              progress = FALSE,
-                              thinTo = 100)
+  baycn_m1 <- mhEdge(adjMatrix = am_m,
+                     burnIn = 0.2,
+                     data = data_m1,
+                     iterations = 1000,
+                     nGV = 1,
+                     pmr = TRUE,
+                     prior = c(0.05,
+                               0.05,
+                               0.9),
+                     progress = FALSE,
+                     thinTo = 200)
 
-  expect_identical(standard_m1gv@chain, mh_m1gv_200_1@chain)
-  expect_identical(standard_m1gv_pmr@chain, mh_m1gv_200_1_pmr@chain)
+  # Run baycn on data simulated for M3 with GV ---------------------------------
 
-  expect_equal(standard_m1gv@likelihood, mh_m1gv_200_1@likelihood)
-  expect_equal(standard_m1gv_pmr@likelihood, mh_m1gv_200_1_pmr@likelihood)
+  data_m3 <- simdata(b0 = 0,
+                     N = 500,
+                     s = 1,
+                     ss = 1,
+                     graph = 'm3_gv')
+
+  baycn_m3 <- mhEdge(adjMatrix = am_m,
+                     burnIn = 0.2,
+                     data = data_m3,
+                     iterations = 1000,
+                     nGV = 1,
+                     pmr = TRUE,
+                     prior = c(0.05,
+                               0.05,
+                               0.9),
+                     progress = TRUE,
+                     thinTo = 200)
+
+  # Calculate the MSE for M1 and M3 --------------------------------------------
+
+  ep_m1 <- matrix(c(1, 0, 0,
+                    0, 0, 1,
+                    1, 0, 0),
+                  byrow = TRUE,
+                  nrow = 3)
+
+  mse_m1 <- sum((baycn_m1@posteriorES[, 2:4] - ep_m1)^2)
+
+  ep_m3 <- matrix(c(1, 0, 0,
+                    1, 0, 0,
+                    0, 0, 1),
+                  byrow = TRUE,
+                  nrow = 3)
+
+  mse_m3 <- sum((baycn_m3@posteriorES[, 2:4] - ep_m3)^2)
+
+  expect_true(mse_m1 < 0.1)
+  expect_true(mse_m3 < 0.1)
 
 })
