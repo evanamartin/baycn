@@ -179,7 +179,11 @@ mhEdge <- function (data,
 
   # Check for potential cycles in the graph and return the edge directions, edge
   # numbers, and the decimal numbers for each cycle if any exist.
-  cp <- cyclePrep(adjMatrix)
+  cf <- cycleFndr(adjMatrix,
+                  nEdges = nEdges,
+                  nGV = nGV,
+                  pmr = pmr,
+                  position = coord)
 
   # Initialize vectors, lists, and matrices ------------------------------------
 
@@ -230,17 +234,19 @@ mhEdge <- function (data,
 
   }
 
-  # Check the output of the cyclePrep function. If there are cycles in the graph
-  # run the rmCycle function to remove any directed cycles.
-  if (!is.null(cp$cycleDN)) {
+  # If there are potential directed cycles in the graph check if they are
+  # present and remove them if they are.
+  if (!is.null(cf$cycles)) {
 
     # Remove any directed cycles in the graph.
-    currentES <- rmCycle(cycleDN = cp$cycleDN,
-                         edgeID = cp$edgeID,
-                         edgeType = edgeType,
-                         individual = currentES,
-                         pmr = pmr,
-                         prior = prior)
+    currentES <- cycleRmvr(cycles = cf$cycles,
+                           edgeID = cf$edgeID,
+                           edgeType = edgeType,
+                           currentES = currentES,
+                           nCycles = cf$nCycles,
+                           nEdges = nEdges,
+                           pmr = pmr,
+                           prior = prior)
 
   }
 
@@ -288,15 +294,17 @@ mhEdge <- function (data,
 
     # If there are potential directed cycles in the graph check if they are
     # present and remove them if they are.
-    if (!is.null(cp$cycleDN)) {
+    if (!is.null(cf$cycles)) {
 
       # Remove any directed cycles in the graph.
-      proposedES <- rmCycle(cycleDN = cp$cycleDN,
-                            edgeID = cp$edgeID,
-                            edgeType = edgeType,
-                            individual = proposedES,
-                            pmr = pmr,
-                            prior = prior)
+      proposedES <- cycleRmvr(cycles = cf$cycles,
+                              edgeID = cf$edgeID,
+                              edgeType = edgeType,
+                              currentES = proposedES,
+                              nCycles = cf$nCycles,
+                              nEdges = nEdges,
+                              pmr = pmr,
+                              prior = prior)
 
     }
 
@@ -379,7 +387,7 @@ mhEdge <- function (data,
       likelihood[[counter]] <- sum(currentLL)
 
       # Calculate the decimal for the accepted graph.
-      graphDecimal[[counter]] <- sum(currentES * 3^(1:nEdges))
+      graphDecimal[[counter]] <- sum(currentES * 3^(0:(nEdges - 1)))
 
     }
 

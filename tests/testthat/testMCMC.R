@@ -1,6 +1,6 @@
 context('baycn without genetic variants')
 
-test_that('the mhEdge function infers the correct graph',{
+test_that('mhEdge infers the correct graph',{
 
   # Adjacency matrix for M1 and M2 ---------------------------------------------
 

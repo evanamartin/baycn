@@ -1,6 +1,6 @@
 context('baycn with genetic variants')
 
-test_that('the mhEdge function infers the correct graph using PMR',{
+test_that('mhEdge infers the correct graph using PMR',{
 
   # Adjacency matrix for M1 - M4 -----------------------------------------------
 
