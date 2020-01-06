@@ -406,26 +406,13 @@ cycleB <- function (SaL) {
 #
 # @param branches A matrix that holds all the branches of a tree.
 #
-# @return A list. The first element, tBranches, is a list of trimmed
-# branches. The second element, nBranches, is an integer of the total number of
-# branches in the tree.
+# @return A list. The first element, nBranches, is an integer of the total
+# number of branches in the tree. The second element, tBranches, is a list of
+# matrices. Each matrix holds the trimmed branches for each cycle size.
 #
 # @importFrom stats na.omit
 #
 cycleTB <- function (branches) {
-
-  # Extract the size of all cycles.
-  cycleSize <- unique(apply(branches,
-                            2,
-                            function (x) sum(!is.na(x)) - 1))
-
-  # Order the cycle sizes from smallest to largest.
-  cycleSize <- cycleSize[order(cycleSize)]
-
-
-  # Determine the number of different cycle sizes that are possible. For
-  # example, 3 node cycles, four node cycles, and so on.
-  ncs <- length(cycleSize)
 
   # Get the number of branches in the tree.
   nBranches <- dim(branches)[2]
@@ -436,10 +423,7 @@ cycleTB <- function (branches) {
   # cycle but are not part of the cycle. The tBranches list can have a length of
   # up to 3:nNodes.
   tBranches <- vector(mode = 'list',
-                      length = ncs)
-
-  # Create a counter for each list in tBranches
-  counter <- rep(0, ncs)
+                      length = nBranches)
 
   # The following loop will take each branch, starting at the leaf, and move
   # toward the root along the nodes until it sees a node that matches the leaf.
@@ -480,36 +464,44 @@ cycleTB <- function (branches) {
 
     }
 
-    # Add the trimmed branch to the appropriate list. For example, a three node
-    # cycle is added to the three node list and so on. The for loop loops
-    # through the possible cycle sizes.
-    for (cs in 1:ncs) {
+    # Add the trimmed branch to the list
+    tBranches[[e]] <- branch
 
-      if ((length(branch) - 1) == cycleSize[[cs]]) {
+  }
 
-        # update the counter
-        counter[[cs]] <- counter[[cs]] + 1
+  # Extract the unique cycle sizes.
+  nCS <- unique(sapply(tBranches, length))
 
-        # Add the trimmed branch to the list corresponding to the number of
-        # nodes in the trimmed branch.
-        tBranches[[cs]][[counter[[cs]]]] <- as.numeric(branch)
+  # Create list for the trimmed branches sorted by cycle size.
+  sTB <- vector(mode = 'list',
+                length = length(nCS))
 
-      }
+  # Check for multiple cycle sizes.
+  if (length(nCS) == 1) {
+
+    sTB[[1]] <- do.call(rbind, tBranches)
+
+  } else {
+
+    # Order the cycle sizes from smallest to largest.
+    nCS <- nCS[order(nCS)]
+
+    # Loop through each cycle size.
+    for (a in seq_along(nCS)) {
+
+      # Find all branches with a length matching the current cycle size.
+      sTB[[a]] <- tBranches[which(sapply(tBranches,
+                                         function(x) length(x) == nCS[[a]]))]
+
+      # Collapse the lists of cycles to a matrix for each cycle size.
+      sTB[[a]] <- do.call(rbind, sTB[[a]])
 
     }
 
   }
 
-  # Loop through each cycle size.
-  for (v in 1:ncs) {
-
-    # Collapse the lists of cycles to a matrix for each cycle size.
-    tBranches[[v]] <- do.call(rbind, tBranches[[v]])
-
-  }
-
   return (list(nBranches = nBranches,
-               tBranches = tBranches))
+               tBranches = sTB))
 
 }
 
@@ -625,7 +617,7 @@ cycleCED <- function (nBranches,
   }
 
   # Get the unique column numbers for each column visited
-  uColumns <- unique(unlist(Columns))
+  uColumns <- as.numeric(unique(unlist(Columns)))
 
   return (list(cCoord = cCoord,
                columns = uColumns,
