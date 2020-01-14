@@ -129,7 +129,10 @@ setMethod('plot',
           signature(x = 'baycn'),
           definition = function (x, y, ...) {
 
+            # The following lines are to avoid the note 'Undefined global
+            # functions or variables: likelihood, decimal'.
             likelihood <- NULL
+            decimal <- NULL
 
             # Number of samples kept
             nSamples <- length(x@likelihood)
