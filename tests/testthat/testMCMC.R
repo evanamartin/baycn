@@ -1,4 +1,4 @@
-context('baycn without genetic variants')
+context('Continuous data')
 
 test_that('mhEdge infers the correct graph',{
 
@@ -63,8 +63,8 @@ test_that('mhEdge infers the correct graph',{
   # Calculate the MSE for M1 and M2 --------------------------------------------
 
   # Expected probabilities for M1
-  ep_m1 <- matrix(c(0.33, 0.66, 0,
-                    0.66, 0.33, 0),
+  ep_m1 <- matrix(c(1/3, 2/3, 0,
+                    2/3, 1/3, 0),
                   byrow = TRUE,
                   nrow = 2)
 

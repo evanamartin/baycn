@@ -1,4 +1,4 @@
-context('baycn with genetic variants')
+context('Mixed data')
 
 test_that('mhEdge infers the correct graph using PMR',{
 
