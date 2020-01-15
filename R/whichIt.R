@@ -11,12 +11,6 @@ whichIt <- function (burnIn,
 
   } else {
 
-    if ((1 - burnIn) * iterations < thinTo) {
-
-      return ('Error: The number of iterations left after the burn-in is less than the thinTo value.')
-
-    }
-
     return (ceiling(seq(from = burnIn * iterations,
                         to = iterations,
                         length.out = thinTo)))

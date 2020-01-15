@@ -3,8 +3,12 @@
 #' The main function for the Metropolis-Hastings algorithm. It returns the
 #' posterior distribution of the edge directions.
 #'
-#' @param data A matrix with the nodes across the columns and the observations
-#' down the rows.
+#' @param data A matrix with the variables across the columns and the
+#' observations down the rows. If there are genetic variants in the data these
+#' variables must come before the remaining variables. For example, if the data
+#' has 3 genetic variant variables and 4 gene expression variables the first
+#' three columns of the data matrix would contain the genetic variant data and
+#' the last four columns would contain the gene expression data.
 #'
 #' @param adjMatrix An adjacency matrix indicating the edges that will be
 #' considered by the Metropolis-Hastings algorithm. This can be the output from
@@ -23,7 +27,8 @@
 #' Principle of Mendelian Randomization (PMR). This prevents the direction of an
 #' edge pointing from a gene expression node to a genetic variant node.
 #'
-#' @param prior A vector containing the prior probability of each edge state.
+#' @param prior A vector containing the prior probability for the three edge
+#' states.
 #'
 #' @param progress Logical. If TRUE a progress bar will be printed.
 #'
@@ -142,13 +147,74 @@ mhEdge <- function (data,
                     adjMatrix,
                     burnIn = 0.2,
                     iterations = 1000,
-                    nGV,
+                    nGV = 0,
                     pmr = FALSE,
                     prior = c(0.05,
                               0.05,
                               0.9),
                     progress = TRUE,
                     thinTo = 200) {
+
+  # Preprocessing checks -------------------------------------------------------
+
+  # Check that data is a matrix.
+  if (!is.matrix(data)) {
+
+    stop ('data is not a matrix')
+
+  }
+
+  # Check that adjMatrix is a square matrix.
+  if (dim(adjMatrix)[1] != dim(adjMatrix)[2]) {
+
+    stop ('adjMatrix must be a square matrix')
+
+  }
+
+  # Check that adjMatrix has all zeros on the diagonal.
+  if (sum(diag(adjMatrix)) != 0) {
+
+    stop ('adjMatrix must have zeros on the diagonal')
+
+  }
+
+  # Check that adjMatrix has the same number of columns as data.
+  if (dim(adjMatrix)[1] != dim(data)[2]) {
+
+    stop ('data must have the same number of columns as adjMatrix')
+
+  }
+
+  # Check the prior probability vector has three elements.
+  if (length(prior) != 3) {
+
+    stop ('prior must have three elements')
+
+  }
+
+  # Check the prior probability sums to 1.
+  if (sum(prior) != 1) {
+
+    stop ('prior must sum to 1')
+
+  }
+
+  # Check that burnIn, thinTo, and iterations agree.
+  if ((1 - burnIn) * iterations < thinTo) {
+
+    stop ('thinTo is greater than the number of iterations after the burnIn')
+
+  }
+
+  # Check that the number of genetic variants is less than the number of nodes.
+  if (nGV > dim(data)[2]) {
+
+    stop ('nGV must be less than or equal to the number of columns in data')
+
+  }
+
+  # Save the time when baycn starts.
+  startTime <- Sys.time()
 
   # Set up ---------------------------------------------------------------------
 
@@ -270,9 +336,6 @@ mhEdge <- function (data,
   proposedLL <- currentLL
 
   # Start the Metropolis-Hastings algorithm ------------------------------------
-
-  # Get the time the Metropolis-Hastings algorithm starts.
-  startTime <- Sys.time()
 
   # Create progress bar.
   if (progress == TRUE) {
@@ -407,9 +470,6 @@ mhEdge <- function (data,
 
   }
 
-  # Get the time the Metropolis-Hastings algorithm ends
-  endTime <- Sys.time()
-
   # Posterior probability matrix -----------------------------------------------
 
   # Create a matrix to hold the posterior probability of each edge.
@@ -477,6 +537,9 @@ mhEdge <- function (data,
   stepSize <- ifelse(burnIn == 0,
                      ceiling(iterations / thinTo),
                      ceiling(((1 - burnIn) * iterations) / thinTo))
+
+  # Save the time when baycn ends.
+  endTime <- Sys.time()
 
   # Create a baycn object ------------------------------------------------------
   baycnObj <- new('baycn',

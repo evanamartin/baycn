@@ -4,13 +4,17 @@
 \alias{mhEdge}
 \title{mhEdge}
 \usage{
-mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nGV,
+mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nGV = 0,
   pmr = FALSE, prior = c(0.05, 0.05, 0.9), progress = TRUE,
   thinTo = 200)
 }
 \arguments{
-\item{data}{A matrix with the nodes across the columns and the observations
-down the rows.}
+\item{data}{A matrix with the variables across the columns and the
+observations down the rows. If there are genetic variants in the data these
+variables must come before the remaining variables. For example, if the data
+has 3 genetic variant variables and 4 gene expression variables the first
+three columns of the data matrix would contain the genetic variant data and
+the last four columns would contain the gene expression data.}
 
 \item{adjMatrix}{An adjacency matrix indicating the edges that will be
 considered by the Metropolis-Hastings algorithm. This can be the output from
@@ -29,7 +33,8 @@ algorithm.}
 Principle of Mendelian Randomization (PMR). This prevents the direction of an
 edge pointing from a gene expression node to a genetic variant node.}
 
-\item{prior}{A vector containing the prior probability of each edge state.}
+\item{prior}{A vector containing the prior probability for the three edge
+states.}
 
 \item{progress}{Logical. If TRUE a progress bar will be printed.}
 
