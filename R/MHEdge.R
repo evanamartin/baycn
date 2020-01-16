@@ -371,33 +371,6 @@ mhEdge <- function (data,
 
     }
 
-    # If the graph after mutation and removing directed cycles is the same as
-    # the graph at the previous iteration then return that graph without
-    # calculating the log likelihood.
-    if (identical(proposedES, currentES)) {
-
-      # Store the accepted graph after burnin and thinning.
-      if (e %in% keep) {
-
-        # Update the counter if e is in the keep vector
-        counter <- counter + 1
-
-        # Store the accepted graph in the MarkovChain matrix
-        MarkovChain[counter, ] <- currentES
-
-        # Store the accepted likelihood
-        likelihood[[counter]] <- sum(currentLL)
-
-        # Calculate the decimal for the accepted graph.
-        graphDecimal[[counter]] <- sum(currentES * 3^(1:nEdges))
-
-      }
-
-      # Skip the rest of the for loop and go to the next iteration
-      next
-
-    }
-
     # Get the indices for the edge states that are different between the current
     # and proposed edge state vectors.
     difference <- divergent(coordinates = coord,

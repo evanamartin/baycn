@@ -20,19 +20,25 @@ lull <- function (am,
                   nNodes,
                   wNodes) {
 
-  # Loop through each node that has changed
-  for (e in wNodes) {
+  # Check if wNodes has length zero. If it doesn't then the proposed and current
+  # edge state vectors are different.
+  if (length(wNodes) != 0) {
 
-    # Create the name for the current node. This will be used to find the
-    # environment containing the likelihood values for the current node.
-    node <- paste0('node', e)
+    # Loop through each node that has changed
+    for (e in wNodes) {
 
-    # Create the name for the current parent configuration. This will be used
-    # to look up the likelihood based on the current parent configuration.
-    parents <- paste0('dn',
-                      sum(am[, e] * 2^(0:(nNodes - 1))))
+      # Create the name for the current node. This will be used to find the
+      # environment containing the likelihood values for the current node.
+      node <- paste0('node', e)
 
-    likelihood[[e]] <- llenv[[node]][[parents]]
+      # Create the name for the current parent configuration. This will be used
+      # to look up the likelihood based on the current parent configuration.
+      parents <- paste0('dn',
+                        sum(am[, e] * 2^(0:(nNodes - 1))))
+
+      likelihood[[e]] <- llenv[[node]][[parents]]
+
+    }
 
   }
 

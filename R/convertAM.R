@@ -24,26 +24,32 @@ convertAM <- function (adjMatrix,
                        edgeStates,
                        wEdges) {
 
-  # Change the elements of the adjacency matrix according to the edge states.
-  for (e in wEdges) {
+  # Check if wEdges has length zero. If it doesn't then the proposed and current
+  # edge state vectors are different.
+  if (length(wEdges) != 0) {
 
-    if (edgeStates[[e]] == 0) {
+    # Change the elements of the adjacency matrix according to the edge states.
+    for (e in wEdges) {
 
-      adjMatrix[coordinates[1, e], coordinates[2, e]] <- 1
+      if (edgeStates[[e]] == 0) {
 
-      adjMatrix[coordinates[2, e], coordinates[1, e]] <- 0
+        adjMatrix[coordinates[1, e], coordinates[2, e]] <- 1
 
-    } else if (edgeStates[[e]] == 1) {
+        adjMatrix[coordinates[2, e], coordinates[1, e]] <- 0
 
-      adjMatrix[coordinates[2, e], coordinates[1, e]] <- 1
+      } else if (edgeStates[[e]] == 1) {
 
-      adjMatrix[coordinates[1, e], coordinates[2, e]] <- 0
+        adjMatrix[coordinates[2, e], coordinates[1, e]] <- 1
 
-    } else {
+        adjMatrix[coordinates[1, e], coordinates[2, e]] <- 0
 
-      adjMatrix[coordinates[1, e], coordinates[2, e]] <- 0
+      } else {
 
-      adjMatrix[coordinates[2, e], coordinates[1, e]] <- 0
+        adjMatrix[coordinates[1, e], coordinates[2, e]] <- 0
+
+        adjMatrix[coordinates[2, e], coordinates[1, e]] <- 0
+
+      }
 
     }
 
