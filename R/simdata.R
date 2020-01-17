@@ -117,7 +117,7 @@
 #' linear model that is the mean of the normally distributed variables. This
 #' coefficient is referred to as the signal strength.
 #'
-#' @param p The frequency of the reference allele.
+#' @param q The frequency of the reference allele.
 #'
 #' @param ssc The signal strength of the confounding variables.
 #'
@@ -148,7 +148,7 @@
 #'                       s = 1,
 #'                       graph = 'm1_iv',
 #'                       ss = 1,
-#'                       p = 0.1,
+#'                       q = 0.1,
 #'                       ssc = 0.2,
 #'                       nConfounding = 3)
 #'
@@ -162,7 +162,7 @@ simdata <- function (b0 = 0,
                      s = 1,
                      ss = 1,
                      graph = 'gn4',
-                     p = 0.1,
+                     q = 0.1,
                      ssc = 0.2,
                      nConfounding = 2) {
 
@@ -172,23 +172,23 @@ simdata <- function (b0 = 0,
 
          'm1_ge' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            return (cbind(T1, T2, T3))
 
@@ -198,28 +198,55 @@ simdata <- function (b0 = 0,
 
          'm1_gv' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            return (cbind(U, T1, T2))
+
+         },
+
+         # m1_cph --------------------------------------------------------------
+
+         'm1_cph' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss))
+
+           return (cbind(U, T1, T2, W))
 
          },
 
@@ -227,12 +254,8 @@ simdata <- function (b0 = 0,
 
          'm1_cp' = {
 
-           U <- sample(0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c(p^2,
-                                2 * p * (1 - p),
-                                (1 - p)^2))
+           U <- sMulti(N = N,
+                       q = q)
 
            # create a vector with the signal strength of the parents for T1
            ssT1 <- vector(mode = 'numeric',
@@ -268,9 +291,9 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rNoParents(N = N,
-                                    b0 = b0,
-                                    s = s)
+             con[, a] <- sNorm(N = N,
+                               b0 = b0,
+                               s = s)
 
              # Add the signal strength of the confounding variable to the ssT1
              # vector.
@@ -290,22 +313,22 @@ simdata <- function (b0 = 0,
 
            }
 
-           T1 <- rMParents(N = N,
-                           mParents = nConfounding + 1,
-                           parentData = parT1,
-                           b0 = b0,
-                           b1 = ssT1,
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = nConfounding + 1,
+                       parentData = parT1,
+                       b0 = b0,
+                       b1 = ssT1,
+                       s = s)
 
            # Fill in the first element of parT2 with data generated from T1.
            parT2[[1]] <- T1
 
-           T2 <- rMParents(N = N,
-                           mParents = nConfounding + 1,
-                           parentData = parT2,
-                           b0 = b0,
-                           b1 = ssT2,
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = nConfounding + 1,
+                       parentData = parT2,
+                       b0 = b0,
+                       b1 = ssT2,
+                       s = s)
 
            return (cbind(U, T1, T2, con))
 
@@ -315,26 +338,22 @@ simdata <- function (b0 = 0,
 
          'm1_cc' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            # create a list to hold the data for the confounding variables
            con <- matrix(nrow = N,
@@ -346,12 +365,12 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rMParents(N = N,
-                                   mParents = 2,
-                                   parentData = list(T1, T2),
-                                   b0 = b0,
-                                   b1 = c(ssc, ssc),
-                                   s = s)
+             con[, a] <- cNorm(N = N,
+                               mParents = 2,
+                               parentData = list(T1, T2),
+                               b0 = b0,
+                               b1 = c(ssc, ssc),
+                               s = s)
 
            }
 
@@ -363,19 +382,15 @@ simdata <- function (b0 = 0,
 
          'm1_iv' = {
 
-           U <- sample(0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c(p^2,
-                                2 * p * (1 - p),
-                                (1 - p)^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            # create a list to hold the data for the confounding variables
            con <- matrix(nrow = N,
@@ -400,12 +415,12 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rMParents(N = N,
-                                   mParents = 1,
-                                   parentData = list(T1),
-                                   b0 = b0,
-                                   b1 = c(ssc),
-                                   s = s)
+             con[, a] <- cNorm(N = N,
+                               mParents = 1,
+                               parentData = list(T1),
+                               b0 = b0,
+                               b1 = c(ssc),
+                               s = s)
 
              # Add the signal strength of the confounding variable to the ssT2
              # vector.
@@ -417,12 +432,12 @@ simdata <- function (b0 = 0,
 
            }
 
-           T2 <- rMParents(N = N,
-                           mParents = nConfounding + 1,
-                           parentData = parT2,
-                           b0 = b0,
-                           b1 = ssT2,
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = nConfounding + 1,
+                       parentData = parT2,
+                       b0 = b0,
+                       b1 = ssT2,
+                       s = s)
 
            return (cbind(U, T1, T2, con))
 
@@ -432,20 +447,20 @@ simdata <- function (b0 = 0,
 
          'm2_ge' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T3 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T3 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T1, T3),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T1, T3),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
            return (cbind(T1, T2, T3))
 
@@ -455,23 +470,19 @@ simdata <- function (b0 = 0,
 
          'm2_gv' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T2 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T2 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T1 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(U, T2),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(U, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
            return (cbind(U, T1, T2))
 
@@ -481,12 +492,8 @@ simdata <- function (b0 = 0,
 
          'm2_cp' = {
 
-           U <- sample(0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c(p^2,
-                                2 * p * (1 - p),
-                                (1 - p)^2))
+           U <- sMulti(N = N,
+                       q = q)
 
            # create a vector with the signal strength of the parents for T1
            ssT1 <- vector(mode = 'numeric',
@@ -525,9 +532,9 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rNoParents(N = N,
-                                    b0 = b0,
-                                    s = s)
+             con[, a] <- sNorm(N = N,
+                               b0 = b0,
+                               s = s)
 
              # Add the signal strength of the confounding variable to the ssT1
              # vector.
@@ -547,22 +554,22 @@ simdata <- function (b0 = 0,
 
            }
 
-           T2 <- rMParents(N = N,
-                           mParents = nConfounding,
-                           parentData = parT2,
-                           b0 = b0,
-                           b1 = ssT2,
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = nConfounding,
+                       parentData = parT2,
+                       b0 = b0,
+                       b1 = ssT2,
+                       s = s)
 
            # Fill in the second element of the parT1 list with the data from T2
            parT1[[2]] <- T2
 
-           T1 <- rMParents(N = N,
-                           mParents = nConfounding + 2,
-                           parentData = parT1,
-                           b0 = b0,
-                           b1 = ssT1,
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = nConfounding + 2,
+                       parentData = parT1,
+                       b0 = b0,
+                       b1 = ssT1,
+                       s = s)
 
            return (cbind(U, T1, T2, con))
 
@@ -572,23 +579,19 @@ simdata <- function (b0 = 0,
 
          'm2_cc' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T2 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T2 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T1 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(U, T2),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(U, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
            # create a list to hold the data for the confounding variables
            con <- matrix(nrow = N,
@@ -600,12 +603,12 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rMParents(N = N,
-                                   mParents = 2,
-                                   parentData = list(T1, T2),
-                                   b0 = b0,
-                                   b1 = c(ssc, ssc),
-                                   s = s)
+             con[, a] <- cNorm(N = N,
+                               mParents = 2,
+                               parentData = list(T1, T2),
+                               b0 = b0,
+                               b1 = c(ssc, ssc),
+                               s = s)
 
            }
 
@@ -617,16 +620,12 @@ simdata <- function (b0 = 0,
 
          'm2_iv' = {
 
-           U <- sample(0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c(p^2,
-                                2 * p * (1 - p),
-                                (1 - p)^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T2 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T2 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
            # create a list to hold the data for the confounding variables
            con <- matrix(nrow = N,
@@ -655,12 +654,12 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rMParents(N = N,
-                                   mParents = 1,
-                                   parentData = list(T2),
-                                   b0 = b0,
-                                   b1 = c(ssc),
-                                   s = s)
+             con[, a] <- cNorm(N = N,
+                               mParents = 1,
+                               parentData = list(T2),
+                               b0 = b0,
+                               b1 = c(ssc),
+                               s = s)
 
              # Add the signal strength of the confounding variable to the ssT1
              # vector.
@@ -672,12 +671,12 @@ simdata <- function (b0 = 0,
 
            }
 
-           T1 <- rMParents(N = N,
-                           mParents = nConfounding + 2,
-                           parentData = parT1,
-                           b0 = b0,
-                           b1 = ssT1,
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = nConfounding + 2,
+                       parentData = parT1,
+                       b0 = b0,
+                       b1 = ssT1,
+                       s = s)
 
            return (cbind(U, T1, T2, con))
 
@@ -687,26 +686,22 @@ simdata <- function (b0 = 0,
 
          'm3_gv' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            return (cbind(U, T1, T2))
 
@@ -716,12 +711,8 @@ simdata <- function (b0 = 0,
 
          'm3_cp' = {
 
-           U <- sample(0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c(p^2,
-                                2 * p * (1 - p),
-                                (1 - p)^2))
+           U <- sMulti(N = N,
+                       q = q)
 
            # create a vector with the signal strength of the parents for T1
            ssT1 <- vector(mode = 'numeric',
@@ -757,9 +748,9 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rNoParents(N = N,
-                                    b0 = b0,
-                                    s = s)
+             con[, a] <- sNorm(N = N,
+                               b0 = b0,
+                               s = s)
 
              # Add the signal strength of the confounding variable to the ssT1
              # vector.
@@ -779,22 +770,22 @@ simdata <- function (b0 = 0,
 
            }
 
-           T1 <- rMParents(N = N,
-                           mParents = nConfounding + 1,
-                           parentData = parT1,
-                           b0 = b0,
-                           b1 = ssT1,
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = nConfounding + 1,
+                       parentData = parT1,
+                       b0 = b0,
+                       b1 = ssT1,
+                       s = s)
 
            # Fill in the first element of parT2 with data generated from U.
            parT2[[1]] <- U
 
-           T2 <- rMParents(N = N,
-                           mParents = nConfounding + 1,
-                           parentData = parT2,
-                           b0 = b0,
-                           b1 = ssT2,
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = nConfounding + 1,
+                       parentData = parT2,
+                       b0 = b0,
+                       b1 = ssT2,
+                       s = s)
 
            return (cbind(U, T1, T2, con))
 
@@ -804,26 +795,22 @@ simdata <- function (b0 = 0,
 
          'm3_cc' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            # create a list to hold the data for the confounding variables
            con <- matrix(nrow = N,
@@ -835,12 +822,12 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rMParents(N = N,
-                                   mParents = 2,
-                                   parentData = list(T1, T2),
-                                   b0 = b0,
-                                   b1 = c(ssc, ssc),
-                                   s = s)
+             con[, a] <- cNorm(N = N,
+                               mParents = 2,
+                               parentData = list(T1, T2),
+                               b0 = b0,
+                               b1 = c(ssc, ssc),
+                               s = s)
 
            }
 
@@ -852,19 +839,15 @@ simdata <- function (b0 = 0,
 
          'm3_iv' = {
 
-           U <- sample(0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c(p^2,
-                                2 * p * (1 - p),
-                                (1 - p)^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            # create a list to hold the data for the confounding variables
            con <- matrix(nrow = N,
@@ -889,12 +872,12 @@ simdata <- function (b0 = 0,
            # Simulate the data for the hidden variables
            for (a in 1:nConfounding) {
 
-             con[, a] <- rMParents(N = N,
-                                   mParents = 1,
-                                   parentData = list(T1),
-                                   b0 = b0,
-                                   b1 = c(ssc),
-                                   s = s)
+             con[, a] <- cNorm(N = N,
+                               mParents = 1,
+                               parentData = list(T1),
+                               b0 = b0,
+                               b1 = c(ssc),
+                               s = s)
 
              # Add the signal strength of the confounding variable to the ssT2
              # vector.
@@ -906,12 +889,12 @@ simdata <- function (b0 = 0,
 
            }
 
-           T2 <- rMParents(N = N,
-                           mParents = nConfounding + 1,
-                           parentData = parT2,
-                           b0 = b0,
-                           b1 = ssT2,
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = nConfounding + 1,
+                       parentData = parT2,
+                       b0 = b0,
+                       b1 = ssT2,
+                       s = s)
 
            return (cbind(U, T1, T2, con))
 
@@ -921,39 +904,39 @@ simdata <- function (b0 = 0,
 
          'm4_ge' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
            # Generate data for T2 and T3 with a v structure at T3.
-           T2_a <- rMParents(N = N,
-                             mParents = 1,
-                             parentData = list(T1),
-                             b0 = b0,
-                             b1 = c(ss),
-                             s = s)
+           T2_a <- cNorm(N = N,
+                         mParents = 1,
+                         parentData = list(T1),
+                         b0 = b0,
+                         b1 = c(ss),
+                         s = s)
 
-           T3_a <- rMParents(N = N,
-                             mParents = 2,
-                             parentData = list(T1, T2_a),
-                             b0 = b0,
-                             b1 = c(ss, ss),
-                             s = s)
+           T3_a <- cNorm(N = N,
+                         mParents = 2,
+                         parentData = list(T1, T2_a),
+                         b0 = b0,
+                         b1 = c(ss, ss),
+                         s = s)
 
            # Generate data for T2 and T3 with a v structure at T2.
-           T3_b <- rMParents(N = N,
-                             mParents = 1,
-                             parentData = list(T1),
-                             b0 = b0,
-                             b1 = c(ss),
-                             s = s)
+           T3_b <- cNorm(N = N,
+                         mParents = 1,
+                         parentData = list(T1),
+                         b0 = b0,
+                         b1 = c(ss),
+                         s = s)
 
-           T2_b <- rMParents(N = N,
-                             mParents = 2,
-                             parentData = list(T1, T3_b),
-                             b0 = b0,
-                             b1 = c(ss, ss),
-                             s = s)
+           T2_b <- cNorm(N = N,
+                         mParents = 2,
+                         parentData = list(T1, T3_b),
+                         b0 = b0,
+                         b1 = c(ss, ss),
+                         s = s)
 
            # Create a vector representing a coin toss.
            coin_flip <- sample(x = 0:1,
@@ -983,42 +966,38 @@ simdata <- function (b0 = 0,
 
          'm4_gv' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
            # Generate data for T1 and T2 with a v structure at T2.
-           T1_a <- rMParents(N = N,
-                             mParents = 1,
-                             parentData = list(U),
-                             b0 = b0,
-                             b1 = c(ss),
-                             s = s)
+           T1_a <- cNorm(N = N,
+                         mParents = 1,
+                         parentData = list(U),
+                         b0 = b0,
+                         b1 = c(ss),
+                         s = s)
 
-           T2_a <- rMParents(N = N,
-                             mParents = 2,
-                             parentData = list(U, T1_a),
-                             b0 = b0,
-                             b1 = c(ss, ss),
-                             s = s)
+           T2_a <- cNorm(N = N,
+                         mParents = 2,
+                         parentData = list(U, T1_a),
+                         b0 = b0,
+                         b1 = c(ss, ss),
+                         s = s)
 
            # Generate data for T1 and T2 with a v structure at T1.
-           T2_b <- rMParents(N = N,
-                             mParents = 1,
-                             parentData = list(U),
-                             b0 = b0,
-                             b1 = c(ss),
-                             s = s)
+           T2_b <- cNorm(N = N,
+                         mParents = 1,
+                         parentData = list(U),
+                         b0 = b0,
+                         b1 = c(ss),
+                         s = s)
 
-           T1_b <- rMParents(N = N,
-                             mParents = 2,
-                             parentData = list(U, T2_b),
-                             b0 = b0,
-                             b1 = c(ss, ss),
-                             s = s)
+           T1_b <- cNorm(N = N,
+                         mParents = 2,
+                         parentData = list(U, T2_b),
+                         b0 = b0,
+                         b1 = c(ss, ss),
+                         s = s)
 
            # Create a vector of 0s and 1s to represent flipping a coin.
            coin_flip <- sample(x = 0:1,
@@ -1048,24 +1027,24 @@ simdata <- function (b0 = 0,
 
          'mp_ge' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T2 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T3 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T3 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 3,
-                           parentData = list(T1, T2, T3),
-                           b0 = b0,
-                           b1 = c(ss, ss, ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 3,
+                       parentData = list(T1, T2, T3),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss),
+                       s = s)
 
            return (cbind(T1, T2, T3, T4))
 
@@ -1075,27 +1054,23 @@ simdata <- function (b0 = 0,
 
          'mp_gv' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T2 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 3,
-                           parentData = list(U, T1, T2),
-                           b0 = b0,
-                           b1 = c(ss, ss, ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 3,
+                       parentData = list(U, T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss),
+                       s = s)
 
            return (cbind(U, T1, T2, T3))
 
@@ -1105,30 +1080,30 @@ simdata <- function (b0 = 0,
 
          'gn4' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T1, T4),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T1, T4),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
            return (cbind(T1, T2, T3, T4))
 
@@ -1138,37 +1113,37 @@ simdata <- function (b0 = 0,
 
          'gn5' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T5 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T3, T4),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T5 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T3, T4),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
            return (cbind(T1, T2, T3, T4, T5))
 
@@ -1178,55 +1153,55 @@ simdata <- function (b0 = 0,
 
          'gn8' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T4 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T5 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T5 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T6 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T1, T5),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T6 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T1, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
-           T7 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T6),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T7 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T6),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T8 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T1, T5),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T8 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T1, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
            return (cbind(T1, T2, T3, T4, T5, T6, T7, T8))
 
@@ -1236,76 +1211,76 @@ simdata <- function (b0 = 0,
 
          'gn11' = {
 
-           T1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T7 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           T7 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T3),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T5 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T4),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T5 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T4),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T8 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T7),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T8 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T7),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T9 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T8),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T9 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T8),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T10 <- rMParents(N = N,
-                            mParents = 1,
-                            parentData = list(T9),
-                            b0 = b0,
-                            b1 = c(ss),
-                            s = s)
+           T10 <- cNorm(N = N,
+                        mParents = 1,
+                        parentData = list(T9),
+                        b0 = b0,
+                        b1 = c(ss),
+                        s = s)
 
-           T11 <- rMParents(N = N,
-                            mParents = 1,
-                            parentData = list(T10),
-                            b0 = b0,
-                            b1 = c(ss),
-                            s = s)
+           T11 <- cNorm(N = N,
+                        mParents = 1,
+                        parentData = list(T10),
+                        b0 = b0,
+                        b1 = c(ss),
+                        s = s)
 
-           T6 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T5, T7),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T6 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T5, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
            return (cbind(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11))
 
@@ -1315,61 +1290,57 @@ simdata <- function (b0 = 0,
 
          'layer' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T5 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T1, T2),
-                           b0 = b0,
-                           b1 = c(ss, ss),
-                           s = s)
+           T5 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
 
-           T6 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T6 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T7 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T3),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T7 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            return (cbind(U, T1, T2, T3, T4, T5, T6, T7))
 
@@ -1379,69 +1350,65 @@ simdata <- function (b0 = 0,
 
          'layer_cp' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           C1 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           C1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           C2 <- rNoParents(N = N,
-                            b0 = b0,
-                            s = s)
+           C2 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
 
-           T1 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(U, C1),
-                           b0 = b0,
-                           b1 = c(ss, ssc),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(U, C1),
+                       b0 = b0,
+                       b1 = c(ss, ssc),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(U, C2),
-                           b0 = b0,
-                           b1 = c(ss, ssc),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(U, C2),
+                       b0 = b0,
+                       b1 = c(ss, ssc),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T5 <- rMParents(N = N,
-                           mParents = 3,
-                           parentData = list(T1, T2, C1),
-                           b0 = b0,
-                           b1 = c(ss, ss, ssc),
-                           s = s)
+           T5 <- cNorm(N = N,
+                       mParents = 3,
+                       parentData = list(T1, T2, C1),
+                       b0 = b0,
+                       b1 = c(ss, ss, ssc),
+                       s = s)
 
-           T6 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T2, C2),
-                           b0 = b0,
-                           b1 = c(ss, ssc),
-                           s = s)
+           T6 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T2, C2),
+                       b0 = b0,
+                       b1 = c(ss, ssc),
+                       s = s)
 
-           T7 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T3),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T7 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            return (cbind(U, T1, T2, T3, T4, T5, T6, T7, C1, C2))
 
@@ -1451,75 +1418,71 @@ simdata <- function (b0 = 0,
 
          'layer_iv' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           C1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ssc),
-                           s = s)
+           C1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ssc),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           C2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T2),
-                           b0 = b0,
-                           b1 = c(ssc),
-                           s = s)
+           C2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ssc),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T5 <- rMParents(N = N,
-                           mParents = 3,
-                           parentData = list(T1, T2, C1),
-                           b0 = b0,
-                           b1 = c(ss, ss, ssc),
-                           s = s)
+           T5 <- cNorm(N = N,
+                       mParents = 3,
+                       parentData = list(T1, T2, C1),
+                       b0 = b0,
+                       b1 = c(ss, ss, ssc),
+                       s = s)
 
-           T6 <- rMParents(N = N,
-                           mParents = 2,
-                           parentData = list(T2, C2),
-                           b0 = b0,
-                           b1 = c(ss, ssc),
-                           s = s)
+           T6 <- cNorm(N = N,
+                       mParents = 2,
+                       parentData = list(T2, C2),
+                       b0 = b0,
+                       b1 = c(ss, ssc),
+                       s = s)
 
-           T7 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T3),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T7 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            return (cbind(U, T1, T2, T3, T4, T5, T6, T7, C1, C2))
 
@@ -1529,47 +1492,43 @@ simdata <- function (b0 = 0,
 
          'star' = {
 
-           U <- sample(x = 0:2,
-                       size = N,
-                       replace = TRUE,
-                       prob = c((1 - p)^2,
-                                2 * p * (1 - p),
-                                p^2))
+           U <- sMulti(N = N,
+                       q = q)
 
-           T1 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(U),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T1 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T2 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T2 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T3 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T3 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T4 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T4 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
-           T5 <- rMParents(N = N,
-                           mParents = 1,
-                           parentData = list(T1),
-                           b0 = b0,
-                           b1 = c(ss),
-                           s = s)
+           T5 <- cNorm(N = N,
+                       mParents = 1,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
 
            return (cbind(U, T1, T2, T3, T4, T5))
 

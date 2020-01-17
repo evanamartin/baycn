@@ -21,6 +21,8 @@
 #' @param iterations An integer for the number of iterations to run the MH
 #' algorithm.
 #'
+#' @param nCPh The number of clinical phenotypes in the graph.
+#'
 #' @param nGV The number of genetic variants in the graph.
 #'
 #' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
@@ -84,7 +86,7 @@
 #'                    s = 1,
 #'                    graph = 'm1_gv',
 #'                    ss = 1,
-#'                    p = 0.27)
+#'                    q = 0.27)
 #'
 #' # Create an adjacency matrix with the true edges.
 #' am_m1 <- matrix(c(0, 1, 0,
@@ -99,6 +101,7 @@
 #'                     adjMatrix = am_m1,
 #'                     burnIn = 0.2,
 #'                     iterations = 1000,
+#'                     nCPh = 0,
 #'                     nGV = 1,
 #'                     pmr = TRUE,
 #'                     prior = c(0.05,
@@ -131,6 +134,7 @@
 #'                  adjMatrix = am_gn4,
 #'                  burnIn = 0.2,
 #'                  iterations = 1000,
+#'                  nCPh = 0,
 #'                  nGV = 0,
 #'                  pmr = FALSE,
 #'                  prior = c(0.05,
@@ -147,6 +151,7 @@ mhEdge <- function (data,
                     adjMatrix,
                     burnIn = 0.2,
                     iterations = 1000,
+                    nCPh = 0,
                     nGV = 0,
                     pmr = FALSE,
                     prior = c(0.05,
@@ -280,6 +285,7 @@ mhEdge <- function (data,
   # combinations for each node. (LOG Likelihood Environment)
   logle <- lookUp(data = data,
                   adjMatrix = adjMatrix,
+                  nCPh = nCPh,
                   nGV = nGV,
                   nNodes = nNodes,
                   pmr = pmr)

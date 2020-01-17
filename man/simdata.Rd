@@ -4,7 +4,7 @@
 \alias{simdata}
 \title{simdata}
 \usage{
-simdata(b0 = 0, N = 500, s = 1, ss = 1, graph = "gn4", p = 0.1,
+simdata(b0 = 0, N = 500, s = 1, ss = 1, graph = "gn4", q = 0.1,
   ssc = 0.2, nConfounding = 2)
 }
 \arguments{
@@ -122,7 +122,7 @@ PMR and is made up of multiple M1 topologies.
 \if{html}{\figure{star.png}{options: width="25\%" alt="Figure: star.png"}}
 \if{latex}{\figure{star.pdf}{options: width=2.5cm}}}
 
-\item{p}{The frequency of the reference allele.}
+\item{q}{The frequency of the reference allele.}
 
 \item{ssc}{The signal strength of the confounding variables.}
 
@@ -153,7 +153,7 @@ data_m1_iv <- simdata(b0 = 0,
                       s = 1,
                       graph = 'm1_iv',
                       ss = 1,
-                      p = 0.1,
+                      q = 0.1,
                       ssc = 0.2,
                       nConfounding = 3)
 

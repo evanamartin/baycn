@@ -9,6 +9,8 @@
 #
 # @param v The index of the for loop for the parent combinations
 #
+# @param nCPh The number of clinical phenotypes in the graph.
+#
 # @param nGV The number of genetic variants in the graph.
 #
 # @param nNodes The number of nodes in the graph.
@@ -22,6 +24,7 @@
 #'
 cll <- function (data,
                  nodeIndex,
+                 nCPh,
                  nGV,
                  nNodes,
                  pVector,
@@ -37,13 +40,21 @@ cll <- function (data,
                                  pVector = pVector,
                                  v = v)
 
-  } else {
+  } else if (nodeIndex <= (nNodes - nCPh)) {
 
     # Calculate the log likelihood for the normal variables.
     logLikelihood <- cllNormal(data = data,
                                nodeIndex = nodeIndex,
                                pVector = pVector,
                                v = v)
+
+  } else {
+
+    # Calculate the log likelihood for the binomial variables.
+    logLikelihood <- cllBinom(data = data,
+                              nodeIndex = nodeIndex,
+                              pVector = pVector,
+                              v = v)
 
   }
 
@@ -89,8 +100,9 @@ cllMultinom <- function (data,
 
   } else {
 
-    # Store the log likelihood for the current node.
-    ll <- logLik(polr(as.factor(data[,nodeIndex])~data[,which(pVector!=0)]))[1]
+    # Calculate the log likelihood for the current node.
+    ll <- logLik(polr(as.factor(data[, nodeIndex]) ~
+                        data[, which(pVector !=0 )]))[1]
 
   }
 
@@ -121,7 +133,7 @@ cllNormal <- function (data,
 
   if (v == 1) {
 
-    # Store the log likelihood for the current node.
+    # Calculate the log likelihood for the current continuous node.
     ll <- sum(dnorm(x = data[, nodeIndex],
                     mean = mean(data[, nodeIndex]),
                     sd = sd(data[, nodeIndex]),
@@ -131,6 +143,52 @@ cllNormal <- function (data,
 
     # Store the log likelihood for the current node.
     ll <- logLik(lm(data[, nodeIndex] ~ data[, which(pVector != 0)]))[1]
+
+  }
+
+  return (ll)
+
+}
+
+# cllBinom
+#
+# Calculates the log likelihood for a node with binomial data.
+#
+# @param data The data matrix.
+#
+# @param nodeIndex The index of the for loop for the nodes
+#
+# @param pVector The vector of parent nodes for the current node.
+#
+# @param v The index of the for loop for the parent combinations
+#
+# @return The log likelihood of the current node.
+#
+#' @importFrom stats binomial dbinom glm logLik
+#'
+cllBinom <- function (data,
+                      nodeIndex,
+                      v,
+                      pVector){
+
+  # Loop through each of the clinical phenotype nodes and calculate the log
+  # likelihood given the edge directions of the current graph.
+  if (v == 1) {
+
+    # Calculate the counts for the two levels of the current clinical phenotype.
+    counts <- as.vector(table(data[, nodeIndex]))
+
+    # Calculate the probability of each level of counts.
+    lprob <- log(counts / sum(counts))
+
+    # Store the log likelihood for the current node.
+    ll <- sum(lprob * counts)
+
+  } else {
+
+    # Calculate the log likelihood for the current node.
+    ll <- logLik(glm(data[, nodeIndex] ~ data[, which(pVector != 0)],
+                     family = binomial(link = 'logit')))[1]
 
   }
 

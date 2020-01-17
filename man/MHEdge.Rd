@@ -4,9 +4,9 @@
 \alias{mhEdge}
 \title{mhEdge}
 \usage{
-mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nGV = 0,
-  pmr = FALSE, prior = c(0.05, 0.05, 0.9), progress = TRUE,
-  thinTo = 200)
+mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nCPh = 0,
+  nGV = 0, pmr = FALSE, prior = c(0.05, 0.05, 0.9),
+  progress = TRUE, thinTo = 200)
 }
 \arguments{
 \item{data}{A matrix with the variables across the columns and the
@@ -26,6 +26,8 @@ sample that will be discarded.}
 
 \item{iterations}{An integer for the number of iterations to run the MH
 algorithm.}
+
+\item{nCPh}{The number of clinical phenotypes in the graph.}
 
 \item{nGV}{The number of genetic variants in the graph.}
 
@@ -85,7 +87,7 @@ data_m1 <- simdata(b0 = 0,
                    s = 1,
                    graph = 'm1_gv',
                    ss = 1,
-                   p = 0.27)
+                   q = 0.27)
 
 # Create an adjacency matrix with the true edges.
 am_m1 <- matrix(c(0, 1, 0,
@@ -100,6 +102,7 @@ mh_m1_pmr <- mhEdge(data = data_m1,
                     adjMatrix = am_m1,
                     burnIn = 0.2,
                     iterations = 1000,
+                    nCPh = 0,
                     nGV = 1,
                     pmr = TRUE,
                     prior = c(0.05,
@@ -132,6 +135,7 @@ mh_gn4 <- mhEdge(data = data_gn4,
                  adjMatrix = am_gn4,
                  burnIn = 0.2,
                  iterations = 1000,
+                 nCPh = 0,
                  nGV = 0,
                  pmr = FALSE,
                  prior = c(0.05,
