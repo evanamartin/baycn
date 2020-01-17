@@ -1214,6 +1214,8 @@ cycleFndr <- function (adjMatrix,
 #
 # @param currentES A vector of edge states for the current graph.
 #
+# @param nCPh The number of clinical phenotypes in the graph.
+#
 # @param nEdges An integer for the number of edges in the graph.
 #
 # @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
@@ -1229,6 +1231,7 @@ cycleRmvr <- function (cycles,
                        edgeID,
                        edgeType,
                        currentES,
+                       nCPh,
                        nCycles,
                        nEdges,
                        pmr,
@@ -1260,31 +1263,35 @@ cycleRmvr <- function (cycles,
       # If there is a directed cycle the edge state is either a 0 or 1.
       if(currentES[[whichEdge]] == 0) {
 
-        # Calculate the probability of moving to edge state 1 or 2 (location 2
-        # or 3 in the prior vector)
-        probability <- cPrior(edges = c(2, 3),
-                              edgeType = edgeType[[whichEdge]],
-                              pmr = pmr,
-                              prior = prior)
+        # The position in the prior vector of the prior probability for the two
+        # edge states that the current edge can move to.
+        prPos <- c(2, 3)
 
-        currentES[[whichEdge]] <- sample(x = c(1, 2),
-                                         size = 1,
-                                         prob = probability)
+        # The states the current edge can move to.
+        states <- c(1, 2)
 
       } else {
 
-        # Calculate the probability of moving to edge state 0 or 2 (location 1
-        # or 3 in the prior vector)
-        probability <- cPrior(edges = c(1, 3),
-                              edgeType = edgeType[[whichEdge]],
-                              pmr = pmr,
-                              prior = prior)
+        # The position in the prior vector of the prior probability for the two
+        # edge states that the current edge can move to.
+        prPos <- c(1, 3)
 
-        currentES[[whichEdge]] <- sample(x = c(0, 2),
-                                         size = 1,
-                                         prob = probability)
+        # The states the current edge can move to.
+        states <- c(0, 2)
 
       }
+
+      # Calculate the probability of moving to the two possible edge states.
+      probability <- cPrior(prPos = prPos,
+                            edgeType = edgeType[[whichEdge]],
+                            nCPh = nCPh,
+                            pmr = pmr,
+                            prior = prior)
+
+      # Select one of the two possible edge states according to the prior.
+      currentES[[whichEdge]] <- sample(x = states,
+                                       size = 1,
+                                       prob = probability)
 
     }
 

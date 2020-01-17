@@ -8,6 +8,8 @@
 #
 # @param graph A vector containing the current edge states for each edge.
 #
+# @param nCPh The number of clinical phenotypes in the graph.
+#
 # @param nEdges The number of edges in the graph.
 #
 # @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
@@ -26,6 +28,7 @@
 #'
 mutate <- function (edgeType,
                     graph,
+                    nCPh,
                     nEdges,
                     pmr,
                     prior,
@@ -48,44 +51,44 @@ mutate <- function (edgeType,
 
     if (graph[[wEdges[[e]]]] == 0) {
 
-      # Calculate the probability of moving to edge state 1 or 2 (location 2 or
-      # 3 in the prior vector)
-      probability <- cPrior(edges = c(2, 3),
-                            edgeType = edgeType[[wEdges[[e]]]],
-                            pmr = pmr,
-                            prior = prior)
+      # The position in the prior vector of the prior probability for the two
+      # edge states that the current edge can move to.
+      prPos <- c(2, 3)
 
-      graph[[wEdges[[e]]]] <- sample(x = c(1, 2),
-                                     size = 1,
-                                     prob = probability)
+      # The states the current edge can move to.
+      states <- c(1, 2)
 
     } else if (graph[[wEdges[[e]]]] == 1) {
 
-      # Calculate the probability of moving to edge state 0 or 2 (location 1 or
-      # 3 in the prior vector)
-      probability <- cPrior(edges = c(1, 3),
-                            edgeType = edgeType[[wEdges[[e]]]],
-                            pmr = pmr,
-                            prior = prior)
+      # The position in the prior vector of the prior probability for the two
+      # edge states that the current edge can move to.
+      prPos <- c(1, 3)
 
-      graph[[wEdges[[e]]]] <- sample(x = c(0, 2),
-                                     size = 1,
-                                     prob = probability)
+      # The states the current edge can move to.
+      states <- c(0, 2)
 
     } else {
 
-      # Calculate the probability of moving to edge state 0 or 1 (location 1 or
-      # 2 in the prior vector)
-      probability <- cPrior(edges = c(1, 2),
-                            edgeType = edgeType[[wEdges[[e]]]],
-                            pmr = pmr,
-                            prior = prior)
+      # The position in the prior vector of the prior probability for the two
+      # edge states that the current edge can move to.
+      prPos <- c(1, 2)
 
-      graph[[wEdges[[e]]]] <- sample(x = c(0, 1),
-                                     size = 1,
-                                     prob = probability)
+      # The states the current edge can move to.
+      states <- c(0, 1)
 
     }
+
+    # Calculate the probability of moving to the two possible edge states.
+    probability <- cPrior(prPos = prPos,
+                          edgeType = edgeType[[wEdges[[e]]]],
+                          nCPh = nCPh,
+                          pmr = pmr,
+                          prior = prior)
+
+    # Select one of the two possible edge states according to the prior.
+    graph[[wEdges[[e]]]] <- sample(x = states,
+                                   size = 1,
+                                   prob = probability)
 
   }
 
