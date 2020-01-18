@@ -26,7 +26,7 @@ cPrior <- function (prPos,
                     pmr,
                     prior) {
 
-  if (edgeType != 0 && (pmr == TRUE || nCPh >= 1)) {
+  if (edgeType != 0 && (pmr || nCPh >= 1)) {
 
     # When using the pmr or if there are clinical phenotypes in the graph the
     # probability of a gv-ge, gv-cph, or ge-cph edge moving to edge state one is

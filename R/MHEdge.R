@@ -235,7 +235,9 @@ mhEdge <- function (data,
   # Determine the edge type for each edge in the graph (gv-ge or ge-ge, gv-gv)
   edgeType <- detType(coord = coord,
                       nEdges = nEdges,
+                      nCPh = nCPh,
                       nGV = nGV,
+                      nNodes = nNodes,
                       pmr = pmr)
 
   # Calculate the probability of choosing from 1 to nEdges.
