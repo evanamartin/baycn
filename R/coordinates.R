@@ -15,8 +15,16 @@
 #
 coordinates <- function (adjMatrix) {
 
-  Rows <- c()
-  Columns <- c()
+  # Get the number of ones in the adjacency matrix. This is a rough estimate of
+  # the number of edges in the network.
+  total <- sum(adjMatrix == 1)
+
+  # Initialize the vectors to full length (and possibly over the actual number
+  # of edges in the graph).
+  Rows <- vector(mode = 'integer',
+                 length = total)
+  Columns <- vector(mode = 'integer',
+                    length = total)
 
   i <- 1
 
@@ -26,7 +34,7 @@ coordinates <- function (adjMatrix) {
 
       if (e < v && (adjMatrix[e, v] != 0 || adjMatrix[v, e] != 0)) {
 
-        # Get the rows and columns of the nonzero entries of the upper
+        # Save the rows and columns of the nonzero entries of the upper
         # triangular adjacency matrix.
         Rows[[i]] <- e
         Columns[[i]] <- v
@@ -39,6 +47,12 @@ coordinates <- function (adjMatrix) {
 
   }
 
+  # Remove the NAs, if there are any, at the end of the Rows and Columns
+  # vectors.
+  Rows <- Rows[Rows != 0]
+  Columns <- Columns[Columns != 0]
+
+  # Combine the Rows and Columns vectors into a matrix.
   return (rbind(Rows, Columns))
 
 }
