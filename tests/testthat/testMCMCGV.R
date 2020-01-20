@@ -73,10 +73,6 @@ test_that('mhEdge infers the correct graph using PMR',{
 
   mse_m3 <- sum((baycn_m3@posteriorES[, 2:4] - ep_m3)^2)
 
-  # Print the MSEs for M1 and M3
-  print(mse_m1)
-  print(mse_m3)
-
   expect_true(mse_m1 < 0.1)
   expect_true(mse_m3 < 0.1)
 

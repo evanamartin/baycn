@@ -78,10 +78,6 @@ test_that('mhEdge infers the correct graph',{
 
   mse_m2 <- sum((baycn_m2@posteriorES[, 2:4] - ep_m2)^2)
 
-  # Print the MSEs for M1 and M2
-  print(mse_m1)
-  print(mse_m2)
-
   expect_true(mse_m1 < 0.1)
   expect_true(mse_m2 < 0.1)
 
