@@ -13,7 +13,7 @@ Description: A Bayesian hybrid approach for inferring Directed Acyclic Graphs
     absence for the edges in the network.
     References:
     Martin and Fu (2019) <arXiv:1909.10678>.
-License: GPL-3
+License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
