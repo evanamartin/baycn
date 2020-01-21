@@ -1,4 +1,4 @@
-context('Continuous data')
+context('data: GE')
 
 test_that('mhEdge infers the correct graph',{
 

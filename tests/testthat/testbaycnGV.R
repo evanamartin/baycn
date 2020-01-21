@@ -1,4 +1,4 @@
-context('Mixed data')
+context('data: GE, GV')
 
 test_that('mhEdge infers the correct graph using PMR',{
 
