@@ -164,9 +164,9 @@ test_that('cycleFndr returns NULL if there are no cycles', {
 test_that('cycleFndr correctly uses the PMR', {
 
   # Fully connected three node graph.
-  adjMatrix<- matrix(1,
-                     nrow = 3,
-                     ncol = 3)
+  adjMatrix <- matrix(1,
+                      nrow = 3,
+                      ncol = 3)
 
   diag(adjMatrix) <- 0
 
@@ -183,9 +183,9 @@ test_that('cycleFndr correctly uses the PMR', {
   expect_null(cf$cycles)
 
   # Fully connected five node graph.
-  adjMatrix<- matrix(1,
-                     nrow = 5,
-                     ncol = 5)
+  adjMatrix <- matrix(1,
+                      nrow = 5,
+                      ncol = 5)
 
   diag(adjMatrix) <- 0
 
@@ -216,6 +216,56 @@ test_that('cycleFndr correctly uses the PMR', {
                                        9, 9, 9, 9, 9, 1, 0, 0, 1, 9,
                                        9, 9, 9, 9, 1, 9, 0, 1, 9, 1),
                                      nrow = 14,
+                                     byrow = TRUE))
+
+})
+
+test_that('cycleFndr correctly uses clinical phenotypes', {
+
+  # Fully connected four node graph.
+  adjMatrix <- matrix(1,
+                      nrow = 4,
+                      ncol = 4)
+
+  diag(adjMatrix) <- 0
+
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
+  cf <- cycleFndr(adjMatrix = adjMatrix,
+                  nEdges = 6,
+                  nCPh = 1,
+                  nGV = 1,
+                  pmr = TRUE,
+                  position = coord)
+
+  # Check that NULL is returned for a four node graph when using the PMR and
+  # there are clinical phenotypes present.
+  expect_null(cf$cycles)
+
+  # Fully connected five node graph.
+  adjMatrix <- matrix(1,
+                      nrow = 5,
+                      ncol = 5)
+
+  diag(adjMatrix) <- 0
+
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
+  cf <- cycleFndr(adjMatrix = adjMatrix,
+                  nEdges = 10,
+                  nCPh = 1,
+                  nGV = 1,
+                  pmr = TRUE,
+                  position = coord)
+
+  # Check that all the cycles are found.
+  expect_true(cf$nCycles == 2)
+  # Check that the correct cycles were found.
+  expect_identical(cf$cycles, matrix(c(9, 9, 9, 9, 0, 1, 9, 0, 9, 9,
+                                       9, 9, 9, 9, 1, 0, 9, 1, 9, 9),
+                                     nrow = 2,
                                      byrow = TRUE))
 
 })
