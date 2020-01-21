@@ -47,8 +47,9 @@ caRatio <- function (current,
   # edge state vectors are different.
   if (length(wEdges) != 0) {
 
-    # Ater getting the locations of the differences of the edge directions between
-    # the current and proposed graphs we need to get the directions of the edges.
+    # Ater getting the locations of the differences of the edge directions
+    # between the current and proposed graphs we need to get the directions of
+    # the edges.
     edgeDirP <- proposed[wEdges]
     edgeDirC <- current[wEdges]
 
@@ -68,25 +69,26 @@ caRatio <- function (current,
 
     # The following vectors will contain the transition probabilities for the
     # current and proposed graphs. transProbP will hold the probabilities for
-    # moving from the proposed graph to the current graph and transProbC will hold
-    # the probabilities of moving from the current graph to the proposed graph.
+    # moving from the proposed graph to the current graph and transProbC will
+    # hold the probabilities of moving from the current graph to the proposed
+    # graph.
     transProbP <- vector(mode = 'numeric',
                          length = nDiff)
     transProbC <- vector(mode = 'numeric',
                          length = nDiff)
 
-    # Attach the correct prior probability to each edge direction for both the old
-    # and new individuals.
+    # Attach the correct prior probability to each edge direction for both the
+    # current and proposed edge state vectors.
     for(e in 1:nDiff) {
 
       # I can use the edge direction (0, 1, or 2) to select the correct prior by
       # adding a 1 to it and using that number to subset the prior vector. For
       # example, if the edge direction is 0 the corresponding prior is in the
-      # first position of the prior vector so prior[[0 + 1]] will give 0.05 which
-      # is the default prior for an edge being 0.
+      # first position of the prior vector so prior[[0 + 1]] will give 0.05
+      # which is the default prior for an edge being 0.
 
-      # Calculate the log(prior) for the current edge state and the probability of
-      # moving from the proposed graph to the current graph.
+      # Calculate the log(prior) for the current edge state and the probability
+      # of moving from the proposed graph to the current graph.
       ptProposed <- carPrior(edgeDir1 = edgeDirP[[e]],
                              edgeDir2 = edgeDirC[[e]],
                              edgeType = etDiff[[e]],
@@ -96,8 +98,8 @@ caRatio <- function (current,
       priorP[[e]] <- ptProposed[1]
       transProbP[[e]] <- ptProposed[2]
 
-      # Calculate the log(prior) for the current edge state and the probability of
-      # moving from the current graph to the proposed graph.
+      # Calculate the log(prior) for the current edge state and the probability
+      # of moving from the current graph to the proposed graph.
       ptCurrent <- carPrior(edgeDir1 = edgeDirC[[e]],
                             edgeDir2 = edgeDirP[[e]],
                             edgeType = etDiff[[e]],

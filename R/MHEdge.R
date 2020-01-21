@@ -5,10 +5,13 @@
 #'
 #' @param data A matrix with the variables across the columns and the
 #' observations down the rows. If there are genetic variants in the data these
-#' variables must come before the remaining variables. For example, if the data
-#' has 3 genetic variant variables and 4 gene expression variables the first
-#' three columns of the data matrix would contain the genetic variant data and
-#' the last four columns would contain the gene expression data.
+#' variables must come before the remaining variables. If there are clinical
+#' phenotypes in the data these variables must come after all other variables.
+#' For example, if there is a data set with one genetic variant variable, three
+#' gene expression variables, and one clinical phenotype variable the first
+#' column in the data matrix must contain the genetic variant data, the next
+#' three columns will contain the gene expression data, and the last column will
+#' contain the clinical phenotype data.
 #'
 #' @param adjMatrix An adjacency matrix indicating the edges that will be
 #' considered by the Metropolis-Hastings algorithm. This can be the output from
@@ -27,7 +30,8 @@
 #'
 #' @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
 #' Principle of Mendelian Randomization (PMR). This prevents the direction of an
-#' edge pointing from a gene expression node to a genetic variant node.
+#' edge pointing from a gene expression or a clinical phenotype node to a
+#' genetic variant node.
 #'
 #' @param prior A vector containing the prior probability for the three edge
 #' states.
@@ -301,9 +305,9 @@ mhEdge <- function (data,
                       prob = prior)
 
   # Check if any gv nodes have ge node parents.
-  if (pmr == TRUE) {
+  if (pmr || nCPh >= 1) {
 
-    # Change the direction of the ge -> gv edges to gv -> ge.
+    # Reverse the direction of any ge -> gv, gv -> cph, or ge -> cph edges.
     currentES[edgeType == 1 & currentES == 1] <- 0
 
   }

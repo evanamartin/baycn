@@ -9,7 +9,7 @@ parentCombinations <- function (pVector,
   # total number of parents.
   totalParents <- sum(pVector)
 
-  # where the parents occur in the vector.
+  # Determine where the parents occur in the vector.
   whichParents <- which(pVector == 1)
 
   # Return a vector of zeros if the current node does not have any parents.

@@ -8,9 +8,9 @@
 # @param adjMatrix The adjacency matrix for the current graph.
 #
 # @param coordinates A matrix with the row and column coordinates of the
-# edges from the adjacency matrix from the MRPC function. The row numbers of
-# each nonzero element make up the first row in the matrix and the column
-# numbers of each nonzero element make up the second row of the matrix.
+# nonzero elements in the adjacency matrix. The row numbers of the nonzero
+# elements appear in the first row and the column numbers of the nonzero
+# elements appear in the second row.
 #
 # @param edgeStates A vector containing the directions of the edges in the
 # graph and the log likelihood of the graph.
@@ -33,20 +33,23 @@ convertAM <- function (adjMatrix,
 
       if (edgeStates[[e]] == 0) {
 
+        # Change the i, j and j, i (where i < j) elements to represent an edge
+        # pointing from node i to node j.
         adjMatrix[coordinates[1, e], coordinates[2, e]] <- 1
-
         adjMatrix[coordinates[2, e], coordinates[1, e]] <- 0
 
       } else if (edgeStates[[e]] == 1) {
 
+        # Change the i, j and j, i (where i < j) elements to represent an edge
+        # pointing from node j to node i.
         adjMatrix[coordinates[2, e], coordinates[1, e]] <- 1
-
         adjMatrix[coordinates[1, e], coordinates[2, e]] <- 0
 
       } else {
 
+        # Change the i, j and j, i (where i < j) elements to represent the
+        # absence of an edge between nodes i and j.
         adjMatrix[coordinates[1, e], coordinates[2, e]] <- 0
-
         adjMatrix[coordinates[2, e], coordinates[1, e]] <- 0
 
       }

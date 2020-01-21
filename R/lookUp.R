@@ -1,3 +1,35 @@
+# lookup
+#
+# Creates an environment for each node in the graph and calculates the log
+# likelihood for each node and for each combination of parent nodes, given the
+# adjacency matrix.
+#
+# @param data A matrix with the variables across the columns and the
+# observations down the rows. If there are genetic variants in the data these
+# variables must come before the remaining variables. If there are clinical
+# phenotypes in the data these variables must come after all other variables.
+# For example, if there is a data set with one genetic variant variable, three
+# gene expression variables, and one clinical phenotype variable the first
+# column in the data matrix must contain the genetic variant data, the next
+# three columns will contain the gene expression data, and the last column will
+# contain the clinical phenotype data.
+#
+# @param adjMatrix An adjacency matrix indicating the edges that will be
+# considered by the Metropolis-Hastings algorithm. This can be the output from
+# another algorithm (e.g., PC). An adjacency matrix is a matrix of zeros and
+# ones. The ones represent an edge and its direction between two nodes.
+#
+# @param nCPh The number of clinical phenotypes in the graph.
+#
+# @param nGV The number of genetic variants in the graph.
+#
+# @param nNodes The number of nodes in the graph.
+#
+# @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
+# Principle of Mendelian Randomization (PMR). This prevents the direction of an
+# edge pointing from a gene expression or a clinical phenotype node to a
+# genetic variant node.
+#
 lookUp <- function (data,
                     adjMatrix,
                     nCPh,

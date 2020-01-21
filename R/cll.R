@@ -5,9 +5,7 @@
 # @param data A matrix with the nodes across the columns and the observations
 # along the rows.
 #
-# @param nodeIndex The index of the for loop for the nodes
-#
-# @param v The index of the for loop for the parent combinations
+# @param nodeIndex The index of the for loop for the nodes.
 #
 # @param nCPh The number of clinical phenotypes in the graph.
 #
@@ -16,6 +14,8 @@
 # @param nNodes The number of nodes in the graph.
 #
 # @param pVector The vector of parent nodes for the current node.
+#
+# @param v The index of the for loop from the parent combinations.
 #
 # @return The log likelihood of the graph according to the orientation of the
 # edges denoted by the DNA of the current graph.
