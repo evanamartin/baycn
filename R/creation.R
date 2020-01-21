@@ -79,6 +79,8 @@ sMulti <- function (N,
 #
 # @param b1 A vector containing the regression coefficients of the parent nodes.
 #
+# @return A vector containing the simulated data.
+#
 #' @importFrom stats as.formula rnorm
 #'
 cNorm <- function (N,
@@ -107,7 +109,7 @@ cNorm <- function (N,
 
   }
 
-  # Create a formula object and evaluate it. The subset ([[2]]) extracts just
+  # Create a formula object and evaluate it. The subset, [[2]], extracts just
   # the right hand side of the formula.
   means <- eval(as.formula(paste(lmFormula,
                                  collapse = ' + '))[[2]])
@@ -131,6 +133,8 @@ cNorm <- function (N,
 # b0 + b1[[1]] * parentData[[1]] + b1[[2]] * parentData[[2]] + ...
 #
 # @param b1 A vector containing the regression coefficients of the parent nodes.
+#
+# @return A vector containing the simulated data.
 #
 #' @importFrom stats as.formula
 #'
@@ -159,7 +163,7 @@ cBinom <- function (N,
 
   }
 
-  # Create a formula object and evaluate it. The subset ([[2]]) extracts just
+  # Create a formula object and evaluate it. The subset, [[2]], extracts just
   # the right hand side of the formula.
   f <- eval(as.formula(paste(lmFormula,
                              collapse = ' + '))[[2]])
@@ -172,5 +176,87 @@ cBinom <- function (N,
 
   # Return the binomial rv.
   return (ifelse(rU < prob, 0, 1))
+
+}
+
+# cMulti
+#
+# @param N The number of observations to simulate.
+#
+# @param mParents The number of parent nodes.
+#
+# @param q The frequency of the reference allele.
+#
+# @param parentData A list containing the data of the parents nodes.
+#
+# @param b0 The slope of the linear model
+# b0 + b1[[1]] * parentData[[1]] + b1[[2]] * parentData[[2]] + ...
+#
+# @param b1 A vector containing the regression coefficients of the parent nodes.
+#
+# @param q The frequency of the reference allele.
+#
+# @return A vector containing the simulated data.
+#
+#' @importFrom stats as.formula qnorm
+#'
+cMulti <- function (N,
+                    mParents,
+                    parentData,
+                    b0,
+                    b1,
+                    q) {
+
+  # Create a vector that will hold a linear model as a character string.
+  lmFormula <- vector(length = mParents + 1)
+
+  # The first element is the slope.
+  lmFormula[[1]] <- '~ b0'
+
+  # Loop through the parents for the current node.
+  for (e in 1:mParents) {
+
+    # Fill in the remaining elements with the regression coefficient and the
+    # data for the corresponding parent node.
+    lmFormula[[e + 1]] <- paste0('b1[[',
+                                 e,
+                                 ']] * parentData[[',
+                                 e,
+                                 ']]')
+
+  }
+
+  # Create a formula object and evaluate it. The subset, [[2]], extracts just
+  # the right hand side of the formula.
+  means <- eval(as.formula(paste(lmFormula,
+                                 collapse = ' + '))[[2]])
+
+  # Simulate data from a normal distribution. This will be divided later to
+  # produce a vector of 0s, 1s, and 2s that follow a multinomial distribution
+  # with new frequencies from having one or more parents.
+  normalRV <- rnorm(n = N,
+                    mean = means,
+                    sd = 1)
+
+  # Create the lower cutoff for q^2 in the standard normal distribution.
+  lowerCutoff <- qnorm(q^2, 0, 1)
+
+  # Create the upper cutoff for (1 - q)^2 in the standard normal distribution.
+  upperCutoff <- qnorm((1 - q)^2, 0, 1, lower.tail = FALSE)
+
+  # Initialize the U vector to full length.
+  U <- rep(NA, length = N)
+
+  # Change the normal values to a zero if the fall below the lower cutoff.
+  U[normalRV < lowerCutoff] <- 0
+
+  # Change the normal values to a two if they are above the upper cutoff.
+  U[normalRV > upperCutoff] <- 2
+
+  # Change the remaining normal values to a one.
+  U[is.na(U)] <- 1
+
+  # Return the multinomial rv.
+  return (U)
 
 }
