@@ -14,6 +14,8 @@
 #
 # @param adjMatrix The adjacency matrix of the graph.
 #
+# @param nCPh The number of clinical phenotypes in the graph.
+#
 # @param nGV The number of genetic variants in the graph.
 #
 # @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
@@ -25,6 +27,7 @@
 # NULL.
 #
 cycleSaL <- function (adjMatrix,
+                      nCPh,
                       nGV,
                       pmr) {
 
@@ -43,16 +46,49 @@ cycleSaL <- function (adjMatrix,
   rownames(undirected) <- c(1:dim(undirected)[2])
   colnames(undirected) <- c(1:dim(undirected)[2])
 
-  # If pmr is TRUE remove all GV rows and columns from the SaL matrix otherwise
-  # leave all columns from the undirected matrix in the SaL matrix.
-  if (pmr == TRUE) {
+  # Reduce the rows and columns of the adjacency matrix if pmr is true or if
+  # there is at least one clinical phenotype present.
+  if (pmr || nCPh >= 1) {
 
-    # First remove the genetic variant rows and columns.
-    SaL <- undirected[-c(1:nGV), -c(1:nGV)]
+    # Calculate the number of nodes in the graph.
+    nNodes <- dim(undirected)[2]
 
-    # Remove rows with a sum of less than two.
-    SaL <- rmRows(SaL)
+    # Determine the number of gv and ge nodes.
+    nGVGE <- nNodes - nCPh
 
+    # Remove rows/columns when using PMR and clinical phenotypes are present.
+    if (pmr && nCPh >= 1) {
+
+      # First remove gv and cph rows/columns.
+      SaL <- undirected[-c(1:nGV, (nGVGE + 1):nNodes),
+                        -c(1:nGV, (nGVGE + 1):nNodes)]
+
+      # Remove rows with a sum of less than two.
+      SaL <- rmRows(SaL)
+
+      # Remove rows/columns when using PMR and clinical phenotypes are not
+      # present.
+    } else if (pmr && nCPh == 0) {
+
+      # First remove the gv rows/columns.
+      SaL <- undirected[-c(1:nGV), -c(1:nGV)]
+
+      # Remove rows with a sum of less than two.
+      SaL <- rmRows(SaL)
+
+      # Remove rows/columns when not using PMR and clinical phenotypes are
+      # present.
+    } else {
+
+      # First remove cph rows/columns.
+      SaL <- undirected[-c((nGVGE + 1):nNodes), -c((nGVGE + 1):nNodes)]
+
+      # Remove rows with a sum of less than two.
+      SaL <- rmRows(SaL)
+
+    }
+
+    # If not using PMR or clinical phenotypes use entire adjacency matrix.
   } else {
 
     # Remove rows with a sum of less than two.
@@ -1107,6 +1143,8 @@ permutate <- function (combs) {
 #
 # @param adjMatrix The adjacency matrix of the graph.
 #
+# @param nCPh The number of clinical phenotypes in the graph.
+#
 # @param nGV An integer. The number of genetic variants in the graph.
 #
 # @param nEdges An integer. The number of edges in the graph.
@@ -1123,6 +1161,7 @@ permutate <- function (combs) {
 # in the graph the function returns NULL.
 #
 cycleFndr <- function (adjMatrix,
+                       nCPh = 0,
                        nGV = 0,
                        nEdges,
                        pmr = FALSE,
@@ -1130,6 +1169,7 @@ cycleFndr <- function (adjMatrix,
 
   # Check for potential cycles in the graph.
   SaL <- cycleSaL(adjMatrix = adjMatrix,
+                  nCPh = nCPh,
                   nGV = nGV,
                   pmr = pmr)
 
