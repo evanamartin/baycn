@@ -134,6 +134,8 @@ cNorm <- function (N,
 #
 # @param b1 A vector containing the regression coefficients of the parent nodes.
 #
+# @param p The probability of success (a number between 0 and 1).
+#
 # @return A vector containing the simulated data.
 #
 #' @importFrom stats as.formula
@@ -142,7 +144,8 @@ cBinom <- function (N,
                     mParents,
                     parentData,
                     b0,
-                    b1) {
+                    b1,
+                    p) {
 
   # Create a vector that will hold a linear model as a character string.
   lmFormula <- vector(length = mParents + 1)
@@ -165,17 +168,21 @@ cBinom <- function (N,
 
   # Create a formula object and evaluate it. The subset, [[2]], extracts just
   # the right hand side of the formula.
-  f <- eval(as.formula(paste(lmFormula,
-                             collapse = ' + '))[[2]])
+  means <- eval(as.formula(paste(lmFormula,
+                                 collapse = ' + '))[[2]])
 
-  # Inverse logit using the parent nodes.
-  prob <- exp(f) / (1 + exp(f))
+  # Simulate data from a normal distribution. This will be divided later to
+  # produce a vector of 0s and 1s binomial distribution with a new probability
+  # of success depending on the signal from the parents.
+  normalRV <- rnorm(n = N,
+                    mean = means,
+                    sd = 1)
 
-  # Generate a uniform random variable to determine the state (0 or 1).
-  rU <- runif(N, 0, 1)
+  # Create the cutoff for p in the standard normal distribution.
+  cutoff <- qnorm(p, 0, 1, lower.tail = FALSE)
 
   # Return the binomial rv.
-  return (ifelse(rU < prob, 0, 1))
+  return (ifelse(normalRV > cutoff, 1, 0))
 
 }
 

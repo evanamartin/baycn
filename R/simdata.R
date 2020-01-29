@@ -117,6 +117,9 @@
 #' linear model that is the mean of the normally distributed variables. This
 #' coefficient is referred to as the signal strength.
 #'
+#' @param p The probability of success for a binomial random variable (a number
+#' between 0 and 1).
+#'
 #' @param q The frequency of the reference allele.
 #'
 #' @param ssc The signal strength of the confounding variables.
@@ -162,6 +165,7 @@ simdata <- function (b0 = 0,
                      s = 1,
                      ss = 1,
                      graph = 'gn4',
+                     p = 0.6,
                      q = 0.1,
                      ssc = 0.2,
                      nConfounding = 2) {
@@ -244,7 +248,8 @@ simdata <- function (b0 = 0,
                        mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
-                       b1 = c(ss))
+                       b1 = c(ss),
+                       p = p)
 
            return (cbind(U, T1, T2, W))
 

@@ -23,6 +23,7 @@ test_that('the likelihood functions calculate the log likelihood correctly',{
                          N = 200,
                          s = 1,
                          ss = 1,
+                         p = 0.6,
                          q = 0.45,
                          graph = 'm1_cph')
 
@@ -98,6 +99,6 @@ test_that('the likelihood functions calculate the log likelihood correctly',{
                       ll_m1_cph$node3$dn2,
                       ll_m1_cph$node4$dn2)
 
-  expect_equal(round(ll_tg_m1_cph, 3), -876.944)
+  expect_equal(round(ll_tg_m1_cph, 3), -841.734)
 
 })
