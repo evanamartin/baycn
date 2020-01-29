@@ -19,12 +19,14 @@ test_that('mhEdge infers the correct graph using PMR',{
                      N = 500,
                      s = 1,
                      ss = 1,
+                     q = 0.1,
                      graph = 'm1_gv')
 
   data_m3 <- simdata(b0 = 0,
                      N = 500,
                      s = 1,
                      ss = 1,
+                     q = 0.1,
                      graph = 'm3_gv')
 
   # Run baycn on M1 and M3 -----------------------------------------------------

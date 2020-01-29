@@ -20,6 +20,8 @@ test_that('mhEdge infers the correct graph with clinical phenotypes present',{
                          N = 500,
                          s = 1,
                          ss = 1,
+                         q = 0.1,
+                         p = 0.6,
                          graph = 'm1_cph')
 
   # Run baycn on M1_CPh -- -----------------------------------------------------
