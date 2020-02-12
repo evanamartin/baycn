@@ -256,8 +256,9 @@ mhEdge <- function (data,
 
   # Check for potential cycles in the graph and return the edge directions, edge
   # numbers, and the decimal numbers for each cycle if any exist.
-  cf <- cycleFndr(adjMatrix,
+  cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = nEdges,
+                  nCPh = nCPh,
                   nGV = nGV,
                   pmr = pmr,
                   position = coord)

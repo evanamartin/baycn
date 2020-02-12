@@ -16,6 +16,7 @@ test_that('cycleFndr can find all cycles when cycles are present',{
 
   cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = 6,
+                  nCPh = 0,
                   nGV = 0,
                   pmr = FALSE,
                   position = coord)
@@ -61,6 +62,7 @@ test_that('cycleFndr can find all cycles when cycles are present',{
 
   cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = 8,
+                  nCPh = 0,
                   nGV = 0,
                   pmr = FALSE,
                   position = coord)
@@ -95,6 +97,7 @@ test_that('cycleFndr can find all cycles when cycles are present',{
 
   cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = 5,
+                  nCPh = 0,
                   nGV = 0,
                   pmr = FALSE,
                   position = coord)
@@ -126,6 +129,7 @@ test_that('cycleFndr returns NULL if there are no cycles', {
 
   cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = 3,
+                  nCPh = 0,
                   nGV = 0,
                   pmr = FALSE,
                   position = coord)
@@ -152,6 +156,7 @@ test_that('cycleFndr returns NULL if there are no cycles', {
 
   cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = 7,
+                  nCPh = 0,
                   nGV = 0,
                   pmr = FALSE,
                   position = coord)
@@ -175,6 +180,7 @@ test_that('cycleFndr correctly uses the PMR', {
 
   cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = 3,
+                  nCPh = 0,
                   nGV = 1,
                   pmr = TRUE,
                   position = coord)
@@ -194,6 +200,7 @@ test_that('cycleFndr correctly uses the PMR', {
 
   cf <- cycleFndr(adjMatrix = adjMatrix,
                   nEdges = 10,
+                  nCPh = 0,
                   nGV = 1,
                   pmr = TRUE,
                   position = coord)
