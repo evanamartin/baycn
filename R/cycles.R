@@ -493,13 +493,13 @@ cycleTB <- function (branches) {
   # These nodes will form a cycle and they will be stored in tBranches.
   for (e in 1:nBranches) {
 
-    # A vector of the nodes that form a cycle. They will be in reverse order
-    # from how they were listed in the branches matrix.
-    branch <- c()
-
     # Get the number of nodes in the eth column of the branches matrix excluding
     # any NAs.
     nNodes <- length(na.omit(branches[, e]))
+
+    # A vector of the nodes that form a cycle. They will be in reverse order
+    # from how they were listed in the branches matrix.
+    branch <- numeric(length = nNodes)
 
     # The leaf or last node in the eth column of the branches matrix will be
     # used to stop the while loop.
@@ -528,7 +528,7 @@ cycleTB <- function (branches) {
     }
 
     # Add the trimmed branch to the list
-    tBranches[[e]] <- branch
+    tBranches[[e]] <- branch[branch != 0]
 
   }
 
