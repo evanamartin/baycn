@@ -215,10 +215,26 @@ mhEdge <- function (data,
 
   }
 
-  # Check that the number of genetic variants is less than the number of nodes.
+  # Check that nGV > 0 if pmr is TRUE.
+  if (pmr && nGV == 0) {
+
+    stop('nGV must be at least 1 when pmr = TRUE')
+
+  }
+
+  # Check that the number of genetic variants is less than or equal to the
+  # number of nodes.
   if (nGV > dim(data)[2]) {
 
     stop ('nGV must be less than or equal to the number of columns in data')
+
+  }
+
+  # Check that the number of clinical phenotypes is less than or equal to the
+  # number of nodes.
+  if (nCPh > dim(data)[2]) {
+
+    stop ('nCPh must be less than or equal to the number of columns in data')
 
   }
 
