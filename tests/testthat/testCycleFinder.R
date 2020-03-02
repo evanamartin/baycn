@@ -81,6 +81,43 @@ test_that('cycleFndr can find all cycles when cycles are present',{
                                      nrow = 8,
                                      byrow = TRUE))
 
+  # A tail between two cycles ----------------------------------------------------
+
+  # Two cycles connected by a tail.
+  adjMatrix <- matrix(c(0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                        1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                        1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+                        0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+                        0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1,
+                        0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+                        0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+                        0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+                        0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0),
+                      byrow = TRUE,
+                      nrow = 11)
+
+  # Get the coordinates of each edge in the network
+  coord <- coordinates(adjMatrix)
+
+  cf <- cycleFndr(adjMatrix = adjMatrix,
+                  nEdges = 12,
+                  nCPh = 0,
+                  nGV = 0,
+                  pmr = FALSE,
+                  position = coord)
+
+  # Check that all the cycles are found.
+  expect_true(cf$nCycles == 4)
+  # Check that the correct cycles were found.
+  expect_identical(cf$cycles, matrix(c(1, 0, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+                                       0, 1, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+                                       9, 9, 9, 9, 0, 1, 0, 9, 0, 9, 9, 9,
+                                       9, 9, 9, 9, 1, 0, 1, 9, 1, 9, 9, 9),
+                                     nrow = 4,
+                                     byrow = TRUE))
+
   # Single cycle ---------------------------------------------------------------
 
   # The following adjacency matrix is from topology GN5
