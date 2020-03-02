@@ -46,50 +46,55 @@ cycleSaL <- function (adjMatrix,
   rownames(undirected) <- c(1:dim(undirected)[2])
   colnames(undirected) <- c(1:dim(undirected)[2])
 
-  # Reduce the rows and columns of the adjacency matrix if pmr is true or if
-  # there is at least one clinical phenotype present.
-  if (pmr || nCPh >= 1) {
+  # Calculate the number of nodes in the graph.
+  nNodes <- dim(undirected)[2]
 
-    # Calculate the number of nodes in the graph.
-    nNodes <- dim(undirected)[2]
+  # If pmr is false or if nGV or nCPh is equal to nNodes run the rmRows
+  # function without making any changes to the undirected matrix.
+  if (pmr == FALSE || nGV == nNodes || nCPh == nNodes) {
+
+    # Remove rows with a sum of less than two.
+    SaL <- rmRows(SaL = undirected)
+
+    # Reduce the rows and columns of the adjacency matrix if pmr is true or if
+    # there is at least one clinical phenotype present.
+  } else if (pmr || nCPh >= 1) {
 
     # Determine the number of gv and ge nodes.
     nGVGE <- nNodes - nCPh
 
-    # Remove rows/columns when using PMR and clinical phenotypes are present.
+    # Set appropriate elements of the undirected matrix to 0 when using PMR and
+    # there is at least 1 clinical phenotype.
     if (pmr && nCPh >= 1) {
 
-      # First remove gv and cph rows/columns.
-      SaL <- undirected[-c(1:nGV, (nGVGE + 1):nNodes),
-                        -c(1:nGV, (nGVGE + 1):nNodes)]
+      # Set elements in [1:nGV, (nGV + 1):nNodes] to 0.
+      undirected[1:nGV, (nGV + 1):nNodes] <- 0
+      # Set elements in [(nGV + 1):nNodes, 1:nGV] to 0.
+      undirected[(nGV + 1):nNodes, 1:nGV] <- 0
+      # Set elements in [(nGV + 1):nGVGE, (nGVGE + 1):nNodes] to 0.
+      undirected[(nGV + 1):nGVGE, (nGVGE + 1):nNodes] <- 0
+      # Set elements in [(nGVGE + 1):nNodes, (nGV + 1):nGVGE] to 0.
+      undirected[(nGVGE + 1):nNodes, (nGV + 1):nGVGE] <- 0
 
-      # Remove rows with a sum of less than two.
-      SaL <- rmRows(SaL)
-
-      # Remove rows/columns when using PMR and clinical phenotypes are not
-      # present.
+      # Set appropriate elements of the undirected matrix to 0 when using PMR
+      # and no clinical phenotypes are present.
     } else if (pmr && nCPh == 0) {
 
-      # First remove the gv rows/columns.
-      SaL <- undirected[-c(1:nGV), -c(1:nGV)]
+      # Set elements in [1:nGV, (nGV + 1):nNodes] to 0.
+      undirected[1:nGV, (nGV + 1):nNodes] <- 0
+      # Set elements in [(nGV + 1):nNodes, 1:nGV] to 0.
+      undirected[(nGV + 1):nNodes, 1:nGV] <- 0
 
-      # Remove rows with a sum of less than two.
-      SaL <- rmRows(SaL)
-
-      # Remove rows/columns when not using PMR and clinical phenotypes are
-      # present.
+      # Set appropriate elements of the undirected matrix to 0 when clinical
+      # phenotypes are present and PMR is FALSE.
     } else {
 
-      # First remove cph rows/columns.
-      SaL <- undirected[-c((nGVGE + 1):nNodes), -c((nGVGE + 1):nNodes)]
-
-      # Remove rows with a sum of less than two.
-      SaL <- rmRows(SaL)
+      # Set elements in [1:nGVGE, (nGVGE + 1):nNodes] to 0.
+      undirected[1:nGVGE, (nGVGE + 1):nNodes] <- 0
+      # Set elements in [(nGVGE + 1):nNodes, 1:nGVGE] to 0.
+      undirected[(nGVGE + 1):nNodes, 1:nGVGE] <- 0
 
     }
-
-    # If not using PMR or clinical phenotypes use entire adjacency matrix.
-  } else {
 
     # Remove rows with a sum of less than two.
     SaL <- rmRows(SaL = undirected)
@@ -107,48 +112,18 @@ cycleSaL <- function (adjMatrix,
   # Remove the 1s in the SaL matrix that are not part of a cycle
   SaL <- rmOnes(SaL = SaL)
 
-  # get the new row sums after the nodes that can't make up a cycle are removed
-  # from the cycles matrix.
-  newSums <- rowSums(SaL)
+  # Remove any tails in the graph.
+  SaL <- rmTail(SaL = SaL)
 
-  # The following while lookp will continue to trim down the SaL matrix when
-  # there is a string of nodes that are connected to at least two nodes but none
-  # of the nodes form a cycle.
-  while (any(newSums <= 1)) {
+  # Check for directed cycles (i.e., there are three or more rows in SaL).
+  if (is.null(SaL)) {
 
-    # Only keep the rows with a sum >= 2
-    SaL <- SaL[which(newSums >= 2), ]
-
-    # Get the new row names
-    rNames <- as.numeric(rownames(SaL))
-
-    # If there is only one row left then the dim function will return NULL
-    if (is.null(rNames)) {
-
-      return (NULL)
-
-      # If there are 2 or fewer rows with a row sum of 2 or greater there are no
-      # cycles in the graph and cycleSaL returns a zero.
-    } else if (length(rNames) <= 2) {
-
-      return (NULL)
-
-    } else {
-
-      # Remove the 1s in the SaL matrix that are not part of a cycle
-      SaL <- rmOnes(SaL)
-
-      # This will be used to check if there are any rows that have a sum that is
-      # less than 2. If there are then the while loop will continue. If not then
-      # the while loop finishes.
-      newSums <- rowSums(SaL)
-
-    }
+    return (NULL)
 
   }
 
   # Remove any columns that do not contain any 1s
-  SaL <- SaL[, rowSums(SaL) != 0]
+  SaL <- SaL[, colSums(SaL) != 0]
 
   return (SaL)
 
@@ -224,11 +199,62 @@ rmRows <- function (SaL) {
 
 }
 
+# rmTail
+#
+# Removes nodes that are connected to at least two other nodes but are not part
+# of a directed cycle. These are referred to as tails.
+#
+# @param SaL A binary matrix containing the nodes that could form a directed
+# cycle.
+#
+# @return An updated SaL matrix with all tails removed.
+#
+rmTail <- function (SaL) {
+
+  # Calculate the row sums after the nodes that cannot create a directed cycle
+  # are removed from the SaL matrix.
+  newSums <- rowSums(SaL)
+
+  # The following while loop will continue to trim down the SaL matrix when
+  # there is a string of nodes (a tail) that are connected to at least two other
+  # nodes but they do not form a directed cycle.
+  while (any(newSums <= 1)) {
+
+    # Only keep the rows with a sum >= 2.
+    SaL <- SaL[which(newSums >= 2), , drop = FALSE]
+
+    # Get the new row names.
+    rNames <- as.numeric(rownames(SaL))
+
+    # If there are two or fewer rows with a row sum of at least two there cannot
+    # be any directed cycles in the graph and cycleSaL returns NULL.
+    if (length(rNames) <= 2) {
+
+      return (NULL)
+
+    } else {
+
+      # Remove the 1s in the SaL matrix that are not part of a cycle
+      SaL <- rmOnes(SaL)
+
+      # Update the newSums vector after rows with a sum of two or less have been
+      # removed from the SaL matrix.
+      newSums <- rowSums(SaL)
+
+    }
+
+  }
+
+  return (SaL)
+
+}
+
 # cycleB
 #
 # Turns the stem and leaf matrix returned by the cycleSaL function into a list
 # of matrices. Each matrix contains all the cycles for each child of the root
-# node.
+# node. This function subsets the SaL matrix using row and column names - not by
+# row and column indices.
 #
 # @param SaL A binary matrix containing the nodes that could potentially form a
 # directed cycle.
@@ -293,8 +319,8 @@ cycleB <- function (SaL) {
                                SaL[tree[[e]][2, 1], ] == 1])
 
         # Eliminate the root node from the children of the current node. This is
-        # done becuase it would lead to creating branches that bounced back and
-        # forth between two nodes.
+        # done becuase it would lead to creating branches that would bounce back
+        # and forth between two nodes.
         children <- pChildren[pChildren != tree[[e]][1, 1]]
 
         # If there is more than one child create additional columns to hold each
@@ -430,7 +456,8 @@ cycleB <- function (SaL) {
 
   }
 
-  return (branches)
+  # Change the branches matrix from a character matrix to a numeric matrix.
+  return (apply(branches, 2, as.numeric))
 
 }
 
@@ -446,8 +473,8 @@ cycleB <- function (SaL) {
 # number of branches in the tree. The second element, tBranches, is a list of
 # matrices. Each matrix holds the trimmed branches for each cycle size.
 #
-# @importFrom stats na.omit
-#
+#' @importFrom stats na.omit
+#'
 cycleTB <- function (branches) {
 
   # Get the number of branches in the tree.
@@ -484,7 +511,7 @@ cycleTB <- function (branches) {
     # Add the parent of the leaf to the branch vector.
     branch[[2]] <- branches[nNodes - 1, e]
 
-    # The previous two lines are run in order to get into the while loop
+    # The previous two lines are run in order to get into the while loop.
 
     # create a counter to fill in the branch vector.
     v <- 2
@@ -653,7 +680,7 @@ cycleCED <- function (nBranches,
   }
 
   # Get the unique column numbers for each column visited
-  uColumns <- as.numeric(unique(unlist(Columns)))
+  uColumns <- unique(unlist(Columns))
 
   return (list(cCoord = cCoord,
                columns = uColumns,
@@ -681,7 +708,7 @@ cycleDJ <- function (SaL,
 
   # Keep the row names of the original SaL matrix. This will be used to check if
   # every row in the matrix has been used.
-  rowNamesSaL <- as.numeric(row.names(SaL))
+  rowNamesSaL <- row.names(SaL)
 
   # Column names visited so far
   columnNamesSaL <- ced$columns
@@ -698,13 +725,38 @@ cycleDJ <- function (SaL,
 
   }
 
+  # Create a counter for the while loop.
+  counter <- 1
+
   # Loop through the previous funcions, eliminating rows from the SaL matrix at
   # each iteration of the while loop, until all cycles are found.
   while (!disjoint) {
 
     # Remove the column names that have been visited previously from the SaL
     # matrix.
-    SaL2 <- SaL[-c(columnNamesSaL), , drop = FALSE]
+    SaL2 <- SaL[!rowNamesSaL %in% columnNamesSaL, , drop = FALSE]
+
+    # Remove the 1s in the SaL matrix that are not part of a cycle.
+    SaL2 <- rmOnes(SaL = SaL2)
+
+    # Remove any tails in the graph.
+    SaL2 <- rmTail(SaL = SaL2)
+
+    # If there are less than three rows in SaL2 and it is the first time through
+    # the while loop return NULL.
+    if (is.null(SaL2) || (dim(SaL2)[1] < 3 && counter == 1)) {
+
+      return (NULL)
+
+      # If there are less than three rows in SaL2 and the counter is greater
+      # than one then there was at least one disjoint cycle and the updated ced
+      # object needs to be returned.
+    } else if (dim(SaL2)[1] < 3 && counter > 1) {
+
+      # Exit out of the while loop.
+      break
+
+    }
 
     # Create a tree as deep as possible with the remaining columns of the SaL
     # matrix.
@@ -729,6 +781,9 @@ cycleDJ <- function (SaL,
 
     # Update the disjoint test.
     disjoint <- setequal(rowNamesSaL, columnNamesSaL)
+
+    # Update the counter.
+    counter <- counter + 1
 
   }
 
@@ -1161,10 +1216,10 @@ permutate <- function (combs) {
 # in the graph the function returns NULL.
 #
 cycleFndr <- function (adjMatrix,
-                       nCPh = 0,
-                       nGV = 0,
+                       nCPh,
+                       nGV,
                        nEdges,
-                       pmr = FALSE,
+                       pmr,
                        position) {
 
   # Check for potential cycles in the graph.
@@ -1283,8 +1338,11 @@ cycleRmvr <- function (cycles,
                       nCycles = nCycles,
                       nEdges = nEdges)
 
-  # Create a vector that has the row indices where the sum of the row is zero.
-  # A zero means there is a cycle in the current graph for this specific cycle.
+  # Create a vector that holds the row indices where the sum of the row is equal
+  # to the number of edges in the graph. A sum of nEdges indicates a row in the
+  # currentC matrix matches the corresponding row in the cycle matrix meaning
+  # there is a directed cycle. The row number indicates which directed cycle is
+  # present in the current graph.
   whichCycle <- which(rowSums(cycles == currentC) == nEdges)
 
   # If there is a cycle change the direction of an edge invovled in the cycle.
