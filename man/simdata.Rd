@@ -4,8 +4,17 @@
 \alias{simdata}
 \title{simdata}
 \usage{
-simdata(b0 = 0, N = 500, s = 1, ss = 1, graph = "gn4", p = 0.6,
-  q = 0.1, ssc = 0.2, nConfounding = 2)
+simdata(
+  b0 = 0,
+  N = 500,
+  s = 1,
+  ss = 1,
+  graph = "gn4",
+  p = 0.6,
+  q = 0.1,
+  ssc = 0.2,
+  nConfounding = 2
+)
 }
 \arguments{
 \item{b0}{The mean of the variable if it does not have any parents. If the

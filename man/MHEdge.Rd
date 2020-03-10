@@ -4,9 +4,18 @@
 \alias{mhEdge}
 \title{mhEdge}
 \usage{
-mhEdge(data, adjMatrix, burnIn = 0.2, iterations = 1000, nCPh = 0,
-  nGV = 0, pmr = FALSE, prior = c(0.05, 0.05, 0.9),
-  progress = TRUE, thinTo = 200)
+mhEdge(
+  data,
+  adjMatrix,
+  burnIn = 0.2,
+  iterations = 1000,
+  nCPh = 0,
+  nGV = 0,
+  pmr = FALSE,
+  prior = c(0.05, 0.05, 0.9),
+  progress = TRUE,
+  thinTo = 200
+)
 }
 \arguments{
 \item{data}{A matrix with the variables across the columns and the
