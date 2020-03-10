@@ -1040,25 +1040,32 @@ cycleUID <- function (uCycles) {
 # cycles down the columns.
 #
 cycleCG <- function (currentES,
+                     cycles,
                      edgeID,
                      nCycles,
                      nEdges) {
 
-  # Create a matrix that will be filled with the current edge states for all
-  # possible directed cycles.
-  blight <- matrix(9,
-                   nrow = nCycles,
-                   ncol = nEdges)
+  # Create a logical vector that will be true if the current graph's edge states
+  # match the edge states of a directed cycle.
+  blight <- vector(mode = 'logical',
+                   length = nCycles)
 
   # Loop through each potential directed cycle.
   for (e in 1:nCycles){
 
-    # Fill in the edges that could form a cycle with the current edge states.
-    blight[e, edgeID[[e]]] <- currentES[edgeID[[e]]]
+    # Compare the edge states of the eth directed cycle with the edge states of
+    # the current graph.
+    if (identical(cycles[e, edgeID[[e]]], currentES[edgeID[[e]]])) {
+
+      # If they are the same then there is a directed cycle in the current
+      # graph for the eth cycle.
+      blight[[e]] <- TRUE
+
+    }
 
   }
 
-  return (blight)
+  return (which(blight))
 
 }
 
@@ -1332,18 +1339,12 @@ cycleRmvr <- function (cycles,
                        pmr,
                        prior) {
 
-  # Get the edge states from the current graph for each potential cycle.
-  currentC <- cycleCG(currentES = currentES,
-                      edgeID = edgeID,
-                      nCycles = nCycles,
-                      nEdges = nEdges)
-
-  # Create a vector that holds the row indices where the sum of the row is equal
-  # to the number of edges in the graph. A sum of nEdges indicates a row in the
-  # currentC matrix matches the corresponding row in the cycle matrix meaning
-  # there is a directed cycle. The row number indicates which directed cycle is
-  # present in the current graph.
-  whichCycle <- which(rowSums(cycles == currentC) == nEdges)
+  # Determine if there are any directed cycles in the current graph.
+  whichCycle <- cycleCG(currentES = currentES,
+                        cycles = cycles,
+                        edgeID = edgeID,
+                        nCycles = nCycles,
+                        nEdges = nEdges)
 
   # If there is a cycle change the direction of an edge invovled in the cycle.
   while (length(whichCycle) != 0) {
@@ -1393,14 +1394,12 @@ cycleRmvr <- function (cycles,
 
     }
 
-    # Get the edge states from the current graph for each potential cycle.
-    currentC <- cycleCG(currentES = currentES,
-                        edgeID = edgeID,
-                        nCycles = nCycles,
-                        nEdges = nEdges)
-
     # Recalculate the row sums and determine if any are zero.
-    whichCycle <- which(rowSums(cycles == currentC) == nEdges)
+    whichCycle <- cycleCG(currentES = currentES,
+                          cycles = cycles,
+                          edgeID = edgeID,
+                          nCycles = nCycles,
+                          nEdges = nEdges)
 
   }
 
