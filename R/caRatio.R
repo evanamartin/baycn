@@ -13,6 +13,8 @@
 # @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (0) or
 # a gv-gv or ge-ge edge (1).
 #
+# @param nCPh The number of clinical phenotypes in the graph.
+#
 # @param pmr Logical. If true the Metropolis-Hastings algorithm will use the
 # Principle of Mendelian Randomization, PMR. This prevents the direction of an
 # edge pointing from a gene expression node to a genetic variant node.
@@ -37,6 +39,7 @@
 caRatio <- function (current,
                      currentLL,
                      edgeType,
+                     nCPh,
                      pmr,
                      proposed,
                      proposedLL,
@@ -92,6 +95,7 @@ caRatio <- function (current,
       ptProposed <- carPrior(edgeDir1 = edgeDirP[[e]],
                              edgeDir2 = edgeDirC[[e]],
                              edgeType = etDiff[[e]],
+                             nCPh = nCPh,
                              pmr = pmr,
                              prior = prior)
 
@@ -103,6 +107,7 @@ caRatio <- function (current,
       ptCurrent <- carPrior(edgeDir1 = edgeDirC[[e]],
                             edgeDir2 = edgeDirP[[e]],
                             edgeType = etDiff[[e]],
+                            nCPh = nCPh,
                             pmr = pmr,
                             prior = prior)
 
