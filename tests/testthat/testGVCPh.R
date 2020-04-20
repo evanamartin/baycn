@@ -5,9 +5,9 @@ test_that('mhEdge infers the correct graph with clinical phenotypes present',{
   # Adjacency matrix for M1 with one clinical phenotype ------------------------
 
   # Fully connected adjacency matrix for M1 with one clinical phenotype
-  am_m1_cph <- matrix(c(0, 1, 0, 0,
+  am_m1_cph <- matrix(c(0, 1, 1, 1,
                         0, 0, 1, 1,
-                        0, 0, 0, 0,
+                        0, 0, 0, 1,
                         0, 0, 0, 0),
                       byrow = TRUE,
                       nrow = 4)
@@ -43,8 +43,11 @@ test_that('mhEdge infers the correct graph with clinical phenotypes present',{
 
   # Expected probabilities for M1_CPh when using PMR and one clinical phenotype.
   ep_m1_cph <- matrix(c(1, 0, 0,
+                        0, 0, 1,
+                        0, 0, 1,
                         1, 0, 0,
-                        1, 0, 0),
+                        1, 0, 0,
+                        0, 0, 1),
                       byrow = TRUE,
                       ncol = 3)
 

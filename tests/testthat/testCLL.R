@@ -99,6 +99,6 @@ test_that('the likelihood functions calculate the log likelihood correctly',{
                       ll_m1_cph$node3$dn2,
                       ll_m1_cph$node4$dn2)
 
-  expect_equal(round(ll_tg_m1_cph, 3), -841.734)
+  expect_equal(round(ll_tg_m1_cph, 3), -874.837)
 
 })
