@@ -54,18 +54,18 @@ am_gn4 <- matrix(c(0, 1, 1, 1,
                 nrow = 4)
 
 # Run baycn on the simulated data.
-baycn_gn4 <- mhEdge(adjMatrix = am_gn4,
-                  burnIn = 0.2,
-                  data = data_gn4,
-                  iterations = 30000,
-                  nCPh = 0,
-                  nGV = 0,
-                  pmr = FALSE,
-                  prior = c(0.05,
-                            0.05,
-                            0.9),
-                  progress = TRUE,
-                  thinTo = 200)
+baycn_gn4 <- mhEdge(data = data_gn4,
+                    adjMatrix = am_gn4,
+                    prior = c(0.05,
+                              0.05,
+                              0.9),
+                    nCPh = 0,
+                    nGV = 0,
+                    pmr = FALSE,
+                    burnIn = 0.2,
+                    iterations = 30000,
+                    thinTo = 200,
+                    progress = TRUE)
 ```
 
 Below is the output from baycn on graph GN4 with a fully connected graph used as the input. Edges 1, 2, 5, and 6 are the true edges used to simulate the data. From the output we can see that edge 1 points from T1 to T2 (column 'zero') about 1/3 of the time and edge 5 points from T2 to T4 (column 'zero') about 2/3 of the time which is what we expected to see based on the Markov equivalent graphs for GN4. In addition baycn infers edges 2 and 6 to be oriented in the correct direction almost 100 percent of the time and edges 3 and 4 to be absent (column 'two') with a high probability which is consistent with the true graph. 
@@ -120,18 +120,18 @@ am_m1 <- matrix(c(0, 1, 1,
                 nrow = 3)
 
 # Run baycn on the simulated data with pmr = TRUE.
-baycn_m1_gv <- mhEdge(adjMatrix = am_m1,
-                  burnIn = 0.2,
-                  data = data_m1_200_1,
-                  iterations = 20000,
-                  nCPh = 0,
-                  nGV = 1,
-                  pmr = TRUE,
-                  prior = c(0.05,
-                            0.05,
-                            0.9),
-                  progress = TRUE,
-                  thinTo = 200)
+baycn_m1_gv <- mhEdge(data = data_m1_200_1,
+                      adjMatrix = am_m1,
+                      prior = c(0.05,
+                                0.05,
+                                0.9),
+                      nCPh = 0,
+                      nGV = 1,
+                      pmr = TRUE,
+                      burnIn = 0.2,
+                      iterations = 20000,
+                      thinTo = 200,
+                      progress = TRUE)
 ```
 
 Below is the output from baycn for graph M1 with a fully connected graph used as the input. The posterior probability estimated by baycn for each edge and edge state is close to what we expect to see. For this analysis we expect edges 1 and 3 to have a high posterior for state zero because M1 does not have any Markov equivalent graphs. In addition, we do not expect to see any posterior probability for state one for either of these edges because of the restriction placed on them (pmr = TRUE). Finally, for edge 2 we expect the posterior to be close to 1 for state two because this edge was not used in simulating the data. 
