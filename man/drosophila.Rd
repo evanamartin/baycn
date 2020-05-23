@@ -5,10 +5,12 @@
 \alias{drosophila}
 \title{Tissue type and transcription factor binding data during Drosophila mesoderm
 development}
-\format{An object of class \code{"matrix"} containing tissue type and
+\format{
+An object of class \code{"matrix"} containing tissue type and
 transcription factor binding data. Tissue type data appears in the first six
 columns of the data matrix and the remaining 15 columns contain the
-transcription factor binding data.}
+transcription factor binding data.
+}
 \source{
 \url{https://www.nature.com/articles/nature08531#Sec22}
 }
@@ -21,11 +23,11 @@ key transcription factors using ChIP-chip assays at two hour intervals during
 drosophila mesoderm development. The five transcription factors are: Twist
 (Twi), Tinman (Tin), Myocyte enhancing factor 2 (Mef2), Bagpipe (Bap), and
 Biniou (Bin). Both Twi and Tin were assayed from 2-8 hours, Mef2 from 2-12
-hours, Bap from 6-8 hours, and Bin from 6-12 hours. They also identified six
-tissue types based on tissue specific expression: mesoderm (Meso), somatic
-muscle (SM), visceral muscle (VM), cardiac muscle (CM), mesoderm and somatic
-muscle (Meso&SM), and somatic and visceral muscle (SM&VM). All data are
-binary and measured at 310 cis-regulatory modules.
+hours, Bap from 6-8 hours, and Bin from 6-12 hours. In addition, Zinzen et
+al. identified six tissue types based on tissue specific expression: mesoderm
+(Meso), somatic muscle (SM), visceral muscle (VM), cardiac muscle (CM),
+mesoderm and somatic muscle (Meso&SM), and somatic and visceral muscle
+(SM&VM). All data are binary and measured at 310 cis-regulatory modules.
 }
 \examples{
 # Load the data.

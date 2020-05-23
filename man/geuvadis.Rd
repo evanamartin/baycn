@@ -4,11 +4,13 @@
 \name{geuvadis}
 \alias{geuvadis}
 \title{Genotype and gene expression data from the GEUVADIS project}
-\format{An object of class \code{"list"} containing 46 eQTL-gene sets. Each
+\format{
+An object of class \code{"list"} containing 46 eQTL-gene sets. Each
 element of the list is a matrix with the observations down the rows and the
 eQTL and genes across the columns. The first column in the matrix contains
 the genotype (eQTL) data and the remaining columns contain the gene
-expression data.}
+expression data.
+}
 \source{
 \url{https://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/analysis_
 results/}
