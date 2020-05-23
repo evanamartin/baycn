@@ -117,8 +117,7 @@
 #' linear model that is the mean of the normally distributed variables. This
 #' coefficient is referred to as the signal strength.
 #'
-#' @param p The probability of success for a binomial random variable (a number
-#' between 0 and 1).
+#' @param p The probability of success for a binomial random variable.
 #'
 #' @param q The frequency of the reference allele.
 #'
@@ -166,7 +165,7 @@ simdata <- function (b0 = 0,
                      ss = 1,
                      graph = 'gn4',
                      p = 0.6,
-                     q = 0.1,
+                     q = 0.45,
                      ssc = 0.2,
                      nConfounding = 2) {
 
@@ -181,14 +180,12 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ss),
@@ -206,14 +203,12 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
@@ -231,25 +226,21 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            W <- cBinom(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
-                       b1 = c(ss),
-                       p = p)
+                       b1 = c(ss))
 
            return (cbind(U, T1, T2, W))
 
@@ -319,7 +310,6 @@ simdata <- function (b0 = 0,
            }
 
            T1 <- cNorm(N = N,
-                       mParents = nConfounding + 1,
                        parentData = parT1,
                        b0 = b0,
                        b1 = ssT1,
@@ -329,7 +319,6 @@ simdata <- function (b0 = 0,
            parT2[[1]] <- T1
 
            T2 <- cNorm(N = N,
-                       mParents = nConfounding + 1,
                        parentData = parT2,
                        b0 = b0,
                        b1 = ssT2,
@@ -347,14 +336,12 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
@@ -371,7 +358,6 @@ simdata <- function (b0 = 0,
            for (a in 1:nConfounding) {
 
              con[, a] <- cNorm(N = N,
-                               mParents = 2,
                                parentData = list(T1, T2),
                                b0 = b0,
                                b1 = c(ssc, ssc),
@@ -391,7 +377,6 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
@@ -421,7 +406,6 @@ simdata <- function (b0 = 0,
            for (a in 1:nConfounding) {
 
              con[, a] <- cNorm(N = N,
-                               mParents = 1,
                                parentData = list(T1),
                                b0 = b0,
                                b1 = c(ssc),
@@ -438,7 +422,6 @@ simdata <- function (b0 = 0,
            }
 
            T2 <- cNorm(N = N,
-                       mParents = nConfounding + 1,
                        parentData = parT2,
                        b0 = b0,
                        b1 = ssT2,
@@ -461,7 +444,6 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T1, T3),
                        b0 = b0,
                        b1 = c(ss, ss),
@@ -483,7 +465,6 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T1 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(U, T2),
                        b0 = b0,
                        b1 = c(ss, ss),
@@ -560,7 +541,6 @@ simdata <- function (b0 = 0,
            }
 
            T2 <- cNorm(N = N,
-                       mParents = nConfounding,
                        parentData = parT2,
                        b0 = b0,
                        b1 = ssT2,
@@ -570,7 +550,6 @@ simdata <- function (b0 = 0,
            parT1[[2]] <- T2
 
            T1 <- cNorm(N = N,
-                       mParents = nConfounding + 2,
                        parentData = parT1,
                        b0 = b0,
                        b1 = ssT1,
@@ -592,7 +571,6 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T1 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(U, T2),
                        b0 = b0,
                        b1 = c(ss, ss),
@@ -609,7 +587,6 @@ simdata <- function (b0 = 0,
            for (a in 1:nConfounding) {
 
              con[, a] <- cNorm(N = N,
-                               mParents = 2,
                                parentData = list(T1, T2),
                                b0 = b0,
                                b1 = c(ssc, ssc),
@@ -660,7 +637,6 @@ simdata <- function (b0 = 0,
            for (a in 1:nConfounding) {
 
              con[, a] <- cNorm(N = N,
-                               mParents = 1,
                                parentData = list(T2),
                                b0 = b0,
                                b1 = c(ssc),
@@ -677,7 +653,6 @@ simdata <- function (b0 = 0,
            }
 
            T1 <- cNorm(N = N,
-                       mParents = nConfounding + 2,
                        parentData = parT1,
                        b0 = b0,
                        b1 = ssT1,
@@ -695,14 +670,12 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
@@ -776,7 +749,6 @@ simdata <- function (b0 = 0,
            }
 
            T1 <- cNorm(N = N,
-                       mParents = nConfounding + 1,
                        parentData = parT1,
                        b0 = b0,
                        b1 = ssT1,
@@ -786,7 +758,6 @@ simdata <- function (b0 = 0,
            parT2[[1]] <- U
 
            T2 <- cNorm(N = N,
-                       mParents = nConfounding + 1,
                        parentData = parT2,
                        b0 = b0,
                        b1 = ssT2,
@@ -804,14 +775,12 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
@@ -828,7 +797,6 @@ simdata <- function (b0 = 0,
            for (a in 1:nConfounding) {
 
              con[, a] <- cNorm(N = N,
-                               mParents = 2,
                                parentData = list(T1, T2),
                                b0 = b0,
                                b1 = c(ssc, ssc),
@@ -848,7 +816,6 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
@@ -878,7 +845,6 @@ simdata <- function (b0 = 0,
            for (a in 1:nConfounding) {
 
              con[, a] <- cNorm(N = N,
-                               mParents = 1,
                                parentData = list(T1),
                                b0 = b0,
                                b1 = c(ssc),
@@ -895,7 +861,6 @@ simdata <- function (b0 = 0,
            }
 
            T2 <- cNorm(N = N,
-                       mParents = nConfounding + 1,
                        parentData = parT2,
                        b0 = b0,
                        b1 = ssT2,
@@ -915,14 +880,12 @@ simdata <- function (b0 = 0,
 
            # Generate data for T2 and T3 with a v structure at T3.
            T2_a <- cNorm(N = N,
-                         mParents = 1,
                          parentData = list(T1),
                          b0 = b0,
                          b1 = c(ss),
                          s = s)
 
            T3_a <- cNorm(N = N,
-                         mParents = 2,
                          parentData = list(T1, T2_a),
                          b0 = b0,
                          b1 = c(ss, ss),
@@ -930,14 +893,12 @@ simdata <- function (b0 = 0,
 
            # Generate data for T2 and T3 with a v structure at T2.
            T3_b <- cNorm(N = N,
-                         mParents = 1,
                          parentData = list(T1),
                          b0 = b0,
                          b1 = c(ss),
                          s = s)
 
            T2_b <- cNorm(N = N,
-                         mParents = 2,
                          parentData = list(T1, T3_b),
                          b0 = b0,
                          b1 = c(ss, ss),
@@ -976,14 +937,12 @@ simdata <- function (b0 = 0,
 
            # Generate data for T1 and T2 with a v structure at T2.
            T1_a <- cNorm(N = N,
-                         mParents = 1,
                          parentData = list(U),
                          b0 = b0,
                          b1 = c(ss),
                          s = s)
 
            T2_a <- cNorm(N = N,
-                         mParents = 2,
                          parentData = list(U, T1_a),
                          b0 = b0,
                          b1 = c(ss, ss),
@@ -991,14 +950,12 @@ simdata <- function (b0 = 0,
 
            # Generate data for T1 and T2 with a v structure at T1.
            T2_b <- cNorm(N = N,
-                         mParents = 1,
                          parentData = list(U),
                          b0 = b0,
                          b1 = c(ss),
                          s = s)
 
            T1_b <- cNorm(N = N,
-                         mParents = 2,
                          parentData = list(U, T2_b),
                          b0 = b0,
                          b1 = c(ss, ss),
@@ -1045,7 +1002,6 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 3,
                        parentData = list(T1, T2, T3),
                        b0 = b0,
                        b1 = c(ss, ss, ss),
@@ -1071,7 +1027,6 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 3,
                        parentData = list(U, T1, T2),
                        b0 = b0,
                        b1 = c(ss, ss, ss),
@@ -1090,21 +1045,18 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T1, T4),
                        b0 = b0,
                        b1 = c(ss, ss),
@@ -1123,34 +1075,167 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T5 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T3, T4),
                        b0 = b0,
                        b1 = c(ss, ss),
                        s = s)
 
            return (cbind(T1, T2, T3, T4, T5))
+
+         },
+
+         # gn6 -----------------------------------------------------------------
+
+         'gn6' = {
+
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T2, T6),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           return (cbind(T1, T2, T3, T4, T5, T6))
+
+         },
+
+         # gn6_gv --------------------------------------------------------------
+
+         'gn6_gv' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T2, T6),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(U, T3),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6))
+
+         },
+
+         # gn6_cph -------------------------------------------------------------
+
+         'gn6_cph' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T2, T6),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(U, T3),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T4, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, W))
 
          },
 
@@ -1163,14 +1248,12 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ss),
@@ -1181,34 +1264,149 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T5 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T6 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T1, T5),
                        b0 = b0,
                        b1 = c(ss, ss),
                        s = s)
 
            T7 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T6),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T8 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T1, T5),
                        b0 = b0,
                        b1 = c(ss, ss),
                        s = s)
 
            return (cbind(T1, T2, T3, T4, T5, T6, T7, T8))
+
+         },
+
+         # gn8_gv --------------------------------------------------------------
+
+         'gn8_gv' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T1, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T6),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T8 <- cNorm(N = N,
+                       parentData = list(T1, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7, T8))
+
+         },
+
+         # gn8_cph -------------------------------------------------------------
+
+         'gn8_cph' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T1, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T6),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T8 <- cNorm(N = N,
+                       parentData = list(T1, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T3, T5, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7, T8, W))
 
          },
 
@@ -1225,69 +1423,213 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T3),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T5 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T4),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T8 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T7),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T9 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T8),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T10 <- cNorm(N = N,
-                        mParents = 1,
                         parentData = list(T9),
                         b0 = b0,
                         b1 = c(ss),
                         s = s)
 
            T11 <- cNorm(N = N,
-                        mParents = 1,
                         parentData = list(T10),
                         b0 = b0,
                         b1 = c(ss),
                         s = s)
 
            T6 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T5, T7),
                        b0 = b0,
                        b1 = c(ss, ss),
                        s = s)
 
            return (cbind(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11))
+
+         },
+
+         # gn13 ----------------------------------------------------------------
+
+         'gn13' = {
+
+           # Simulate data for the source nodes first.
+           U1 <- sMulti(N = N,
+                        q = q)
+
+           U2 <- sMulti(N = N,
+                        q = q)
+
+           U3 <- sMulti(N = N,
+                        q = q)
+
+           U4 <- sMulti(N = N,
+                        q = q)
+
+           U5 <- sMulti(N = N,
+                        q = q)
+
+           T6 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           T7 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           # Simulate data for all other nodes with data for parent nodes
+           # simulated before the data is simulated for the child nodes. In
+           # other words, the order the data are simulated depends on who the
+           # parents and children are for each node.
+           T8 <- cNorm(N = N,
+                       parentData = list(T7),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(U5, T8),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(U2, T1),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U3, T1, T6),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(U4, T6, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss),
+                       s = s)
+
+           return (cbind(U1, U2, U3, U4, U5,
+                         T1, T2, T3, T4, T5,
+                         T6, T7, T8))
+
+         },
+
+         # gn13_cph ------------------------------------------------------------
+
+         'gn13_cph' = {
+
+           # Simulate data for the source nodes first.
+           U1 <- sMulti(N = N,
+                        q = q)
+
+           U2 <- sMulti(N = N,
+                        q = q)
+
+           U3 <- sMulti(N = N,
+                        q = q)
+
+           U4 <- sMulti(N = N,
+                        q = q)
+
+           U5 <- sMulti(N = N,
+                        q = q)
+
+           T6 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           T7 <- sNorm(N = N,
+                       b0 = b0,
+                       s = s)
+
+           # Simulate data for all other nodes with data for parent nodes
+           # simulated before the data is simulated for the child nodes. In
+           # other words, the order the data are simulated depends on who the
+           # parents and children are for each node.
+           T8 <- cNorm(N = N,
+                       parentData = list(T7),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(U5, T8),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(U2, T1),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U3, T1, T6),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(U4, T6, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U1, U3, T2, T4, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss, ss))
+
+           return (cbind(U1, U2, U3, U4, U5,
+                         T1, T2, T3, T4, T5,
+                         T6, T7, T8, W))
 
          },
 
@@ -1299,55 +1641,164 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T5 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T1, T2),
                        b0 = b0,
                        b1 = c(ss, ss),
                        s = s)
 
            T6 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T7 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T3),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            return (cbind(U, T1, T2, T3, T4, T5, T6, T7))
+
+         },
+
+         # layer_cph_3 ---------------------------------------------------------
+
+         'layer_cph_3' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T5, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7, W))
+
+         },
+
+         # layer_cph_4 ---------------------------------------------------------
+
+         'layer_cph_4' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T3, T5, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7, W))
 
          },
 
@@ -1367,49 +1818,42 @@ simdata <- function (b0 = 0,
                        s = s)
 
            T1 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(U, C1),
                        b0 = b0,
                        b1 = c(ss, ssc),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(U, C2),
                        b0 = b0,
                        b1 = c(ss, ssc),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T5 <- cNorm(N = N,
-                       mParents = 3,
                        parentData = list(T1, T2, C1),
                        b0 = b0,
                        b1 = c(ss, ss, ssc),
                        s = s)
 
            T6 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T2, C2),
                        b0 = b0,
                        b1 = c(ss, ssc),
                        s = s)
 
            T7 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T3),
                        b0 = b0,
                        b1 = c(ss),
@@ -1427,63 +1871,54 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            C1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ssc),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            C2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T2),
                        b0 = b0,
                        b1 = c(ssc),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T5 <- cNorm(N = N,
-                       mParents = 3,
                        parentData = list(T1, T2, C1),
                        b0 = b0,
                        b1 = c(ss, ss, ssc),
                        s = s)
 
            T6 <- cNorm(N = N,
-                       mParents = 2,
                        parentData = list(T2, C2),
                        b0 = b0,
                        b1 = c(ss, ssc),
                        s = s)
 
            T7 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T3),
                        b0 = b0,
                        b1 = c(ss),
@@ -1501,41 +1936,82 @@ simdata <- function (b0 = 0,
                        q = q)
 
            T1 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(U),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T2 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T3 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T4 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            T5 <- cNorm(N = N,
-                       mParents = 1,
                        parentData = list(T1),
                        b0 = b0,
                        b1 = c(ss),
                        s = s)
 
            return (cbind(U, T1, T2, T3, T4, T5))
+
+         },
+
+         # star_cph ------------------------------------------------------------
+
+         'star_cph' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T2, T4),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, W))
 
          })
 
