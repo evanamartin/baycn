@@ -40,6 +40,8 @@ cll <- function (data,
                                  pVector = pVector,
                                  v = v)
 
+    # If e is greater than nGV but less than nNodes - nCPh then the node is a
+    # gene expression node.
   } else if (nodeIndex <= (nNodes - nCPh)) {
 
     # Calculate the log likelihood for the normal variables.
@@ -48,6 +50,8 @@ cll <- function (data,
                                pVector = pVector,
                                v = v)
 
+    # If e is greater than nNodes - nCPh then the node is a clinical phenotype
+    # node.
   } else {
 
     # Calculate the log likelihood for the binomial variables.
@@ -100,9 +104,25 @@ cllMultinom <- function (data,
 
   } else {
 
-    # Calculate the log likelihood for the current node.
-    ll <- logLik(polr(as.factor(data[, nodeIndex]) ~
-                        data[, which(pVector !=0 )]))[1]
+    # Check for the number of levels for the current node. If there are two or
+    # more levels the polr function will be used to calculate the likelihood. If
+    # there are only two levels to the current node then the glm function will
+    # be used to calculate the log likelihood.
+    if (length(as.vector(table(data[, nodeIndex]))) > 2) {
+
+      # Calculate the log likelihood for the current node when it has three or
+      # more levels.
+      ll <- logLik(polr(as.factor(data[, nodeIndex]) ~
+                          data[, which(pVector != 0 )]))[1]
+
+    } else {
+
+      # Calculate the log likelihood for the current node when it only has two
+      # levels.
+      ll <- logLik(glm(data[, nodeIndex] ~ data[, which(pVector != 0)],
+                       family = binomial(link = 'logit')))[1]
+
+    }
 
   }
 
