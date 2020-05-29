@@ -11,7 +11,7 @@ simdata(
   ss = 1,
   graph = "gn4",
   p = 0.6,
-  q = 0.1,
+  q = 0.45,
   ssc = 0.2,
   nConfounding = 2
 )
@@ -131,8 +131,7 @@ PMR and is made up of multiple M1 topologies.
 \if{html}{\figure{star.png}{options: width="25\%" alt="Figure: star.png"}}
 \if{latex}{\figure{star.pdf}{options: width=2.5cm}}}
 
-\item{p}{The probability of success for a binomial random variable (a number
-between 0 and 1).}
+\item{p}{The probability of success for a binomial random variable.}
 
 \item{q}{The frequency of the reference allele.}
 
