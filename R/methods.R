@@ -5,6 +5,7 @@
 #' @importFrom methods show
 #'
 #' @export
+#'
 setMethod('show',
           signature = 'baycn',
           definition = function (object) {
@@ -48,6 +49,7 @@ setMethod('show',
 #' @param ... Other Arguments passed to methods.
 #'
 #' @export
+#'
 setMethod('summary',
           signature(object = 'baycn'),
           definition = function (object, ...) {
@@ -112,68 +114,76 @@ setMethod('summary',
 
 #' plot
 #'
-#' @param x An object of classs baycn.
+#' @param x An object of class baycn.
 #'
-#' @param y Optional if x is the appropriate structure.
+#' @param presence A scalar between 0 and 1. This is the cutoff for considering
+#' an edge to be present. For example, if presence = 0.4 then an edge is
+#' considered to be present if the sum of the posterior proability for the two
+#' edge directions is greater than 0.4. The edge will be considered to be absent
+#' if this sum is less than 0.4.
 #'
-#' @param ... Other Arguments passed to methods.
+#' @param direction A scalar between 0 and 1. This is the cutoff for determining
+#' the direction of an edge. For example, if direction = 0.2 then an edge is
+#' considered to be directed if the difference between the posterior proability
+#' for the two edge directions is greater than 0.2. An edge will be considered
+#' undirected if the difference is less than 0.2.
+#'
+#' @param edgeLabel Logical - indicates whether the posterior probabilities
+#' should be included as edge labels in the plot. If edgeLabel is TRUE then
+#' weighted must also be set to TRUE.
+#'
+#' @param mode See \code{\link[igraph]{graph_from_adjacency_matrix}} for
+#' details.
+#'
+#' @param weighted See \code{\link[igraph]{graph_from_adjacency_matrix}} for
+#' details.
+#'
+#' @param ... Other Arguments passed to plot.igraph.
+#'
+#' @importFrom igraph graph_from_adjacency_matrix plot.igraph E
 #'
 #' @aliases plot,baycn-method
 #'
-#' @import ggplot2
-#'
-#' @importFrom egg ggarrange
-#'
 #' @export
+#'
 setMethod('plot',
           signature(x = 'baycn'),
-          definition = function (x, y, ...) {
+          definition = function (x,
+                                 presence = 0.4,
+                                 direction = 0.2,
+                                 edgeLabel = TRUE,
+                                 mode = 'directed',
+                                 weighted = TRUE,
+                                 ...) {
 
-            # The following lines are to avoid the note 'Undefined global
-            # functions or variables: likelihood, decimal'.
-            likelihood <- NULL
-            decimal <- NULL
+            # Create a directed adjacency matrix to pass to igraph functions.
+            dam <- directedAM(ppm = x@posteriorPM,
+                              presence = presence,
+                              direction = direction)
 
-            # Number of samples kept
-            nSamples <- length(x@likelihood)
+            # Create an igraph object from the directed adjacency matrix.
+            igraph_dam <- graph_from_adjacency_matrix(dam,
+                                                      mode = mode,
+                                                      weighted = weighted)
 
-            # Convert the likelihood to a data frame to pass to ggplot.
-            logLikelihood <- data.frame(likelihood = x@likelihood)
+            # Create edge labels from the graph_from_adjacency_matrix function.
+            weightLabels <- round(E(igraph_dam)$weight,
+                                  3)
 
-            # Convert the decimal numbers to a data frame to pass to ggplot.
-            decimalNum <- data.frame(decimal = x@decimal)
+            # Determine whether or not to include edge labels in the plot.
+            if (edgeLabel == TRUE) {
 
-            # Create the trace plot for the likelihood.
-            p <- ggplot(logLikelihood, aes(x = 1:nSamples,
-                                           y = likelihood)) +
-              ggtitle('log likelihood') +
-              theme(panel.background = element_blank(),
-                    panel.grid.major = element_blank(),
-                    panel.grid.minor = element_blank(),
-                    plot.title = element_text(hjust = 0.5),
-                    axis.line = element_line(color = 'black')) +
-              geom_line(color = '#5500cc',
-                        size = 1) +
-              labs(x = '') +
-              labs(y = '') +
-              ylim(min(logLikelihood), max(logLikelihood))
+              # Plot the network.
+              plot.igraph(igraph_dam,
+                          edge.label = weightLabels,
+                          ...)
 
-            # Create the trace plot for the decimal number.
-            g <- ggplot(decimalNum, aes(x = 1:nSamples,
-                                        y = decimal)) +
-              ggtitle('decimal number') +
-              theme(panel.background = element_blank(),
-                    panel.grid.major = element_blank(),
-                    panel.grid.minor = element_blank(),
-                    plot.title = element_text(hjust = 0.5),
-                    axis.line = element_line(color = 'black')) +
-              geom_line(color = '#cc5500',
-                        size = 1) +
-              labs(x = '') +
-              labs(y = '') +
-              ylim(min(decimalNum), max(decimalNum))
+            } else {
 
-            # print the two plots with one column and two rows.
-            egg::ggarrange(p, g, ncol = 1)
+              # Plot the network.
+              plot.igraph(igraph_dam,
+                          ...)
+
+            }
 
           })
