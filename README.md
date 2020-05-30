@@ -110,7 +110,7 @@ data_m1_200_1 <- simdata(b0 = 0,
                          N = 600,
                          s = 1,
                          ss = 1,
-                         q = 0.1
+                         q = 0.1,
                          graph = 'm1_gv')
 
 # Fully connected adjacency matrix for topology M1.
