@@ -40,10 +40,10 @@ set.seed(5)
 
 # Generate data for topology GN4.
 data_gn4 <- simdata(b0 = 0,
-                         N = 600,
-                         s = 1,
-                         ss = 1,
-                         graph = 'gn4')
+                    N = 600,
+                    s = 1,
+                    ss = 1,
+                    graph = 'gn4')
 
 # Fully connected adjacency matrix for topology GN4.
 am_gn4 <- matrix(c(0, 1, 1, 1,
@@ -107,9 +107,10 @@ set.seed(72)
 
 # Simulate data for topology M1 with one genetic variant.
 data_m1_200_1 <- simdata(b0 = 0,
-                         N = 200,
+                         N = 600,
                          s = 1,
                          ss = 1,
+                         q = 0.1
                          graph = 'm1_gv')
 
 # Fully connected adjacency matrix for topology M1.
@@ -141,14 +142,14 @@ Below is the output from baycn for graph M1 with a fully connected graph used as
 summary(baycn_m1_gv)
 
 #< Posterior probability: 
-#<       nodes  zero  one   two
-#< edge1  U-T1 1.000 0.00 0.000
-#< edge2  U-T2 0.145 0.00 0.855
-#< edge3 T1-T2 0.910 0.09 0.000
+#<       nodes  zero   one   two
+#< edge1  U-T1 1.000 0.000 0.000
+#< edge2  U-T2 0.145 0.000 0.855
+#< edge3 T1-T2 0.935 0.065 0.000
 
 #< Log likelihood: 
-#<      Min      1Q  Median      3Q     Max
-#<  -665.22 -665.22 -665.22 -665.22 -665.22
+#<      Min       1Q   Median       3Q      Max
+#< -2034.81 -2034.81 -2034.81 -2034.81 -2034.77
 
 #< Number of unique graphs: 3
 #< Run time in seconds: 3.456078
