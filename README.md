@@ -1,4 +1,4 @@
-<img src='man/figures/logo.png' align="right" height="139" /></a>
+<img src='man/figures/baycn_logo.png' align="right" height="139" /></a>
 
 [![CRAN status](https://www.r-pkg.org/badges/version/baycn)](https://cran.r-project.org/package=baycn)
 [![Build Status](https://travis-ci.org/evanamartin/baycn.svg?branch=master)](https://travis-ci.org/evanamartin/baycn)
