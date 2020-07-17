@@ -4,17 +4,69 @@
 \alias{prerec}
 \title{prerec}
 \usage{
-prerec(iMatrix, tMatrix)
+prerec(amInferred, amTrue, cutoff)
 }
 \arguments{
-\item{iMatrix}{The undirected adjacency matrix of the inferred graph.}
+\item{amInferred}{A baycn object or a posterior probability adjacency
+matrix.}
 
-\item{tMatrix}{The undirected adjacency matrix of the true graph.}
+\item{amTrue}{The undirected adjacency matrix of the true graph. This will
+be a symmetric matrix with 0s along the diagonal.}
+
+\item{cutoff}{A number between 0 and 1 indicating the posterior probability
+threshold for considering an edge present.}
 }
 \value{
 A list. The first element is the precision and the second element is
 the recall of the inferred graph.
 }
 \description{
-Calculates the precision and recall of the inferred graph.
+Calculates the precision and recall (i.e., power) of the inferred graph.
+}
+\examples{
+
+set.seed(5)
+
+# Generate data from topology GN4.
+data_gn4 <- simdata(graph = 'gn4',
+                    N = 200,
+                    b0 = 0,
+                    ss = 1,
+                    s = 1)
+
+# Adjacency matrix for topology GN4 - all possible edges.
+am_gn4 <- matrix(c(0, 1, 1, 1,
+                   0, 0, 1, 1,
+                   0, 0, 0, 1,
+                   0, 0, 0, 0),
+                 byrow = TRUE,
+                 nrow = 4)
+
+# Run baycn on the data from topology GN4.
+baycn_gn4 <- mhEdge(data = data_gn4,
+                    adjMatrix = am_gn4,
+                    prior = c(0.05,
+                              0.05,
+                              0.9),
+                    nCPh = 0,
+                    nGV = 0,
+                    pmr = FALSE,
+                    iterations = 1000,
+                    burnIn = 0.2,
+                    thinTo = 500,
+                    progress = FALSE)
+
+# Adjacency matrix with the true edges for topology GN4.
+am_gn4_true <- matrix(c(0, 1, 1, 0,
+                        1, 0, 0, 1,
+                        1, 0, 0, 1,
+                        0, 1, 1, 0),
+                      byrow = TRUE,
+                      nrow = 4)
+
+# Calculate the precision and recall.
+prerec_gn4 <- prerec(amInferred = baycn_gn4,
+                     amTrue = am_gn4_true,
+                     cutoff = 0.4)
+
 }
