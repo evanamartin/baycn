@@ -3,9 +3,11 @@
 # Calculates the prior depending on the current edge state and edge type for
 # the caRatio function. For example, gv-ge, gv-gv, ge-ge.
 #
-# @param edgeDir1 A scalar indicating the state of the edge for graph one.
+# @param edgeDir1 A scalar indicating the state of the edge for graph one (the
+# graph - or state - being moved from).
 #
-# @param edgeDir2 A scalar indicating the state of the edge for graph two.
+# @param edgeDir2 A scalar indicating the state of the edge for graph two (the
+# graph - or state - being moved to).
 #
 # @param edgeType A 0 or 1 indicating whether the edge is a gv-ge edge (1) or
 # a gv-gv or ge-ge edge (1).
@@ -40,8 +42,8 @@ carPrior <- function (edgeDir1,
   # Extract the prior for the edge state in graph one.
   priors <- log(prior[[edgeDir1 + 1]])
 
-  # Calculate the probability of moving from the state in graph two to the
-  # edge state in graph one.
+  # Calculate the probability of moving from the state in graph one to the
+  # edge state in graph two.
   transition <- log(prior[[edgeDir2 + 1]] /
                       sum(prior[-(edgeDir1 + 1)]))
 
