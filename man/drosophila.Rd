@@ -6,10 +6,14 @@
 \title{Tissue type and transcription factor binding data during Drosophila mesoderm
 development}
 \format{
-An object of class \code{"matrix"} containing tissue type and
-transcription factor binding data. Tissue type data appears in the first six
-columns of the data matrix and the remaining 15 columns contain the
-transcription factor binding data.
+An object of class \code{"list"} containing tissue type and
+transcription factor binding data during drosophila mesoderm development. The
+first element in the list is a matrix which contains the data in the original
+form. The second element in the list is a matrix that contains the binary
+data. For this matrix any value greater than zero to changed to a one. For
+both data sets the tissue type data appears in the first six columns of the
+data matrix and the remaining 15 columns contain the transcription factor
+binding data.
 }
 \source{
 \url{https://www.nature.com/articles/nature08531#Sec22}
@@ -33,8 +37,11 @@ mesoderm and somatic muscle (Meso&SM), and somatic and visceral muscle
 # Load the data.
 data(drosophila)
 
-# Display the first 5 rows and 8 columns of the data matrix.
-drosophila[1:5, 1:8]
+# Display the first 5 rows and 8 columns of the continuous data matrix.
+drosophila$continuous[1:5, 1:8]
+
+# Display the first 5 rows and 8 columns of the discrete data matrix.
+drosophila$discrete[1:5, 1:8]
 
 }
 \references{
