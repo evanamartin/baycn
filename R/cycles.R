@@ -1098,6 +1098,8 @@ cycleLen <- function (edgeID) {
 #
 # @return A list of all possible cycles with 3, 4, 5, ... nodes
 #
+#' @importFrom utils combn
+#'
 cycleFC <- function (SaL) {
 
   # Calculate the number of cycle sizes.
