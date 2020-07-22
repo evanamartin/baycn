@@ -3,14 +3,6 @@
 #' A function for simulating data under various topologies for continuous and
 #' mixed data.
 #'
-#' @param b0 The mean of the variable if it does not have any parents. If the
-#' variable has one or more parents it is the slope in the linear model that is
-#' the mean of the normally distributed variables.
-#'
-#' @param N The number of observations to simulate.
-#'
-#' @param s The standard deviation of the normal distribution.
-#'
 #' @param graph A character string of the graph for which data will be
 #' simulated. The graphs that can be chosen are m1_ge, m1_gv, m1_cp, m1_cc,
 #' m1_iv, m2_ge, m2_gv, m2_cp, m2_cc, m2_iv, m3_gv, m3_cp, m3_cc, m3_iv, mp_ge,
@@ -113,9 +105,17 @@
 #' \if{html}{\figure{star.png}{options: width="25\%" alt="Figure: star.png"}}
 #' \if{latex}{\figure{star.pdf}{options: width=2.5cm}}
 #'
+#' @param N The number of observations to simulate.
+#'
+#' @param b0 The mean of the variable if it does not have any parents. If the
+#' variable has one or more parents it is the slope in the linear model that is
+#' the mean of the normally distributed variables.
+#'
 #' @param ss The coefficient of the parent nodes (if there are any) in the
 #' linear model that is the mean of the normally distributed variables. This
 #' coefficient is referred to as the signal strength.
+#'
+#' @param s The standard deviation of the normal distribution.
 #'
 #' @param p The probability of success for a binomial random variable.
 #'
@@ -135,21 +135,21 @@
 #'
 #' @examples
 #' # Generate data under topology GN4.
-#' data_gn4 <- simdata(b0 = 1,
+#' data_gn4 <- simdata(graph = 'gn4',
 #'                     N = 500,
-#'                     s = 1,
-#'                     graph = 'gn4',
-#'                     ss = 1)
+#'                     b0 = 1,
+#'                     ss = 1,
+#'                     s = 1)
 #'
 #' # Display the first few rows of the data.
 #' data_gn4[1:5, ]
 #'
 #' # Generate data under topology M1 with 3 intermediate confounding variables.
-#' data_m1_iv <- simdata(b0 = 0,
+#' data_m1_iv <- simdata(graph = 'm1_iv',
 #'                       N = 500,
-#'                       s = 1,
-#'                       graph = 'm1_iv',
+#'                       b0 = 0,
 #'                       ss = 1,
+#'                       s = 1,
 #'                       q = 0.1,
 #'                       ssc = 0.2,
 #'                       nConfounding = 3)
@@ -159,11 +159,11 @@
 #'
 #' @export
 #'
-simdata <- function (b0 = 0,
+simdata <- function (graph = 'gn4',
                      N = 500,
-                     s = 1,
+                     b0 = 0,
                      ss = 1,
-                     graph = 'gn4',
+                     s = 1,
                      p = 0.6,
                      q = 0.45,
                      ssc = 0.2,
@@ -682,6 +682,34 @@ simdata <- function (b0 = 0,
                        s = s)
 
            return (cbind(U, T1, T2))
+
+         },
+
+         # m3_cph --------------------------------------------------------------
+
+         'm3_cph' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss))
+
+           return (cbind(U, T1, T2, W))
 
          },
 
@@ -1804,6 +1832,486 @@ simdata <- function (b0 = 0,
 
          },
 
+         # cas_gv_3 ------------------------------------------------------------
+
+         'cas_gv_3' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T2, T3),
+                       b0 = b0,
+                       b1 = c(1, 1, 1))
+
+           return (cbind(U, T1, T2, T3, W))
+
+         },
+
+         # cas_gv_3_1 ----------------------------------------------------------
+
+         'cas_gv_3_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T1, T2, T3),
+                       b0 = b0,
+                       b1 = c(1, 1, 1, 1))
+
+           return (cbind(U, T1, T2, T3, W))
+
+         },
+
+         # cas_gv_4 ------------------------------------------------------------
+
+         'cas_gv_4' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T2, T3, T4),
+                       b0 = b0,
+                       b1 = c(1, 1, 1, 1))
+
+           return (cbind(U, T1, T2, T3, T4, W))
+
+         },
+
+         # cas_gv_4_1 ----------------------------------------------------------
+
+         'cas_gv_4_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T1, T2, T3, T4),
+                       b0 = b0,
+                       b1 = c(1, 1, 1, 1, 1))
+
+           return (cbind(U, T1, T2, T3, T4, W))
+
+         },
+
+         # cas_gv_5 ------------------------------------------------------------
+
+         'cas_gv_5' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T4),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T2, T3, T4, T5),
+                       b0 = b0,
+                       b1 = c(1, 1, 1, 1, 1))
+
+           return (cbind(U, T1, T2, T3, T4, T5, W))
+
+         },
+
+         # cas_gv_5_1 ----------------------------------------------------------
+
+         'cas_gv_5_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T4),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T1, T2, T3, T4, T5),
+                       b0 = b0,
+                       b1 = c(1, 1, 1, 1, 1, 1))
+
+           return (cbind(U, T1, T2, T3, T4, T5, W))
+
+         },
+
+         # ffl_gv_3 ------------------------------------------------------------
+
+         'ffl_gv_3' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 =   b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T2, T3),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, W))
+
+         },
+
+         # ffl_gv_3_1 ----------------------------------------------------------
+
+         'ffl_gv_3_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 =   b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T1, T2, T3),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, W))
+
+         },
+
+         # ffl_gv_4 ------------------------------------------------------------
+
+         'ffl_gv_4' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 =   b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T2, T3, T4),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, W))
+
+         },
+
+         # ffl_gv_4_1 ----------------------------------------------------------
+
+         'ffl_gv_4_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 =   b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T1, T2, T3, T4),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, W))
+
+         },
+
+         # ffl_gv_5 ------------------------------------------------------------
+
+         'ffl_gv_5' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T4),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T1, T2, T3, T4, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, W))
+
+         },
+
+         # ffl_gv_5_1 ----------------------------------------------------------
+
+         'ffl_gv_5_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T4),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T1, T2, T3, T4, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, W))
+
+         },
+
          # layer ---------------------------------------------------------------
 
          'layer' = {
@@ -1856,6 +2364,8 @@ simdata <- function (b0 = 0,
            return (cbind(U, T1, T2, T3, T4, T5, T6, T7))
 
          },
+
+
 
          # layer_cph_3 ---------------------------------------------------------
 
@@ -1970,6 +2480,270 @@ simdata <- function (b0 = 0,
                        b1 = c(ss, ss, ss, ss))
 
            return (cbind(U, T1, T2, T3, T4, T5, T6, T7, W))
+
+         },
+
+         # layer_cph_4_0 -------------------------------------------------------
+
+         'layer_cph_4_0' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1, T2),
+                       b0 = b0,
+                       b1 = c(ss, ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T2),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T4, T6, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, T7, W))
+
+         },
+
+         # layer_cph_4_1 -------------------------------------------------------
+
+         'layer_cph_4_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T3, T5, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T3, T4, T5, T7, W))
+
+         },
+
+         # layer_cph_4_2 -------------------------------------------------------
+
+         'layer_cph_4_2' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T3, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss))
+
+           return (cbind(U, T1, T3, T4, T5, T7, W))
+
+         },
+
+         # layer_cph_4_3 -------------------------------------------------------
+
+         'layer_cph_4_3' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T3, T5, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T3, T5, T7, W))
+
+         },
+
+         # layer_cph_4_4 -------------------------------------------------------
+
+         'layer_cph_4_4' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T3, T5),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss))
+
+           return (cbind(U, T1, T3, T5, T7, W))
+
+         },
+
+         # layer_cph_4_5 -------------------------------------------------------
+
+         'layer_cph_4_5' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T7 <- cNorm(N = N,
+                       parentData = list(T3),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(U, T3, T1, T7),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss))
+
+           return (cbind(U, T1, T3, T7, W))
 
          },
 
@@ -2229,6 +3003,110 @@ simdata <- function (b0 = 0,
                        b1 = c(ss, ss, ss, ss))
 
            return (cbind(U, T1, T2, T3, T4, T5, W))
+
+         },
+
+         # star_cph_3 ----------------------------------------------------------
+
+         'star_cph_3' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T2, T3, T4, T5, T6),
+                       b0 = b0,
+                       b1 = c(ss, ss, ss, ss, ss))
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, W))
+
+         },
+
+         # star_cph_3_1 --------------------------------------------------------
+
+         'star_cph_3_1' = {
+
+           U <- sMulti(N = N,
+                       q = q)
+
+           T1 <- cNorm(N = N,
+                       parentData = list(U),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T2 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T3 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T4 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T5 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           T6 <- cNorm(N = N,
+                       parentData = list(T1),
+                       b0 = b0,
+                       b1 = c(ss),
+                       s = s)
+
+           W <- cBinom(N = N,
+                       parentData = list(T2, T3, T4, T5, T6),
+                       b0 = b0,
+                       b1 = c(1, 1, 1, 1, 1))
+
+           return (cbind(U, T1, T2, T3, T4, T5, T6, W))
 
          })
 

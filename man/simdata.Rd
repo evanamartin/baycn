@@ -5,11 +5,11 @@
 \title{simdata}
 \usage{
 simdata(
-  b0 = 0,
-  N = 500,
-  s = 1,
-  ss = 1,
   graph = "gn4",
+  N = 500,
+  b0 = 0,
+  ss = 1,
+  s = 1,
   p = 0.6,
   q = 0.45,
   ssc = 0.2,
@@ -17,18 +17,6 @@ simdata(
 )
 }
 \arguments{
-\item{b0}{The mean of the variable if it does not have any parents. If the
-variable has one or more parents it is the slope in the linear model that is
-the mean of the normally distributed variables.}
-
-\item{N}{The number of observations to simulate.}
-
-\item{s}{The standard deviation of the normal distribution.}
-
-\item{ss}{The coefficient of the parent nodes (if there are any) in the
-linear model that is the mean of the normally distributed variables. This
-coefficient is referred to as the signal strength.}
-
 \item{graph}{A character string of the graph for which data will be
 simulated. The graphs that can be chosen are m1_ge, m1_gv, m1_cp, m1_cc,
 m1_iv, m2_ge, m2_gv, m2_cp, m2_cc, m2_iv, m3_gv, m3_cp, m3_cc, m3_iv, mp_ge,
@@ -131,6 +119,18 @@ PMR and is made up of multiple M1 topologies.
 \if{html}{\figure{star.png}{options: width="25\%" alt="Figure: star.png"}}
 \if{latex}{\figure{star.pdf}{options: width=2.5cm}}}
 
+\item{N}{The number of observations to simulate.}
+
+\item{b0}{The mean of the variable if it does not have any parents. If the
+variable has one or more parents it is the slope in the linear model that is
+the mean of the normally distributed variables.}
+
+\item{ss}{The coefficient of the parent nodes (if there are any) in the
+linear model that is the mean of the normally distributed variables. This
+coefficient is referred to as the signal strength.}
+
+\item{s}{The standard deviation of the normal distribution.}
+
 \item{p}{The probability of success for a binomial random variable.}
 
 \item{q}{The frequency of the reference allele.}
@@ -149,21 +149,21 @@ mixed data.
 }
 \examples{
 # Generate data under topology GN4.
-data_gn4 <- simdata(b0 = 1,
+data_gn4 <- simdata(graph = 'gn4',
                     N = 500,
-                    s = 1,
-                    graph = 'gn4',
-                    ss = 1)
+                    b0 = 1,
+                    ss = 1,
+                    s = 1)
 
 # Display the first few rows of the data.
 data_gn4[1:5, ]
 
 # Generate data under topology M1 with 3 intermediate confounding variables.
-data_m1_iv <- simdata(b0 = 0,
+data_m1_iv <- simdata(graph = 'm1_iv',
                       N = 500,
-                      s = 1,
-                      graph = 'm1_iv',
+                      b0 = 0,
                       ss = 1,
+                      s = 1,
                       q = 0.1,
                       ssc = 0.2,
                       nConfounding = 3)
