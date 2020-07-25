@@ -14,15 +14,12 @@
 #' contain the clinical phenotype data.
 #'
 #' @param adjMatrix An adjacency matrix indicating the edges that will be
-#' considered by the Metropolis-Hastings algorithm. This can be the output from
-#' another algorithm (e.g., PC). An adjacency matrix is a matrix of zeros and
-#' ones. The ones represent an edge and its direction between two nodes.
+#' considered by the Metropolis-Hastings algorithm. An adjacency matrix is a
+#' matrix of zeros and ones. The ones represent an edge and its direction
+#' between two nodes.
 #'
-#' @param burnIn A number between 0 and 1 indicating the percentage of the
-#' sample that will be discarded.
-#'
-#' @param iterations An integer for the number of iterations to run the MH
-#' algorithm.
+#' @param prior A vector containing the prior probability for the three edge
+#' states.
 #'
 #' @param nCPh The number of clinical phenotypes in the graph.
 #'
@@ -33,13 +30,17 @@
 #' edge pointing from a gene expression or a clinical phenotype node to a
 #' genetic variant node.
 #'
-#' @param prior A vector containing the prior probability for the three edge
-#' states.
+#' @param burnIn A number between 0 and 1 indicating the percentage of the
+#' sample that will be discarded.
 #'
-#' @param progress Logical. If TRUE a progress bar will be printed.
+#' @param iterations An integer for the number of iterations to run the MH
+#' algorithm.
 #'
 #' @param thinTo An integer indicating the number of observations the chain
 #' should be thinned to.
+#'
+#' @param progress Logical. If TRUE the runtime in seconds for the cycle finder
+#' and log likelihood functions and a progress bar will be printed.
 #'
 #' @return An object of class baycn containing 9 elements:
 #'
@@ -103,16 +104,16 @@
 #' # Principle of Mendelian Randomization (PMR) and the true edges as the input.
 #' mh_m1_pmr <- mhEdge(data = data_m1,
 #'                     adjMatrix = am_m1,
-#'                     burnIn = 0.2,
-#'                     iterations = 1000,
-#'                     nCPh = 0,
-#'                     nGV = 1,
-#'                     pmr = TRUE,
 #'                     prior = c(0.05,
 #'                               0.05,
 #'                               0.9),
-#'                     progress = FALSE,
-#'                     thinTo = 200)
+#'                     nCPh = 0,
+#'                     nGV = 1,
+#'                     pmr = TRUE,
+#'                     burnIn = 0.2,
+#'                     iterations = 1000,
+#'                     thinTo = 200,
+#'                     progress = FALSE)
 #'
 #' summary(mh_m1_pmr)
 #'
@@ -136,16 +137,16 @@
 #' # edges as the input.
 #' mh_gn4 <- mhEdge(data = data_gn4,
 #'                  adjMatrix = am_gn4,
-#'                  burnIn = 0.2,
-#'                  iterations = 1000,
-#'                  nCPh = 0,
-#'                  nGV = 0,
-#'                  pmr = FALSE,
 #'                  prior = c(0.05,
 #'                            0.05,
 #'                            0.9),
-#'                  progress = FALSE,
-#'                  thinTo = 200)
+#'                  nCPh = 0,
+#'                  nGV = 0,
+#'                  pmr = FALSE,
+#'                  burnIn = 0.2,
+#'                  iterations = 1000,
+#'                  thinTo = 200,
+#'                  progress = FALSE)
 #'
 #' summary(mh_gn4)
 #'
@@ -153,16 +154,16 @@
 #'
 mhEdge <- function (data,
                     adjMatrix,
-                    burnIn = 0.2,
-                    iterations = 1000,
-                    nCPh = 0,
-                    nGV = 0,
-                    pmr = FALSE,
                     prior = c(0.05,
                               0.05,
                               0.9),
-                    progress = TRUE,
-                    thinTo = 200) {
+                    nCPh = 0,
+                    nGV = 0,
+                    pmr = FALSE,
+                    burnIn = 0.2,
+                    iterations = 1000,
+                    thinTo = 200,
+                    progress = TRUE) {
 
   # Preprocessing checks -------------------------------------------------------
 
@@ -270,6 +271,15 @@ mhEdge <- function (data,
                   iterations = iterations,
                   thinTo = thinTo)
 
+  # Display runtime message for finding potential cycles.
+  if (progress) {
+
+    cat('Identifying potential cycles: ')
+
+    begin_time <- Sys.time()
+
+  }
+
   # Check for potential cycles in the graph and return the edge directions, edge
   # numbers, and the decimal numbers for each cycle if any exist.
   cf <- cycleFndr(adjMatrix = adjMatrix,
@@ -278,6 +288,16 @@ mhEdge <- function (data,
                   nGV = nGV,
                   pmr = pmr,
                   position = coord)
+
+  # Display runtime message for finding potential cycles.
+  if (progress) {
+
+    end_time <- Sys.time()
+
+    cat(as.double(round(end_time - begin_time, 3),
+                  units = 'secs'), 'seconds', '\n')
+
+  }
 
   # Initialize vectors, lists, and matrices ------------------------------------
 
@@ -302,16 +322,14 @@ mhEdge <- function (data,
   currentLL <- vector(mode = 'numeric',
                       length = nNodes)
 
-  # Create the likelihood dictionary -------------------------------------------
+  # Create the likelihood environment ------------------------------------------
 
   # Create a new environment that has the log likelihood for all possible parent
   # combinations for each node. (LOG Likelihood Environment)
-  logle <- lookUp(data = data,
-                  adjMatrix = adjMatrix,
-                  nCPh = nCPh,
-                  nGV = nGV,
-                  nNodes = nNodes,
-                  pmr = pmr)
+  logle <- logLikEnv(data = data,
+                     nCPh = nCPh,
+                     nGV = nGV,
+                     nNodes = nNodes)
 
   # Generate a starting graph --------------------------------------------------
 
@@ -353,9 +371,12 @@ mhEdge <- function (data,
                            nNodes = nNodes)
 
   # Look up the log likelihood for each node.
-  currentLL <- lull(am = currentAM,
+  currentLL <- lull(data = data,
+                    am = currentAM,
                     likelihood = currentLL,
                     llenv = logle,
+                    nCPh = nCPh,
+                    nGV = nGV,
                     nNodes = nNodes,
                     wNodes = 1:nNodes)
 
@@ -368,7 +389,7 @@ mhEdge <- function (data,
   # Start the Metropolis-Hastings algorithm ------------------------------------
 
   # Create progress bar.
-  if (progress == TRUE) {
+  if (progress) {
 
     pb <- txtProgressBar(min = 0, max = iterations, style = 3)
 
@@ -415,9 +436,12 @@ mhEdge <- function (data,
                             wEdges = difference$dEdges)
 
     # Look up the log likelihood for each node whose parents have changed.
-    proposedLL <- lull(am = proposedAM,
+    proposedLL <- lull(data = data,
+                       am = proposedAM,
                        likelihood = currentLL,
                        llenv = logle,
+                       nCPh = nCPh,
+                       nGV = nGV,
                        nNodes = nNodes,
                        wNodes = difference$dNodes)
 
@@ -461,7 +485,7 @@ mhEdge <- function (data,
     }
 
     # Update progress bar.
-    if (progress == TRUE) {
+    if (progress) {
 
       setTxtProgressBar(pb, e)
 
@@ -470,7 +494,7 @@ mhEdge <- function (data,
   }
 
   # Close the progress bar.
-  if (progress == TRUE) {
+  if (progress) {
 
     close(pb)
 

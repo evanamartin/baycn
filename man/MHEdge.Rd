@@ -7,14 +7,14 @@
 mhEdge(
   data,
   adjMatrix,
-  burnIn = 0.2,
-  iterations = 1000,
+  prior = c(0.05, 0.05, 0.9),
   nCPh = 0,
   nGV = 0,
   pmr = FALSE,
-  prior = c(0.05, 0.05, 0.9),
-  progress = TRUE,
-  thinTo = 200
+  burnIn = 0.2,
+  iterations = 1000,
+  thinTo = 200,
+  progress = TRUE
 )
 }
 \arguments{
@@ -29,15 +29,12 @@ three columns will contain the gene expression data, and the last column will
 contain the clinical phenotype data.}
 
 \item{adjMatrix}{An adjacency matrix indicating the edges that will be
-considered by the Metropolis-Hastings algorithm. This can be the output from
-another algorithm (e.g., PC). An adjacency matrix is a matrix of zeros and
-ones. The ones represent an edge and its direction between two nodes.}
+considered by the Metropolis-Hastings algorithm. An adjacency matrix is a
+matrix of zeros and ones. The ones represent an edge and its direction
+between two nodes.}
 
-\item{burnIn}{A number between 0 and 1 indicating the percentage of the
-sample that will be discarded.}
-
-\item{iterations}{An integer for the number of iterations to run the MH
-algorithm.}
+\item{prior}{A vector containing the prior probability for the three edge
+states.}
 
 \item{nCPh}{The number of clinical phenotypes in the graph.}
 
@@ -48,13 +45,17 @@ Principle of Mendelian Randomization (PMR). This prevents the direction of an
 edge pointing from a gene expression or a clinical phenotype node to a
 genetic variant node.}
 
-\item{prior}{A vector containing the prior probability for the three edge
-states.}
+\item{burnIn}{A number between 0 and 1 indicating the percentage of the
+sample that will be discarded.}
 
-\item{progress}{Logical. If TRUE a progress bar will be printed.}
+\item{iterations}{An integer for the number of iterations to run the MH
+algorithm.}
 
 \item{thinTo}{An integer indicating the number of observations the chain
 should be thinned to.}
+
+\item{progress}{Logical. If TRUE the runtime in seconds for the cycle finder
+and log likelihood functions and a progress bar will be printed.}
 }
 \value{
 An object of class baycn containing 9 elements:
@@ -113,16 +114,16 @@ am_m1 <- matrix(c(0, 1, 0,
 # Principle of Mendelian Randomization (PMR) and the true edges as the input.
 mh_m1_pmr <- mhEdge(data = data_m1,
                     adjMatrix = am_m1,
-                    burnIn = 0.2,
-                    iterations = 1000,
-                    nCPh = 0,
-                    nGV = 1,
-                    pmr = TRUE,
                     prior = c(0.05,
                               0.05,
                               0.9),
-                    progress = FALSE,
-                    thinTo = 200)
+                    nCPh = 0,
+                    nGV = 1,
+                    pmr = TRUE,
+                    burnIn = 0.2,
+                    iterations = 1000,
+                    thinTo = 200,
+                    progress = FALSE)
 
 summary(mh_m1_pmr)
 
@@ -146,16 +147,16 @@ am_gn4 <- matrix(c(0, 1, 1, 0,
 # edges as the input.
 mh_gn4 <- mhEdge(data = data_gn4,
                  adjMatrix = am_gn4,
-                 burnIn = 0.2,
-                 iterations = 1000,
-                 nCPh = 0,
-                 nGV = 0,
-                 pmr = FALSE,
                  prior = c(0.05,
                            0.05,
                            0.9),
-                 progress = FALSE,
-                 thinTo = 200)
+                 nCPh = 0,
+                 nGV = 0,
+                 pmr = FALSE,
+                 burnIn = 0.2,
+                 iterations = 1000,
+                 thinTo = 200,
+                 progress = FALSE)
 
 summary(mh_gn4)
 

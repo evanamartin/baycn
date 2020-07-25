@@ -29,6 +29,7 @@ test_that('the likelihood functions calculate the log likelihood correctly',{
 
   # Adjacency matrices ---------------------------------------------------------
 
+  # True adjacency matrix for GN4.
   am_gn4 <- matrix(c(0, 1, 1, 0,
                      0, 0, 0, 1,
                      0, 0, 0, 0,
@@ -36,14 +37,14 @@ test_that('the likelihood functions calculate the log likelihood correctly',{
                    byrow = TRUE,
                    nrow = 4)
 
-  diag(am_gn4) <- 0
+  # True adjacency matrix for M2.
+  am_m2 <- matrix(c(0, 1, 0,
+                    0, 0, 0,
+                    0, 1, 0),
+                  byrow = TRUE,
+                  nrow = 3)
 
-  am_m2 <- matrix(1,
-                  nrow = 3,
-                  ncol = 3)
-
-  diag(am_m2) <- 0
-
+  # True adjacency matrix for M1 with a clinical phenotype node.
   am_m1_cph <- matrix(c(0, 1, 0, 0,
                         0, 0, 1, 1,
                         0, 0, 0, 0,
@@ -51,54 +52,60 @@ test_that('the likelihood functions calculate the log likelihood correctly',{
                       byrow = TRUE,
                       nrow = 4)
 
+  # Create the likelihood environments -----------------------------------------
+
+  logle_gn4 <- logLikEnv(data = data_gn4,
+                         nCPh = 0,
+                         nGV = 0,
+                         nNodes = 4)
+
+  logle_m2_gv <- logLikEnv(data = data_m2_gv,
+                           nCPh = 0,
+                           nGV = 1,
+                           nNodes = 3)
+
+  logle_m1_cph <- logLikEnv(data = data_m1_cph,
+                            nCPh = 1,
+                            nGV = 1,
+                            nNodes = 4)
+
   # Calculate the log likelihood for gn4 ---------------------------------------
 
-  ll_gn4 <- lookUp(data = data_gn4,
-                   adjMatrix = am_gn4,
-                   nCPh = 0,
-                   nGV = 0,
-                   nNodes = 4,
-                   pmr = FALSE)
+  ll_gn4 <- lull(data = data_gn4,
+                 am = am_gn4,
+                 likelihood = vector(length = 4),
+                 llenv = logle_gn4,
+                 nCPh = 0,
+                 nGV = 0,
+                 nNodes = 4,
+                 wNodes = 1:4)
 
-  # Log likelihood for the true graph.
-  ll_tg_gn4 <- sum(ll_gn4$node1$dn0,
-                   ll_gn4$node2$dn1,
-                   ll_gn4$node3$dn9,
-                   ll_gn4$node4$dn2)
-
-  expect_equal(round(ll_tg_gn4, 3), -1121.318)
+  expect_equal(round(sum(ll_gn4), 3), -1121.318)
 
   # Calculate the log likelihood for m2_gv -------------------------------------
 
-  ll_m2_gv <- lookUp(data = data_m2_gv,
-                     adjMatrix = am_m2,
-                     nCPh = 0,
-                     nGV = 1,
-                     nNodes = 3,
-                     pmr = TRUE)
+  ll_m2_gv <- lull(data = data_m2_gv,
+                   am = am_m2,
+                   likelihood = vector(length = 3),
+                   llenv = logle_m2_gv,
+                   nCPh = 0,
+                   nGV = 1,
+                   nNodes = 3,
+                   wNodes = 1:3)
 
-  # Log likelihood for the true graph.
-  ll_tg_m2_gv <- sum(ll_m2_gv$node1$dn0,
-                     ll_m2_gv$node2$dn5,
-                     ll_m2_gv$node3$dn0)
-
-  expect_equal(round(ll_tg_m2_gv, 3), -774.512)
+  expect_equal(round(sum(ll_m2_gv), 3), -774.512)
 
   # Calculate the log likelihood for m1_cph ------------------------------------
 
-  ll_m1_cph <- lookUp(data = data_m1_cph,
-                      adjMatrix = am_m1_cph,
-                      nCPh = 1,
-                      nGV = 1,
-                      nNodes = 4,
-                      pmr = TRUE)
+  ll_m1_cph <- lull(data = data_m1_cph,
+                    am = am_m1_cph,
+                    likelihood = vector(length = 4),
+                    llenv = logle_m1_cph,
+                    nCPh = 1,
+                    nGV = 1,
+                    nNodes = 4,
+                    wNodes = 1:4)
 
-  # Log likelihood for the true graph.
-  ll_tg_m1_cph <- sum(ll_m1_cph$node1$dn0,
-                      ll_m1_cph$node2$dn1,
-                      ll_m1_cph$node3$dn2,
-                      ll_m1_cph$node4$dn2)
-
-  expect_equal(round(ll_tg_m1_cph, 3), -874.837)
+  expect_equal(round(sum(ll_m1_cph), 3), -874.837)
 
 })
