@@ -944,6 +944,55 @@ cycleEID <- function (cCoord,
 
 }
 
+# cycleEID_alter
+#
+# Extracts the edge index of each edge in the graph.
+#
+# This is a parallelized version of the cycleEID function
+#
+# @param cCoord A list containing the coordinates in the adjacency matrix of
+# the nodes that could form a cycle.
+#
+# @param position A matrix of row and column indices for each edge in a cycle.
+# This is the output from the coordiantes function.
+#
+# @param threads An integer specifying the number of threads to use. Default is 1
+#
+# @return A list containing the edge indices for the edges that could form a
+# directed cycle for each cycle in the graph.
+#
+cycleEID_alter <- function (cCoord, position, threads = 1) {
+    m <- dim(position)[2]
+    ncs <- length(cCoord)
+    
+    cl <- makeCluster(threads)
+    registerDoParallel(cl)
+    
+    # Loop through each of the cycle sizes as the original function but over multiple clusters
+    edgeID <- foreach(e = 1:ncs) %dopar% {
+        nCycles <- length(cCoord[[e]])
+        nEdges <- dim(cCoord[[e]][[1]])[1]
+        edgeID <- matrix(1,
+                        nrow = nCycles,
+                        ncol = nEdges)
+        for (v in 1:nCycles) {
+          for (a in 1:nEdges) {
+
+            for (n in 1:m) {
+              if (setequal(position[, n], cCoord[[e]][[v]][a, ])) {
+                edgeID[v, a] <- n
+                break
+              }
+            }
+          }
+        }
+        edgeID
+    }
+
+    stopCluster(cl)
+  return (edgeID)
+}
+
 # cycleUES
 #
 # Extracts the unique edge states for each cycle.
@@ -1062,6 +1111,44 @@ cycleCG <- function (currentES,
 
 }
 
+# cycleCG_alter
+#
+# Takes the edge states from the current graph and fills a matrix for each
+# potential directed cycle with them.
+#
+# The same function as `cycleCG` but without the for loop 
+#
+# @param currentES A vector of edge states for the current graph
+#
+# @param edgeID A list of edge indices for all possible directed cycles.
+#
+# @param nCycles An integer for the number of cycles in the graph.
+#
+# @param nEdges An integer for the number of edges in the graph.
+#
+# @return A matrix of current edge states across the rows and potential directed
+# cycles down the columns.
+#
+cycleCG_alter <- function (currentES,
+                     edgeID,
+                     nCycles,
+                     nEdges) {
+
+  # Create a matrix that will be filled with the current edge states for all
+  # possible directed cycles.
+  blight <- matrix(9,
+                   nrow = nCycles,
+                   ncol = nEdges)
+
+  rows <- rep(1:nCycles, times = sapply(edgeID, length))
+  cols <- unlist(edgeID)
+  # Fill in the edges that could form a cycle with the current edge states.
+  blight[cbind(rows, cols)] <- currentES[cols]
+
+  return (blight)
+
+}
+
 # cycleLen
 #
 # Calculates the number of cycles in the edgeID list.
@@ -1150,6 +1237,97 @@ cycleFC <- function (SaL) {
 
 }
 
+# cycleFC_alter
+#
+# Takes a fully connected SaL matrix and finds all possible cycles with
+# 3, 4, 5, ... nodes .
+#
+# Functions the same as cycleFC but is parallelized to use multiple threads
+#
+# @param SaL A binary matrix containing the nodes that could potentially form a
+# directed cycle.
+#
+# @param threads An integer specifying the number of threads to use. Default is 1
+#
+# @return A list of all possible cycles with 3, 4, 5, ... nodes
+#
+#' @importFrom utils combn
+#'
+cycleFC_alter <- function (SaL, threads = 1) {
+    # Setting up the cluster for the `foreach` loop
+    num_cores <- detectCores() - 1
+    cl <- makeCluster(threads)
+    registerDoParallel(cl)
+    nCS <- length(3:dim(SaL)[1])
+
+    results <- foreach(e = 1:nCS, .packages = "gtools") %dopar% {
+
+      # This is the permutate function from below. Need to redefine this function in 
+      # the foreach loop as it does not exist in the cluster namespace
+      #
+      # permutes the node indices of the nodes that can form a cycle - after removing
+      # the first node in the vector.
+      #
+      # @param combs A matrix of combinations of nodes that can form a cycle.
+      #
+      # @return A matrix of permutations of nodes that can form a cycle.
+      #
+      #' @importFrom gtools permutations
+      #'
+      permutate <- function (combs) {
+
+        # Store the number of rows and columns for the cmbntns matrix.
+        nRows <- dim(combs)[1]
+        nColumns <- dim(combs)[2]
+
+        # Create a list for the permutations of each combination in the cmbtns
+        # matrix.
+        prmttns <- vector(mode = 'list',
+                          length = nRows)
+
+        # Go through each combination of nodes and choose the first node in the
+        # row and permute the remaining nodes.
+        for (v in 1:nRows) {
+
+          # Fill in the prmttns matrix with the index of the node that appears
+          # in the first column.
+          prmttns[[v]] <- matrix(combs[v, 1],
+                                 nrow = factorial(nColumns - 1),
+                                 ncol = nColumns + 1)
+
+          # Permute the remaining nodes in the cycle.
+          prmttns[[v]][, 2:nColumns] <- permutations(n = nColumns - 1,
+                                                     r = nColumns - 1,
+                                                     v = combs[v, 2:nColumns])
+
+        }
+
+        # Combine all of the matrices into one matrix for the current cycle size.
+        return (do.call(rbind, prmttns))
+
+      }
+
+      # Find all of the combinations for the current cycle size.
+      cmbntns <- t(combn(as.numeric(rownames(SaL)), (e + 2)))
+
+      # Permute the nodes in each row of the cmbntns matrix
+      cycles_e <- permutate(combs = cmbntns)
+
+      # Extract the number of cycles for the current cycle size.
+      nCycles_e <- dim(cycles_e)[1]
+
+      list(cycles = cycles_e, nCycles = nCycles_e)
+    }
+
+    stopCluster(cl)
+
+    # Separate the results back into your original list structures
+    cycles <- lapply(results, `[[`, "cycles")
+    nCycles <- lapply(results, `[[`, "nCycles")
+    return (list(nBranches = sum(unlist(nCycles)),
+                   tBranches = cycles))
+}
+
 # permutate
 #
 # permutes the node indices of the nodes that can form a cycle - after removing
@@ -1194,35 +1372,40 @@ permutate <- function (combs) {
 
 }
 
-# cycleFndr
-#
-# Carries out all the steps to find directed cycles
-#
-# @param adjMatrix The adjacency matrix of the graph.
-#
-# @param nCPh The number of clinical phenotypes in the graph.
-#
-# @param nGV An integer. The number of genetic variants in the graph.
-#
-# @param nEdges An integer. The number of edges in the graph.
-#
-# @param pmr Logical. If TRUE the principle of Mendelian randomization will be
-# used. This restrics any genetic variant node from being the child of a gene
-# expression node (when pmr = TRUE).
-#
-# @param position A matrix of row and column indices for each edge in a cycle.
-# This is the output from the coordiantes function.
-#
-# @return A list containing the unique decimal numbers for the cycles in the
-# graph and the indices of each edge in every cycle. If there are no cycles
-# in the graph the function returns NULL.
-#
+#' cycleFndr
+#'
+#' Carries out all the steps to find directed cycles
+#'
+#' @param adjMatrix The adjacency matrix of the graph.
+#'
+#' @param nCPh The number of clinical phenotypes in the graph.
+#'
+#' @param nGV An integer. The number of genetic variants in the graph.
+#'
+#' @param nEdges An integer. The number of edges in the graph.
+#'
+#' @param pmr Logical. If TRUE the principle of Mendelian randomization will be
+#' used. This restrics any genetic variant node from being the child of a gene
+#' expression node (when pmr = TRUE).
+#'
+#' @param position A matrix of row and column indices for each edge in a cycle.
+#' This is the output from the coordiantes function.
+#'
+#' @param threads An integer specifying the number of threads to use. Default is 1
+#'
+#' @return A list containing the unique decimal numbers for the cycles in the
+#' graph and the indices of each edge in every cycle. If there are no cycles
+#' in the graph the function returns NULL.
+#'
+#' @export
+#'
 cycleFndr <- function (adjMatrix,
                        nCPh,
                        nGV,
                        nEdges,
                        pmr,
-                       position) {
+                       position,
+                       threads = 1) {
 
   # Check for potential cycles in the graph.
   SaL <- cycleSaL(adjMatrix = adjMatrix,
@@ -1243,7 +1426,11 @@ cycleFndr <- function (adjMatrix,
   if (sum(SaL) == dim(SaL)[1]^2 - dim(SaL)[1]) {
 
     # Find all possible cycles with three or more nodes.
-    trimmedB <- cycleFC(SaL = SaL)
+    if (threads > 1) {
+      trimmedB <- cycleFC_alter(SaL = SaL, threads = threads)
+    } else {
+      trimmedB <- cycleFC(SaL = SaL)
+    }
 
     # If the SaL matrix is not fully connected build a tree as deep as possible
     # from the SaL matrix.
@@ -1278,10 +1465,16 @@ cycleFndr <- function (adjMatrix,
   }
 
   # Extract the indicies of the edges that form each cycle.
-  edgeID <- cycleEID(cCoord = ced$cCoord,
+  if (threads > 1) {
+    edgeID <- cycleEID_alter(cCoord = ced$cCoord,
+                             position = position,
+                             threads = threads)
+  } else {
+    edgeID <- cycleEID(cCoord = ced$cCoord,
                      position = position)
+  }
 
-  # Convert the list of cycles to a matrix and remove repeated cycles.
+    # Convert the list of cycles to a matrix and remove repeated cycles.
   uCycles <- cycleUES(edgeDir = ced$edgeDir,
                       edgeID = edgeID,
                       nEdges = nEdges)
@@ -1335,7 +1528,7 @@ cycleRmvr <- function (cycles,
                        prior) {
 
   # Get the edge states from the current graph for each potential cycle.
-  currentC <- cycleCG(currentES = currentES,
+  currentC <- cycleCG_alter(currentES = currentES,
                       edgeID = edgeID,
                       nCycles = nCycles,
                       nEdges = nEdges)
@@ -1396,7 +1589,7 @@ cycleRmvr <- function (cycles,
     }
 
     # Get the edge states from the current graph for each potential cycle.
-    currentC <- cycleCG(currentES = currentES,
+    currentC <- cycleCG_alter(currentES = currentES,
                         edgeID = edgeID,
                         nCycles = nCycles,
                         nEdges = nEdges)
@@ -1409,3 +1602,4 @@ cycleRmvr <- function (cycles,
   return (currentES)
 
 }
+

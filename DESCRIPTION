@@ -23,6 +23,9 @@ Imports:
   gtools,
   igraph,
   MASS,
-  methods
+  methods,
+  parallel,
+  foreach,
+  doParallel
 RoxygenNote: 7.1.1
 Suggests: testthat

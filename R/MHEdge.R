@@ -42,6 +42,15 @@
 #' @param progress Logical. If TRUE the runtime in seconds for the cycle finder
 #' and log likelihood functions and a progress bar will be printed.
 #'
+#' @param threads An integer specifying the number of threads to use for finding 
+#' cycles. Default is 1
+#'
+#' @param inpCf A list containing the unique decimal numbers for the cycles in 
+#' the graph and the indices of each edge in every cycle. This argument is for 
+#' the output of the `cycleFndr` function. If there are no cycles in the graph 
+#' enter NULL. This is an optional value. Default value is "none". In the case of "none"
+#' this function will run `cycleFndr` to find cycles in the graph.
+#'
 #' @return An object of class baycn containing 9 elements:
 #'
 #' \itemize{
@@ -149,6 +158,43 @@
 #'                  progress = FALSE)
 #'
 #' summary(mh_gn4)
+#' 
+#' # An alternative way to run the above function
+#' \dontrun{
+#'   # Get the coordinates of the non zero elements in the adjacency matrix.
+#'   coord <- coordinates(adjMatrix = am_gn4)
+#'  
+#'   # Determine the number of edges in the network.
+#'   nEdges <- dim(coord)[2]
+#'   
+#'   # Get the potential cycles in the adjacency matrix.
+#'   cf <- cycleFndr(adjMatrix = am_gn4,
+#'                   nEdges = nEdges,
+#'                   nCPh = 0,
+#'                   nGV - 0,
+#'                   pmr = FALSE,
+#'                   position = coord,
+#'                   threads = 4)
+#'                   
+#'   # Run `mhEdge` with the `cf` generated above.
+#'   # Useful with having to run `mhEdge` multiple times with the same 
+#'   # adjacency matrix
+#'   mh_gn4 <- mhEdge(data = data_gn4,
+#'                    adjMatrix = am_gn4,
+#'                    prior = c(0.05,
+#'                              0.05,
+#'                              0.9),
+#'                    nCPh = 0,
+#'                    nGV = 0,
+#'                    pmr = FALSE,
+#'                    burnIn = 0.2,
+#'                    iterations = 1000,
+#'                    thinTo = 200,
+#'                    progress = FALSE,
+#'                    inpCf = cf)
+#'  
+#'   summary(mh_gn4)
+#' }
 #'
 #' @export
 #'
@@ -163,7 +209,9 @@ mhEdge <- function (data,
                     burnIn = 0.2,
                     iterations = 1000,
                     thinTo = 200,
-                    progress = TRUE) {
+                    progress = TRUE,
+                    inpCf = "none",
+                    threads = 1) {
 
   # Preprocessing checks -------------------------------------------------------
 
@@ -280,14 +328,31 @@ mhEdge <- function (data,
 
   }
 
-  # Check for potential cycles in the graph and return the edge directions, edge
-  # numbers, and the decimal numbers for each cycle if any exist.
-  cf <- cycleFndr(adjMatrix = adjMatrix,
-                  nEdges = nEdges,
-                  nCPh = nCPh,
-                  nGV = nGV,
-                  pmr = pmr,
-                  position = coord)
+  # Check if potential cycles have already been given in the input. 
+  # If not, run `cycleFndr`. There is minimal verification that any input 
+  # outside of "none" will be a proper output from `cycleFndr`
+  if (typeof(inpCf) == "character" && inpCf == "none") {
+    # Check for potential cycles in the graph and return the edge directions, edge
+    # numbers, and the decimal numbers for each cycle if any exist.
+    cf <- cycleFndr(adjMatrix = adjMatrix,
+                    nEdges = nEdges,
+                    nCPh = nCPh,
+                    nGV = nGV,
+                    pmr = pmr,
+                    position = coord,
+                    threads = threads)
+  } else if (
+             sum(names(inpCf) == c("cycles", "edgeID", "nCycles")) == 3
+            ) {
+    # Log onto screen that the input cycles is being used
+    if (progress) {
+      cat("(Using the given cycles) ")
+    }
+
+    cf <- inpCf
+  } else {
+    stop ("Invalid inpCf. Make sure this is the output of the `cycleFndr` function.")
+  }
 
   # Display runtime message for finding potential cycles.
   if (progress) {
