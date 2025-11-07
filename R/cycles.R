@@ -1,3 +1,6 @@
+#' @importFrom parallel makeCluster stopCluster
+#' @importFrom doParallel registerDoParallel
+#' 
 # cycleSaL
 #
 # The first step in identifying potential directed cycles in the graph is to
