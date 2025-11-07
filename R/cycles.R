@@ -1,5 +1,6 @@
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach %dopar%
 #' 
 # cycleSaL
 #
@@ -965,34 +966,36 @@ cycleEID <- function (cCoord,
 # directed cycle for each cycle in the graph.
 #
 cycleEID_alter <- function (cCoord, position, threads = 1) {
-    m <- dim(position)[2]
-    ncs <- length(cCoord)
-    
-    cl <- makeCluster(threads)
-    registerDoParallel(cl)
-    
-    # Loop through each of the cycle sizes as the original function but over multiple clusters
-    edgeID <- foreach(e = 1:ncs) %dopar% {
-        nCycles <- length(cCoord[[e]])
-        nEdges <- dim(cCoord[[e]][[1]])[1]
-        edgeID <- matrix(1,
-                        nrow = nCycles,
-                        ncol = nEdges)
-        for (v in 1:nCycles) {
-          for (a in 1:nEdges) {
-
-            for (n in 1:m) {
-              if (setequal(position[, n], cCoord[[e]][[v]][a, ])) {
-                edgeID[v, a] <- n
-                break
-              }
-            }
+  m <- dim(position)[2]
+  ncs <- length(cCoord)
+  
+  cl <- makeCluster(threads)
+  # Ensure cluster is closed even if there's an error
+  on.exit(stopCluster(cl), add = TRUE)
+  
+  registerDoParallel(cl)
+  
+  # Loop through each of the cycle sizes as the original function but over multiple clusters
+  edgeID <- foreach(e = 1:ncs) %dopar% {
+    nCycles <- length(cCoord[[e]])
+    nEdges <- dim(cCoord[[e]][[1]])[1]
+    edgeID <- matrix(1,
+                     nrow = nCycles,
+                     ncol = nEdges)
+    for (v in 1:nCycles) {
+      for (a in 1:nEdges) {
+        for (n in 1:m) {
+          if (setequal(position[, n], cCoord[[e]][[v]][a, ])) {
+            edgeID[v, a] <- n
+            break
           }
         }
-        edgeID
+      }
     }
-
-    stopCluster(cl)
+    edgeID
+  }
+  
+  # stopCluster(cl) is now handled by on.exit()
   return (edgeID)
 }
 
@@ -1257,78 +1260,81 @@ cycleFC <- function (SaL) {
 #' @importFrom utils combn
 #'
 cycleFC_alter <- function (SaL, threads = 1) {
-    # Setting up the cluster for the `foreach` loop
-    num_cores <- detectCores() - 1
-    cl <- makeCluster(threads)
-    registerDoParallel(cl)
-    nCS <- length(3:dim(SaL)[1])
-
-    results <- foreach(e = 1:nCS, .packages = "gtools") %dopar% {
-
-      # This is the permutate function from below. Need to redefine this function in 
-      # the foreach loop as it does not exist in the cluster namespace
-      #
-      # permutes the node indices of the nodes that can form a cycle - after removing
-      # the first node in the vector.
-      #
-      # @param combs A matrix of combinations of nodes that can form a cycle.
-      #
-      # @return A matrix of permutations of nodes that can form a cycle.
-      #
-      #' @importFrom gtools permutations
-      #'
-      permutate <- function (combs) {
-
-        # Store the number of rows and columns for the cmbntns matrix.
-        nRows <- dim(combs)[1]
-        nColumns <- dim(combs)[2]
-
-        # Create a list for the permutations of each combination in the cmbtns
-        # matrix.
-        prmttns <- vector(mode = 'list',
-                          length = nRows)
-
-        # Go through each combination of nodes and choose the first node in the
-        # row and permute the remaining nodes.
-        for (v in 1:nRows) {
-
-          # Fill in the prmttns matrix with the index of the node that appears
-          # in the first column.
-          prmttns[[v]] <- matrix(combs[v, 1],
-                                 nrow = factorial(nColumns - 1),
-                                 ncol = nColumns + 1)
-
-          # Permute the remaining nodes in the cycle.
-          prmttns[[v]][, 2:nColumns] <- permutations(n = nColumns - 1,
-                                                     r = nColumns - 1,
-                                                     v = combs[v, 2:nColumns])
-
-        }
-
-        # Combine all of the matrices into one matrix for the current cycle size.
-        return (do.call(rbind, prmttns))
-
+  # Setting up the cluster for the `foreach` loop
+  num_cores <- detectCores() - 1
+  cl <- makeCluster(threads)
+  # Ensure cluster is closed even if there's an error
+  on.exit(stopCluster(cl), add = TRUE)
+  
+  registerDoParallel(cl)
+  nCS <- length(3:dim(SaL)[1])
+  
+  results <- foreach(e = 1:nCS, .packages = "gtools") %dopar% {
+    
+    # This is the permutate function from below. Need to redefine this function in 
+    # the foreach loop as it does not exist in the cluster namespace
+    #
+    # permutes the node indices of the nodes that can form a cycle - after removing
+    # the first node in the vector.
+    #
+    # @param combs A matrix of combinations of nodes that can form a cycle.
+    #
+    # @return A matrix of permutations of nodes that can form a cycle.
+    #
+    #' @importFrom gtools permutations
+    #'
+    permutate <- function (combs) {
+      
+      # Store the number of rows and columns for the cmbntns matrix.
+      nRows <- dim(combs)[1]
+      nColumns <- dim(combs)[2]
+      
+      # Create a list for the permutations of each combination in the cmbtns
+      # matrix.
+      prmttns <- vector(mode = 'list',
+                        length = nRows)
+      
+      # Go through each combination of nodes and choose the first node in the
+      # row and permute the remaining nodes.
+      for (v in 1:nRows) {
+        
+        # Fill in the prmttns matrix with the index of the node that appears
+        # in the first column.
+        prmttns[[v]] <- matrix(combs[v, 1],
+                               nrow = factorial(nColumns - 1),
+                               ncol = nColumns + 1)
+        
+        # Permute the remaining nodes in the cycle.
+        prmttns[[v]][, 2:nColumns] <- permutations(n = nColumns - 1,
+                                                   r = nColumns - 1,
+                                                   v = combs[v, 2:nColumns])
+        
       }
-
-      # Find all of the combinations for the current cycle size.
-      cmbntns <- t(combn(as.numeric(rownames(SaL)), (e + 2)))
-
-      # Permute the nodes in each row of the cmbntns matrix
-      cycles_e <- permutate(combs = cmbntns)
-
-      # Extract the number of cycles for the current cycle size.
-      nCycles_e <- dim(cycles_e)[1]
-
-      list(cycles = cycles_e, nCycles = nCycles_e)
+      
+      # Combine all of the matrices into one matrix for the current cycle size.
+      return (do.call(rbind, prmttns))
+      
     }
-
-    stopCluster(cl)
-
-    # Separate the results back into your original list structures
-    cycles <- lapply(results, `[[`, "cycles")
-    nCycles <- lapply(results, `[[`, "nCycles")
-    return (list(nBranches = sum(unlist(nCycles)),
-                   tBranches = cycles))
+    
+    # Find all of the combinations for the current cycle size.
+    cmbntns <- t(combn(as.numeric(rownames(SaL)), (e + 2)))
+    
+    # Permute the nodes in each row of the cmbntns matrix
+    cycles_e <- permutate(combs = cmbntns)
+    
+    # Extract the number of cycles for the current cycle size.
+    nCycles_e <- dim(cycles_e)[1]
+    
+    list(cycles = cycles_e, nCycles = nCycles_e)
+  }
+  
+  # stopCluster(cl) is now handled by on.exit()
+  
+  # Separate the results back into your original list structures
+  cycles <- lapply(results, `[[`, "cycles")
+  nCycles <- lapply(results, `[[`, "nCycles")
+  return (list(nBranches = sum(unlist(nCycles)),
+               tBranches = cycles))
 }
 
 # permutate
